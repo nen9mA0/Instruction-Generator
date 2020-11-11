@@ -1,0 +1,4 @@
+datafiles/
+build/
+
+*.pyc
