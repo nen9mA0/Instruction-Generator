@@ -1,0 +1,43 @@
+RUNS	['mm']
+RUNS	['nnn']
+MAKING A DECODE-OPERAND/ENC-ACTION FROM REG0=XED_REG_ST0:rw:IMPL:f80
+MAKING A DECODE-OPERAND/ENC-ACTION FROM MEM0:r:mem32real
+MAKING A DECODE-OPERAND/ENC-ACTION FROM REG1=XED_REG_X87STATUS:w:SUPP
+EXTRA BINDING MOD=mm:SUPP
+EXTRA BINDING RM=nnn:SUPP
+MAKE RULE for ICLASS: FADD
+CONDITIONS:
+	REG0=XED_REG_ST0:rw:f80:IMPL
+	MEM0:r:mem32real
+	REG1=XED_REG_X87STATUS:w:SUPP
+	MOD=mm:SUPP
+	RM=nnn:SUPP
+ACTIONS:
+	    bits 0xd8 (raw 216) length: 8 field_offset: 0
+	 letters field_name: MOD mm length: 2 field_offset: 0
+	      od field_name: MOD != 0x3 (raw 3)
+	    bits field_name: REG 0x0 (raw 0) length: 3 field_offset: 0
+	 letters field_name: RM nnn length: 3 field_offset: 0
+	      nt nt: MODRM
+Making action for blot     bits 0xd8 (raw 216) length: 8 field_offset: 0
+CONVERT 11011000 <--     bits 0xd8 (raw 216) length: 8 field_offset: 0
+Making action for blot  letters field_name: MOD mm length: 2 field_offset: 0
+Making action for blot       od field_name: MOD != 0x3 (raw 3)
+Ignoring OD != relationships in actions:       od field_name: MOD != 0x3 (raw 3)
+Making action for blot     bits field_name: REG 0x0 (raw 0) length: 3 field_offset: 0
+CONVERT 0 <--     bits field_name: REG 0x0 (raw 0) length: 3 field_offset: 0
+Making action for blot  letters field_name: RM nnn length: 3 field_offset: 0
+Making action for blot       nt nt: MODRM
+OPERAND: REG0=XED_REG_ST0:rw:f80:IMPL
+	 MADE CONDITION
+		ANDCOND <pattern_class.condition_t object at 0x0000021DC999AC18>
+OPERAND: MEM0:r:mem32real
+	 MADE CONDITION
+		ANDCOND <pattern_class.condition_t object at 0x0000021DC999ACC0>
+		ANDCOND <pattern_class.condition_t object at 0x0000021DC999ABE0>
+OPERAND: REG1=XED_REG_X87STATUS:w:SUPP
+	 SKIPPING OPERAND in the AND CONDITIONS
+OPERAND: MOD=mm:SUPP
+	 SKIPPING OPERAND in the AND CONDITIONS
+OPERAND: RM=nnn:SUPP
+	 SKIPPING OPERAND in the AND CONDITIONS

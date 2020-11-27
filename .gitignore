@@ -1,4 +1,6 @@
-datafiles/
-build/
+*/*
+
+!myInsGen/encoder/
+
 
 *.pyc
