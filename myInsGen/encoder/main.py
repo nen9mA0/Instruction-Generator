@@ -118,7 +118,7 @@ def GetRegOnly():
 # all_ins = "../../datafiles_test/all-enc-instructions.txt"
 
 save = True
-needreload = False
+needreload = True
 
 if __name__ == "__main__":
     sd = save_data.SaveData(all_ins, pkl_dir, logger)

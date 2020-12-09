@@ -34,6 +34,7 @@ class GeneratorStorage(object):
     def __init__(self):
         self.nts = gs.nts
         self.ntlufs = gs.ntlufs
+        self.seqs = gs.seqs
         self.reg_names = gs.reg_names
         self.iarray = gs.iarray
         self.reg_nt_bind = {}
@@ -159,12 +160,12 @@ class NTContext(object):
 
     def __iter__(self):
         self.length = len(self.contexts)
-        self.i = self.length - 1
+        self.i = self.length-1
         return self
 
     # this iterator can only iterate the nodes which is leaf node. Because leaf node means the lastest context of our execute
     def __next__(self):
-        if len(self.contexts[self.i][1]) == 0:
+        if len(self.contexts[self.i][1]) == 0 and self.i>=0:
             self.current = self.contexts[self.i]
             self.current_index = self.i
             self.i -= 1
@@ -181,6 +182,10 @@ class NTContext(object):
         else:
             self.current[item] = value
             return True
+
+    def Assignment(self, item, value):
+        self.current[item] = value
+        return True
 
     def Fork(self):                         # fork context
         if self.current:
@@ -216,30 +221,46 @@ class Generator(object):
         self.gens = GeneratorStorage()
         self.context = None
 
+    def __getattr__(self, item):
+        return getattr(self.context, item)
+
     def _ExecNT(self, nt):
-        root_index = self.context.current_index
-        for rule in nt.rules:
-            self.context.ForkFrom(root_index)
-            flag = True
-            isforked = False
-            for cond in rule.conditions.and_conditions:
-                if cond.equals == True:
-                    if not self.context.TestAndAssignment(cond.field_name, cond.rvalue.value):
-                        flag = False                        # conditions unsatisfy
-                        break
-                    else:                                   # if context don't have the value
-                        pass                                #fork context
-                else:
-                    logger.error("_ExecNT: Not Equal condition %s in\n%s" %(cond, rule))
+        for context in self.context:
+            root_index = self.context.current_index
+            for rule in nt.rules:
+                self.ForkFrom(root_index)
+                flag = True
+                isforked = False
+                for cond in rule.conditions.and_conditions:
+                    if cond.equals == True:
+                        if not self.TestAndAssignment(cond.field_name, cond.rvalue.value):      # for conditions, we must test first to verify if conditions are satisfied
+                            flag = False                        # conditions unsatisfy
+                            break
+                        else:                                   # if context don't have the value
+                            pass                                #fork context
+                    else:
+                        logger.error("_ExecNT: Not Equal condition %s in\n%s" %(cond, rule))
 
-            for act in rule.actions:
-                if act.type == "FB":
-                    if not self.context.TestAndAssignment(act.field_name, act.value):
-                        raise ValueError("_ExecNT: Action conflict with condition: %s=%s" %(act.field_name, act.value))
-                else:
-                    a = 0
-                    pass
+                for act in rule.actions:
+                    if act.type == "FB":                        # for actions, we don't need to test, for whose key has been in context, just overwrite it
+                        #if not self.TestAndAssignment(act.field_name, act.value):
+                        #raise ValueError("_ExecNT: Action conflict with condition: %s=%s" %(act.field_name, act.value))
+                        self.Assignment(act.field_name, act.value)
+                    else:
+                        a = 0
+                        pass
+        return self.context
 
+    def _ExecSeq(self, seqname):
+        if not seqname in self.gens.seqs:
+            raise KeyError("_ExecSeq: Cannot find seqname: %s" %seqname)
+        for name in self.gens.seqs[seqname].nonterminals:
+            nt_name = name[:-5]                         # [:-5] to remove the _BIND or _EMIT
+            if not nt_name in self.gens.nts:
+                raise KeyError("_ExecSeq: Cannot find ntname: %s" %nt_name)
+            else:
+                self._ExecNT(self.gens.nts[nt_name])
+            pass
         return self.context
 
     def GetOutputRegIform(self, reg):
@@ -288,6 +309,9 @@ class Generator(object):
 
         nts = []
         flag = True                             # Record if context satisfy conditions
+
+        self._ExecSeq("ISA_BINDINGS")
+
         for cond in iform.rule.conditions.and_conditions:
             if cond.rvalue.nt:
                 nt_name = cond.rvalue.value

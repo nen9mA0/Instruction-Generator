@@ -3,6 +3,7 @@
 !myInsGen/encoder/
 myInsGen/encoder/log
 myInsGen/encoder/.VSCodeCounter/
+myInsGen/encoder/all-datafiles
 
 *.pyc
 *.pkl

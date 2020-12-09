@@ -43,26 +43,17 @@ def GsLoad(f, obj):
     obj.deleted_instructions = pickle.load(f)
     obj.iarray = pickle.load(f)
 
-# for vscode execute
-
 pkl_dir = "pklfiles"
 
-all_reg = "all-datafiles/all-registers.txt"
-all_state_file = "all-datafiles/all-state.txt"
-all_enc_pattern = "all-datafiles/all-enc-patterns.txt"
-all_enc_dec_pattern = "all-datafiles/all-enc-dec-patterns.txt"
-all_field = "all-datafiles/all-fields.txt"
+all_reg = "all-datafiles/basic_test/basic-test-registers.txt"
+all_state_file = "all-datafiles/basic_test/basic-test-state.txt"
+all_enc_pattern = "all-datafiles/basic_test/basic-test-enc-patterns.txt"
+all_enc_dec_pattern = "all-datafiles/basic_test/basic-test-enc-dec-patterns.txt"
+all_field = "all-datafiles/basic_test/basic-test-fields.txt"
 # all_ins = "all-datafiles/all-enc-instructions.txt"
 all_ins = "../../datafiles_test/test-enc-instructions.txt"
 # all_ins = "all-datafiles/base_instructions.txt"
 
-# for local directory execute
-
-# all_state_file = "all-datafiles/all-state.txt"
-# all_enc_pattern = "all-datafiles/all-enc-patterns.txt"
-# all_enc_dec_pattern = "all-datafiles/all-enc-dec-patterns.txt"
-# all_field = "all-datafiles/all-fields.txt"
-# all_ins = "all-datafiles/all-enc-instructions.txt"
 
 # logger = Logger.logger_t("log/out.txt")
 logger = Logger.logger_t()
