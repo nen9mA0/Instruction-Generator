@@ -1,0 +1,34 @@
+###FILE: ./datafiles/bdw/adox-adcx-isa.xed.txt
+{
+ICLASS    : ADCX
+CPL       : 3
+CATEGORY  : ADOX_ADCX
+EXTENSION : ADOX_ADCX
+ISA_SET   : ADOX_ADCX
+FLAGS     : MUST [ cf-tst cf-mod ]
+PATTERN   : 0x0F 0x38 0xF6  MOD[0b11] MOD=3 REG[rrr] RM[nnn] osz_refining_prefix W0  IMMUNE66()
+OPERANDS  : REG0=GPR32_R():rw:d REG1=GPR32_B():r:d
+PATTERN   : 0x0F 0x38 0xF6   MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() osz_refining_prefix W0  IMMUNE66()
+OPERANDS  : REG0=GPR32_R():rw:d MEM0:r:d
+PATTERN   : 0x0F 0x38 0xF6  MOD[0b11] MOD=3 REG[rrr] RM[nnn] osz_refining_prefix  W1 IMMUNE66() mode64
+OPERANDS  : REG0=GPR64_R():rw:q  REG1=GPR64_B():r:q
+PATTERN   : 0x0F 0x38 0xF6  MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM() osz_refining_prefix  W1  IMMUNE66() mode64
+OPERANDS  : REG0=GPR64_R():rw:q  MEM0:r:q
+}
+###FILE: ./datafiles/bdw/adox-adcx-isa.xed.txt
+{
+ICLASS    : ADOX
+CPL       : 3
+CATEGORY  : ADOX_ADCX
+EXTENSION : ADOX_ADCX
+ISA_SET   : ADOX_ADCX
+FLAGS     : MUST [ of-tst of-mod ]
+PATTERN   : 0x0F 0x38 0xF6  MOD[0b11] MOD=3 REG[rrr] RM[nnn] refining_f3  W0 IMMUNE66()
+OPERANDS  : REG0=GPR32_R():rw:d  REG1=GPR32_B():r:d
+PATTERN   : 0x0F 0x38 0xF6  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() refining_f3 W0 IMMUNE66()
+OPERANDS  : REG0=GPR32_R():rw:d MEM0:r:d
+PATTERN   : 0x0F 0x38 0xF6 MOD[0b11] MOD=3 REG[rrr] RM[nnn] refining_f3 W1 IMMUNE66()  mode64
+OPERANDS  : REG0=GPR64_R():rw:q  REG1=GPR64_B():r:q
+PATTERN   : 0x0F 0x38 0xF6 MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM() refining_f3 W1   IMMUNE66() mode64
+OPERANDS  : REG0=GPR64_R():rw:q  MEM0:r:q
+}

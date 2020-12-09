@@ -1,0 +1,14 @@
+###FILE: ./datafiles/hsw/lzcnt-isa.xed.txt
+{
+ICLASS    : LZCNT
+VERSION   : 2
+CPL       : 3
+CATEGORY  : LZCNT
+EXTENSION : LZCNT
+COMMENT   : These next one WAS introduced first by AMD circa SSE4a.
+FLAGS     : MUST [ cf-mod zf-mod of-u af-u pf-u sf-u ]
+PATTERN   : 0x0F 0xBD f3_refining_prefix LZCNT=1 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=GPRv_R():w:v     MEM0:r:v
+PATTERN   : 0x0F 0xBD f3_refining_prefix LZCNT=1 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=GPRv_R():w:v     REG1=GPRv_B():r:v
+}

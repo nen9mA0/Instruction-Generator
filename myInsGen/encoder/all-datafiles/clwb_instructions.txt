@@ -1,0 +1,11 @@
+###FILE: ./datafiles/clwb/clwb.xed.txt
+{
+ICLASS: CLWB
+CPL: 3
+CATEGORY:  CLWB
+EXTENSION: CLWB
+ISA_SET:   CLWB
+ATTRIBUTES: PREFETCH
+PATTERN   : 0x0F 0xAE  MOD[mm] MOD!=3 REG[0b110] RM[nnn]  osz_refining_prefix REFINING66() MODRM()
+OPERANDS  : MEM0:r:mprefetch
+}

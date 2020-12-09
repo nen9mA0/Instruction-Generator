@@ -138,7 +138,7 @@ def parse_one_decode_rule( iclass, operand_str, pattern_str):
             
         if do_encoder_input_check:
             if p_short in gs.storage_fields and gs.storage_fields[p_short].encoder_input:
-                print("MODAL PATTERN: %s" %p_short)
+                logger.debug("MODAL PATTERN: %s" %p_short)
                 modal_patterns.append(p)
                 continue
 
@@ -163,8 +163,8 @@ def parse_one_decode_rule( iclass, operand_str, pattern_str):
         s = []
         for p in pattern_list:
             s.append(str(p))
-        print("PATTERN LIST: %s" %", ".join(s))
-        print("EXTRABINDING LIST: %s" %str(extra_bindings_list))
+        logger.debug("PATTERN LIST: %s" %", ".join(s))
+        logger.debug("EXTRABINDING LIST: %s" %str(extra_bindings_list))
         patterns.extend(pattern_list)
         extra_bindings.extend(extra_bindings_list)
         
@@ -210,7 +210,7 @@ def parse_one_decode_rule( iclass, operand_str, pattern_str):
             pass # we ignore things that are just bits at this point.
         else:
             extra_operand = operand_t("%s=%s:SUPP" % (field_name, value))
-            logger.info("EXTRA BINDING %s=%s:SUPP" % (field_name, value))
+            logger.debug("EXTRA BINDING %s=%s:SUPP" % (field_name, value))
             operands.append(extra_operand)
 
     # Add the extra_actions were part of the decode operands as
@@ -308,7 +308,7 @@ def read_decoder_instruction_file(lines):
         if udelete_pattern.search(line):
             m = udelete_full_pattern.search(line)
             unamed = m.group('uname')
-            print("REGISTER BAD UNAME: %s" %unamed)
+            logger.debug("REGISTER BAD UNAME: %s" %unamed)
             gs.deleted_unames[unamed] = True
             continue
 

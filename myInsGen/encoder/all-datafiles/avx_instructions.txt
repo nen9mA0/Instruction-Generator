@@ -1,0 +1,3745 @@
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VADDPD
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES: MXCSR
+PATTERN : VV1 0x58  V66 VL128 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:dq:f64
+PATTERN : VV1 0x58  V66 VL128 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=XMM_B():r:dq:f64
+PATTERN : VV1 0x58  V66 VL256 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 MEM0:r:qq:f64
+PATTERN : VV1 0x58  V66 VL256 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 REG2=YMM_B():r:qq:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VADDPS
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES: MXCSR
+PATTERN : VV1 0x58  VNP VL128 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:dq:f32
+PATTERN : VV1 0x58  VNP VL128 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:dq:f32
+PATTERN : VV1 0x58  VNP VL256 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 MEM0:r:qq:f32
+PATTERN : VV1 0x58  VNP VL256 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 REG2=YMM_B():r:qq:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VADDSD
+EXCEPTIONS: avx-type-3
+CPL       : 3
+ATTRIBUTES : simd_scalar MXCSR
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x58  VF2  V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:q:f64
+PATTERN : VV1 0x58  VF2  V0F  MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=XMM_B():r:q:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VADDSS
+EXCEPTIONS: avx-type-3
+CPL       : 3
+ATTRIBUTES : simd_scalar MXCSR
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x58  VF3  V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:d:f32
+PATTERN : VV1 0x58  VF3  V0F  MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:d:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VADDSUBPD
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES:  MXCSR
+PATTERN : VV1 0xD0  VL128 V66 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:dq:f64
+PATTERN : VV1 0xD0  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=XMM_B():r:dq:f64
+PATTERN : VV1 0xD0  VL256 V66 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 MEM0:r:qq:f64
+PATTERN : VV1 0xD0  VL256 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 REG2=YMM_B():r:qq:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VADDSUBPS
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES:  MXCSR
+PATTERN : VV1 0xD0  VL128 VF2 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:dq:f32
+PATTERN : VV1 0xD0  VL128 VF2 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:dq:f32
+PATTERN : VV1 0xD0  VL256 VF2 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 MEM0:r:qq:f32
+PATTERN : VV1 0xD0  VL256 VF2 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 REG2=YMM_B():r:qq:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VANDPD
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : LOGICAL_FP
+EXTENSION : AVX
+PATTERN : VV1 0x54  VL128 V66 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u64 REG1=XMM_N():r:dq:u64 MEM0:r:dq:u64
+PATTERN : VV1 0x54  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u64 REG1=XMM_N():r:dq:u64 REG2=XMM_B():r:dq:u64
+PATTERN : VV1 0x54  VL256 V66 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:u64 REG1=YMM_N():r:qq:u64 MEM0:r:qq:u64
+PATTERN : VV1 0x54  VL256 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:u64 REG1=YMM_N():r:qq:u64 REG2=YMM_B():r:qq:u64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VANDPS
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : LOGICAL_FP
+EXTENSION : AVX
+PATTERN : VV1 0x54  VL128 VNP V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq REG1=XMM_N():r:dq MEM0:r:dq
+PATTERN : VV1 0x54  VL128 VNP V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq REG1=XMM_N():r:dq REG2=XMM_B():r:dq
+PATTERN : VV1 0x54  VL256 VNP V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq REG1=YMM_N():r:qq MEM0:r:qq
+PATTERN : VV1 0x54  VL256 VNP V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq REG1=YMM_N():r:qq REG2=YMM_B():r:qq
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VANDNPD
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : LOGICAL_FP
+EXTENSION : AVX
+PATTERN : VV1 0x55  VL128 V66 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u64 REG1=XMM_N():r:dq:u64 MEM0:r:dq:u64
+PATTERN : VV1 0x55  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u64 REG1=XMM_N():r:dq:u64 REG2=XMM_B():r:dq:u64
+PATTERN : VV1 0x55  VL256 V66 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:u64 REG1=YMM_N():r:qq:u64 MEM0:r:qq:u64
+PATTERN : VV1 0x55  VL256 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:u64 REG1=YMM_N():r:qq:u64 REG2=YMM_B():r:qq:u64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VANDNPS
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : LOGICAL_FP
+EXTENSION : AVX
+PATTERN : VV1 0x55  VL128 VNP V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq REG1=XMM_N():r:dq MEM0:r:dq
+PATTERN : VV1 0x55  VL128 VNP V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq REG1=XMM_N():r:dq REG2=XMM_B():r:dq
+PATTERN : VV1 0x55  VL256 VNP V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq REG1=YMM_N():r:qq MEM0:r:qq
+PATTERN : VV1 0x55  VL256 VNP V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq REG1=YMM_N():r:qq REG2=YMM_B():r:qq
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VBLENDPD
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x0D  VL128 V66 V0F3A MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:dq:f64 IMM0:r:b
+PATTERN : VV1 0x0D  VL128 V66 V0F3A MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=XMM_B():r:dq:f64 IMM0:r:b
+PATTERN : VV1 0x0D  VL256 V66 V0F3A MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 MEM0:r:qq:f64 IMM0:r:b
+PATTERN : VV1 0x0D  VL256 V66 V0F3A MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 REG2=YMM_B():r:qq:f64 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VBLENDPS
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x0C  VL128 V66 V0F3A MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:dq:f32 IMM0:r:b
+PATTERN : VV1 0x0C  VL128 V66 V0F3A MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:dq:f32 IMM0:r:b
+PATTERN : VV1 0x0C  VL256 V66 V0F3A MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 MEM0:r:qq:f32 IMM0:r:b
+PATTERN : VV1 0x0C  VL256 V66 V0F3A MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 REG2=YMM_B():r:qq:f32 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VCMPPD
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES:  MXCSR
+PATTERN : VV1 0xC2  V66 VL128 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:dq:f64 IMM0:r:b
+PATTERN : VV1 0xC2  V66 VL128 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=XMM_B():r:dq:f64 IMM0:r:b
+PATTERN : VV1 0xC2  V66 VL256 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 MEM0:r:qq:f64 IMM0:r:b
+PATTERN : VV1 0xC2  V66 VL256 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 REG2=YMM_B():r:qq:f64 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VCMPPS
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES:  MXCSR
+PATTERN : VV1 0xC2  VNP VL128 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:dq:f32 IMM0:r:b
+PATTERN : VV1 0xC2  VNP VL128 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:dq:f32 IMM0:r:b
+PATTERN : VV1 0xC2  VNP VL256 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 MEM0:r:qq:f32 IMM0:r:b
+PATTERN : VV1 0xC2  VNP VL256 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 REG2=YMM_B():r:qq:f32 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VCMPSD
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES : simd_scalar MXCSR
+PATTERN : VV1 0xC2   VF2 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:q:f64 IMM0:r:b
+PATTERN : VV1 0xC2   VF2 V0F  MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=XMM_B():r:q:f64 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VCMPSS
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES : simd_scalar MXCSR
+PATTERN : VV1 0xC2   VF3 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:d:f32 IMM0:r:b
+PATTERN : VV1 0xC2   VF3 V0F  MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:d:f32 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VCOMISD
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES : simd_scalar MXCSR
+FLAGS     : MUST [ zf-mod pf-mod cf-mod of-0 af-0 sf-0 ]
+PATTERN : VV1 0x2F   V66 V0F  NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():r:q:f64 MEM0:r:q:f64
+PATTERN : VV1 0x2F   V66 V0F  NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():r:q:f64 REG1=XMM_B():r:q:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VCOMISS
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES : simd_scalar MXCSR
+FLAGS     : MUST [ zf-mod pf-mod cf-mod of-0 af-0 sf-0 ]
+PATTERN : VV1 0x2F   VNP V0F  NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():r:d:f32 MEM0:r:d:f32
+PATTERN : VV1 0x2F   VNP V0F  NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():r:d:f32 REG1=XMM_B():r:d:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VCVTDQ2PD
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : CONVERT
+EXTENSION : AVX
+COMMENT   : ignores MXCSR. 32b int fits in f64
+PATTERN : VV1 0xE6  VL128 VF3 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64 MEM0:r:q:i32
+PATTERN : VV1 0xE6  VL128 VF3 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_B():r:q:i32
+PATTERN : VV1 0xE6  VL256 VF3 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f64 MEM0:r:dq:i32
+PATTERN : VV1 0xE6  VL256 VF3 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=XMM_B():r:dq:i32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VCVTDQ2PS
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : CONVERT
+EXTENSION : AVX
+ATTRIBUTES:  MXCSR
+PATTERN : VV1 0x5B  VL128 VNP V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 MEM0:r:dq:i32
+PATTERN : VV1 0x5B  VL128 VNP V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_B():r:dq:i32
+PATTERN : VV1 0x5B  VL256 VNP V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f32 MEM0:r:qq:i32
+PATTERN : VV1 0x5B  VL256 VNP V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_B():r:qq:i32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VCVTPD2DQ
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : CONVERT
+EXTENSION : AVX
+ATTRIBUTES:  MXCSR
+PATTERN : VV1 0xE6  VL128 VF2 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i32 MEM0:r:dq:f64
+PATTERN : VV1 0xE6  VL128 VF2 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_B():r:dq:f64
+PATTERN : VV1 0xE6  VL256 VF2 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i32 MEM0:r:qq:f64
+PATTERN : VV1 0xE6  VL256 VF2 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=YMM_B():r:qq:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VCVTTPD2DQ
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : CONVERT
+EXTENSION : AVX
+ATTRIBUTES:  MXCSR
+PATTERN : VV1 0xE6  VL128 V66 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i32 MEM0:r:dq:f64
+PATTERN : VV1 0xE6  VL128 V66 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_B():r:dq:f64
+PATTERN : VV1 0xE6  VL256 V66 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i32 MEM0:r:qq:f64
+PATTERN : VV1 0xE6  VL256 V66 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=YMM_B():r:qq:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VCVTPD2PS
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : CONVERT
+EXTENSION : AVX
+ATTRIBUTES:  MXCSR
+PATTERN : VV1 0x5A  V66 VL128 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 MEM0:r:dq:f64
+PATTERN : VV1 0x5A  V66 VL128 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_B():r:dq:f64
+PATTERN : VV1 0x5A  V66 VL256 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 MEM0:r:qq:f64
+PATTERN : VV1 0x5A  V66 VL256 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=YMM_B():r:qq:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VCVTPS2DQ
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : CONVERT
+EXTENSION : AVX
+ATTRIBUTES:  MXCSR
+PATTERN : VV1 0x5B  VL128 V66 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i32 MEM0:r:dq:f32
+PATTERN : VV1 0x5B  VL128 V66 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_B():r:dq:f32
+PATTERN : VV1 0x5B  VL256 V66 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:i32 MEM0:r:qq:f32
+PATTERN : VV1 0x5B  VL256 V66 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:i32 REG1=YMM_B():r:qq:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VCVTTPS2DQ
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : CONVERT
+EXTENSION : AVX
+ATTRIBUTES:  MXCSR
+PATTERN : VV1 0x5B  VL128 VF3 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i32 MEM0:r:dq:f32
+PATTERN : VV1 0x5B  VL128 VF3 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_B():r:dq:f32
+PATTERN : VV1 0x5B  VL256 VF3 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:i32 MEM0:r:qq:f32
+PATTERN : VV1 0x5B  VL256 VF3 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:i32 REG1=YMM_B():r:qq:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VCVTPS2PD
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : CONVERT
+EXTENSION : AVX
+ATTRIBUTES:  MXCSR
+PATTERN : VV1 0x5A  VNP VL128 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64 MEM0:r:q:f32
+PATTERN : VV1 0x5A  VNP VL128 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_B():r:q:f32
+PATTERN : VV1 0x5A  VNP VL256 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f64 MEM0:r:dq:f32
+PATTERN : VV1 0x5A  VNP VL256 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=XMM_B():r:dq:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VCVTSD2SI
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : CONVERT
+EXTENSION : AVX
+ATTRIBUTES : simd_scalar MXCSR
+COMMENT   : SNB/IVB/HSW require VEX.L=128. Later processors are LIG
+PATTERN : VV1 0x2D   VF2 V0F  NOVSR not64 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=GPR32_R():w:d:i32 MEM0:r:q:f64
+PATTERN : VV1 0x2D   VF2 V0F  NOVSR not64 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=GPR32_R():w:d:i32 REG1=XMM_B():r:q:f64
+PATTERN : VV1 0x2D   VF2 V0F  NOVSR mode64 norexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=GPR32_R():w:d:i32 MEM0:r:q:f64
+PATTERN : VV1 0x2D   VF2 V0F  NOVSR mode64 norexw_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=GPR32_R():w:d:i32 REG1=XMM_B():r:q:f64
+PATTERN : VV1 0x2D   VF2 V0F  NOVSR mode64 rexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=GPR64_R():w:q:i64 MEM0:r:q:f64
+PATTERN : VV1 0x2D   VF2 V0F  NOVSR mode64 rexw_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=GPR64_R():w:q:i64 REG1=XMM_B():r:q:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VCVTTSD2SI
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : CONVERT
+EXTENSION : AVX
+ATTRIBUTES : simd_scalar MXCSR
+COMMENT   : SNB/IVB/HSW require VEX.L=128. Later processors are LIG
+PATTERN : VV1 0x2C   VF2 V0F  NOVSR not64 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=GPR32_R():w:d:i32 MEM0:r:q:f64
+PATTERN : VV1 0x2C   VF2 V0F  NOVSR not64 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=GPR32_R():w:d:i32 REG1=XMM_B():r:q:f64
+PATTERN : VV1 0x2C   VF2 V0F  NOVSR mode64 norexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=GPR32_R():w:d:i32 MEM0:r:q:f64
+PATTERN : VV1 0x2C   VF2 V0F  NOVSR mode64 norexw_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=GPR32_R():w:d:i32 REG1=XMM_B():r:q:f64
+PATTERN : VV1 0x2C   VF2 V0F  NOVSR mode64 rexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=GPR64_R():w:q:i64 MEM0:r:q:f64
+PATTERN : VV1 0x2C   VF2 V0F  NOVSR mode64 rexw_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=GPR64_R():w:q:i64 REG1=XMM_B():r:q:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VCVTSS2SI
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : CONVERT
+EXTENSION : AVX
+ATTRIBUTES : simd_scalar MXCSR
+COMMENT   : SNB/IVB/HSW require VEX.L=128. Later processors are LIG
+PATTERN : VV1 0x2D   VF3 V0F  NOVSR not64 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=GPR32_R():w:d:i32 MEM0:r:d:f32
+PATTERN : VV1 0x2D   VF3 V0F  NOVSR not64 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=GPR32_R():w:d:i32 REG1=XMM_B():r:d:f32
+PATTERN : VV1 0x2D   VF3 V0F  NOVSR mode64 norexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=GPR32_R():w:d:i32 MEM0:r:d:f32
+PATTERN : VV1 0x2D   VF3 V0F  NOVSR mode64 norexw_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=GPR32_R():w:d:i32 REG1=XMM_B():r:d:f32
+PATTERN : VV1 0x2D   VF3 V0F  NOVSR mode64 rexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=GPR64_R():w:q:i64 MEM0:r:d:f32
+PATTERN : VV1 0x2D   VF3 V0F  NOVSR mode64 rexw_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=GPR64_R():w:q:i64 REG1=XMM_B():r:d:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VCVTTSS2SI
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : CONVERT
+EXTENSION : AVX
+ATTRIBUTES : simd_scalar MXCSR
+COMMENT   : SNB/IVB/HSW require VEX.L=128. Later processors are LIG
+PATTERN : VV1 0x2C   VF3 V0F  NOVSR not64 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=GPR32_R():w:d:i32 MEM0:r:d:f32
+PATTERN : VV1 0x2C   VF3 V0F  NOVSR not64 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=GPR32_R():w:d:i32 REG1=XMM_B():r:d:f32
+PATTERN : VV1 0x2C   VF3 V0F  NOVSR mode64 norexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=GPR32_R():w:d:i32 MEM0:r:d:f32
+PATTERN : VV1 0x2C   VF3 V0F  NOVSR mode64 norexw_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=GPR32_R():w:d:i32 REG1=XMM_B():r:d:f32
+PATTERN : VV1 0x2C   VF3 V0F  NOVSR mode64 rexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=GPR64_R():w:q:i64 MEM0:r:d:f32
+PATTERN : VV1 0x2C   VF3 V0F  NOVSR mode64 rexw_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=GPR64_R():w:q:i64 REG1=XMM_B():r:d:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VCVTSD2SS
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : CONVERT
+EXTENSION : AVX
+ATTRIBUTES : simd_scalar MXCSR
+PATTERN : VV1 0x5A  VF2 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:q:f64
+PATTERN : VV1 0x5A  VF2 V0F  MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:q:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VCVTSI2SD
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : CONVERT
+EXTENSION : AVX
+ATTRIBUTES : simd_scalar MXCSR
+PATTERN : VV1 0x2A  VF2 V0F not64 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:d:i32
+PATTERN : VV1 0x2A  VF2 V0F not64 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=GPR32_B():r:d:i32
+PATTERN : VV1 0x2A  VF2 V0F mode64 norexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:d:i32
+PATTERN : VV1 0x2A  VF2 V0F mode64 norexw_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=GPR32_B():r:d:i32
+PATTERN : VV1 0x2A  VF2 V0F mode64 rexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:q:i64
+PATTERN : VV1 0x2A  VF2 V0F mode64 rexw_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=GPR64_B():r:q:i64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VCVTSI2SS
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : CONVERT
+EXTENSION : AVX
+ATTRIBUTES : simd_scalar MXCSR
+PATTERN : VV1 0x2A   VF3 V0F not64 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:d:i32
+PATTERN : VV1 0x2A   VF3 V0F not64 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=GPR32_B():r:d:i32
+PATTERN : VV1 0x2A   VF3 V0F mode64 norexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:d:i32
+PATTERN : VV1 0x2A   VF3 V0F mode64 norexw_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=GPR32_B():r:d:i32
+PATTERN : VV1 0x2A   VF3 V0F mode64 rexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:q:i64
+PATTERN : VV1 0x2A   VF3 V0F mode64 rexw_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=GPR64_B():r:q:i64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VCVTSS2SD
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : CONVERT
+EXTENSION : AVX
+ATTRIBUTES : simd_scalar MXCSR
+PATTERN : VV1 0x5A  VF3 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:d:f32
+PATTERN : VV1 0x5A  VF3 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=XMM_B():r:d:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VDIVPD
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES:  MXCSR
+PATTERN : VV1 0x5E  V66 V0F VL128 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:dq:f64
+PATTERN : VV1 0x5E  V66 V0F VL128 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=XMM_B():r:dq:f64
+PATTERN : VV1 0x5E  V66 V0F VL256 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 MEM0:r:qq:f64
+PATTERN : VV1 0x5E  V66 V0F VL256 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 REG2=YMM_B():r:qq:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VDIVPS
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES:  MXCSR
+PATTERN : VV1 0x5E  VNP V0F VL128 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:dq:f32
+PATTERN : VV1 0x5E  VNP V0F VL128 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:dq:f32
+PATTERN : VV1 0x5E  VNP V0F VL256 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 MEM0:r:qq:f32
+PATTERN : VV1 0x5E  VNP V0F VL256 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 REG2=YMM_B():r:qq:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VDIVSD
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES : simd_scalar MXCSR
+PATTERN : VV1 0x5E  VF2 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:q:f64
+PATTERN : VV1 0x5E  VF2 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=XMM_B():r:q:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VDIVSS
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES : simd_scalar MXCSR
+PATTERN : VV1 0x5E  VF3 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:d:f32
+PATTERN : VV1 0x5E  VF3 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:d:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VEXTRACTF128
+EXCEPTIONS: avx-type-6
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x19  norexw_prefix VL256 V66 V0F3A NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : MEM0:w:dq:f64 REG0=YMM_R():r:dq:f64  IMM0:r:b
+PATTERN : VV1 0x19  norexw_prefix VL256 V66 V0F3A NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_B():w:dq:f64 REG1=YMM_R():r:dq:f64 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VDPPD
+EXCEPTIONS: avx-type-2D
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES:  MXCSR
+PATTERN : VV1 0x41  VL128 V66 V0F3A MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:dq:f64 IMM0:r:b
+PATTERN : VV1 0x41  VL128 V66 V0F3A MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=XMM_B():r:dq:f64 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VDPPS
+EXCEPTIONS: avx-type-2D
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES:  MXCSR
+PATTERN : VV1 0x40  VL128 V66 V0F3A MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:dq:f32 IMM0:r:b
+PATTERN : VV1 0x40  VL128 V66 V0F3A MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:dq:f32 IMM0:r:b
+PATTERN : VV1 0x40  VL256 V66 V0F3A MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 MEM0:r:qq:f32 IMM0:r:b
+PATTERN : VV1 0x40  VL256 V66 V0F3A MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 REG2=YMM_B():r:qq:f32 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VEXTRACTPS
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x17  VL128 V66 V0F3A  NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : MEM0:w:d:f32  REG0=XMM_R():r:dq:f32  IMM0:r:b
+PATTERN : VV1 0x17  VL128 V66 V0F3A  NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=GPR32_B():w  REG1=XMM_R():r:dq:f32  IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VZEROALL
+EXCEPTIONS: avx-type-8
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES : xmm_state_w
+PATTERN : VV1 0x77 VNP  V0F VL256  NOVSR
+OPERANDS:
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VZEROUPPER
+EXCEPTIONS: avx-type-8
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES : xmm_state_w NOTSX
+PATTERN : VV1 0x77 VNP  V0F VL128 NOVSR
+OPERANDS:
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VHADDPD
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES:  MXCSR
+PATTERN : VV1 0x7C  VL128 V66 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:dq:f64
+PATTERN : VV1 0x7C  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=XMM_B():r:dq:f64
+PATTERN : VV1 0x7C  VL256 V66 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 MEM0:r:qq:f64
+PATTERN : VV1 0x7C  VL256 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 REG2=YMM_B():r:qq:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VHADDPS
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES:  MXCSR
+PATTERN : VV1 0x7C  VL128 VF2 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:dq:f32
+PATTERN : VV1 0x7C  VL128 VF2 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:dq:f32
+PATTERN : VV1 0x7C  VL256 VF2 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 MEM0:r:qq:f32
+PATTERN : VV1 0x7C  VL256 VF2 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 REG2=YMM_B():r:qq:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VHSUBPD
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES:  MXCSR
+PATTERN : VV1 0x7D  VL128 V66 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:dq:f64
+PATTERN : VV1 0x7D  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=XMM_B():r:dq:f64
+PATTERN : VV1 0x7D  VL256 V66 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 MEM0:r:qq:f64
+PATTERN : VV1 0x7D  VL256 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 REG2=YMM_B():r:qq:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VHSUBPS
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES:  MXCSR
+PATTERN : VV1 0x7D  VL128 VF2 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:dq:f32
+PATTERN : VV1 0x7D  VL128 VF2 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:dq:f32
+PATTERN : VV1 0x7D  VL256 VF2 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 MEM0:r:qq:f32
+PATTERN : VV1 0x7D  VL256 VF2 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 REG2=YMM_B():r:qq:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPERMILPD
+EXCEPTIONS: avx-type-6
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x0D VL128 V66 V0F38 norexw_prefix  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:dq:u64
+PATTERN : VV1 0x0D  VL128 V66 V0F38 norexw_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=XMM_B():r:dq:u64
+PATTERN : VV1 0x0D  VL256 V66 V0F38 norexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 MEM0:r:qq:u64
+PATTERN : VV1 0x0D  VL256 V66 V0F38 norexw_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 REG2=YMM_B():r:qq:u64
+PATTERN : VV1 0x05  VL128 V66 V0F3A norexw_prefix NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f64 MEM0:r:dq:f64 IMM0:r:b
+PATTERN : VV1 0x05  VL128 V66 V0F3A norexw_prefix NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_B():r:dq:f64 IMM0:r:b
+PATTERN : VV1 0x05  VL256 V66 V0F3A norexw_prefix NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f64 MEM0:r:qq:f64 IMM0:r:b
+PATTERN : VV1 0x05  VL256 V66 V0F3A norexw_prefix NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_B():r:qq:f64 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPERMILPS
+EXCEPTIONS: avx-type-6
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x0C VL128 V66 V0F38 norexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:dq:u32
+PATTERN : VV1 0x0C  VL128 V66 V0F38 norexw_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:dq:u32
+PATTERN : VV1 0x0C  VL256 V66 V0F38  norexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 MEM0:r:qq:u32
+PATTERN : VV1 0x0C  VL256 V66 V0F38  norexw_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 REG2=YMM_B():r:qq:u32
+PATTERN : VV1 0x04 VL128 V66 V0F3A norexw_prefix NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f32 MEM0:r:dq:f32 IMM0:r:b
+PATTERN : VV1 0x04 VL128 V66 V0F3A norexw_prefix NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_B():r:dq:f32 IMM0:r:b
+PATTERN : VV1 0x04 VL256 V66 V0F3A norexw_prefix NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f32 MEM0:r:qq:f32 IMM0:r:b
+PATTERN : VV1 0x04 VL256 V66 V0F3A norexw_prefix NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_B():r:qq:f32 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPERM2F128
+EXCEPTIONS: avx-type-6
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x06 VL256 V66 V0F3A norexw_prefix  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 MEM0:r:qq:f64 IMM0:r:b
+PATTERN : VV1 0x06 VL256 V66 V0F3A norexw_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 REG2=YMM_B():r:qq:f64 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VBROADCASTSS
+EXCEPTIONS: avx-type-6
+CPL       : 3
+CATEGORY  : BROADCAST
+EXTENSION : AVX
+PATTERN : VV1 0x18  norexw_prefix VL128 V66 V0F38 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 MEM0:r:d:f32 EMX_BROADCAST_1TO4_32
+PATTERN : VV1 0x18  norexw_prefix VL256 V66 V0F38 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f32 MEM0:r:d:f32 EMX_BROADCAST_1TO8_32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VBROADCASTSD
+EXCEPTIONS: avx-type-6
+CPL       : 3
+CATEGORY  : BROADCAST
+EXTENSION : AVX
+PATTERN : VV1 0x19  norexw_prefix VL256 V66 V0F38 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f64 MEM0:r:q:f64 EMX_BROADCAST_1TO4_64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VBROADCASTF128
+EXCEPTIONS: avx-type-6
+CPL       : 3
+CATEGORY  : BROADCAST
+EXTENSION : AVX
+COMMENT : There is no F128 type. I just set these to f64 for lack of anything better.
+PATTERN : VV1 0x1A norexw_prefix VL256 V66 V0F38 NOVSR  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f64 MEM0:r:dq:f64 EMX_BROADCAST_2TO4_64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VINSERTF128
+EXCEPTIONS: avx-type-6
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x18  norexw_prefix VL256 V66 V0F3A MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 MEM0:r:dq:f64 IMM0:r:b EMX_BROADCAST_2TO4_64
+PATTERN : VV1 0x18  norexw_prefix  VL256 V66 V0F3A MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 REG2=XMM_B():r:dq:f64 IMM0:r:b EMX_BROADCAST_2TO4_64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VINSERTPS
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x21  VL128 V66 V0F3A MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:d:f32 IMM0:r:b
+PATTERN : VV1 0x21  VL128 V66 V0F3A MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:dq:f32 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VLDDQU
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xF0  VL128 VF2 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq  MEM0:r:dq
+PATTERN : VV1 0xF0  VL256 VF2 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq MEM0:r:qq
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMASKMOVPS
+EXCEPTIONS: avx-type-6
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES : maskop NONTEMPORAL
+PATTERN : VV1 0x2C V66 VL128 V0F38 norexw_prefix  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32   REG1=XMM_N():r:dq MEM0:r:dq:f32
+PATTERN : VV1 0x2C V66 VL256 V0F38    norexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f32   REG1=YMM_N():r:qq MEM0:r:qq:f32
+PATTERN : VV1 0x2E V66 V0F38 VL128  norexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:dq:f32  REG0=XMM_N():r:dq   REG1=XMM_R():r:dq:f32
+PATTERN : VV1 0x2E V66 V0F38 VL256 norexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:qq:f32   REG0=YMM_N():r:qq  REG1=YMM_R():r:qq:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMASKMOVPD
+EXCEPTIONS: avx-type-6
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES : maskop
+PATTERN : VV1 0x2D  V66 VL128 V0F38  norexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64   REG1=XMM_N():r:dq:u64 MEM0:r:dq:f64
+PATTERN : VV1 0x2D  V66 VL256 V0F38 norexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f64   REG1=YMM_N():r:qq:u64 MEM0:r:qq:f64
+PATTERN : VV1 0x2F   V66 V0F38 VL128 norexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:dq:f64  REG0=XMM_N():r:dq:u64  REG1=XMM_R():r:dq:f64
+PATTERN : VV1 0x2F   V66 V0F38 VL256 norexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:qq:f64  REG0=YMM_N():r:qq:u64   REG1=YMM_R():r:qq:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPTEST
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : LOGICAL
+EXTENSION : AVX
+FLAGS     : MUST [ zf-mod cf-mod ]
+PATTERN : VV1 0x17  VL128 V66 V0F38 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():r:dq MEM0:r:dq
+PATTERN : VV1 0x17  VL128 V66 V0F38 NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():r:dq REG1=XMM_B():r:dq
+PATTERN : VV1 0x17  VL256 V66 V0F38 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():r:qq MEM0:r:qq
+PATTERN : VV1 0x17  VL256 V66 V0F38 NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():r:qq REG1=YMM_B():r:qq
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VTESTPS
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : LOGICAL_FP
+EXTENSION : AVX
+FLAGS     : MUST [ zf-mod cf-mod ]
+PATTERN : VV1 0x0E VL128 V66 V0F38 norexw_prefix  NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():r:dq:f32 MEM0:r:dq:f32
+PATTERN : VV1 0x0E  VL128 V66 V0F38 norexw_prefix NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():r:dq:f32 REG1=XMM_B():r:dq:f32
+PATTERN : VV1 0x0E VL256 V66 V0F38  norexw_prefix NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():r:qq:f32 MEM0:r:qq:f32
+PATTERN : VV1 0x0E VL256 V66 V0F38 norexw_prefix NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():r:qq:f32 REG1=YMM_B():r:qq:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VTESTPD
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : LOGICAL_FP
+EXTENSION : AVX
+FLAGS     : MUST [ zf-mod cf-mod ]
+PATTERN : VV1 0x0F  VL128 V66 V0F38 norexw_prefix NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():r:dq:f64 MEM0:r:dq:f64
+PATTERN : VV1 0x0F VL128 V66 V0F38 norexw_prefix NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():r:dq:f64 REG1=XMM_B():r:dq:f64
+PATTERN : VV1 0x0F VL256 V66 V0F38  norexw_prefix NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():r:qq:f64 MEM0:r:qq:f64
+PATTERN : VV1 0x0F VL256 V66 V0F38 norexw_prefix NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():r:qq:f64 REG1=YMM_B():r:qq:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMAXPD
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES:  MXCSR
+PATTERN : VV1 0x5F  V66 V0F VL128 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:dq:f64
+PATTERN : VV1 0x5F  V66 V0F VL128 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=XMM_B():r:dq:f64
+PATTERN : VV1 0x5F  V66 V0F VL256 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 MEM0:r:qq:f64
+PATTERN : VV1 0x5F  V66 V0F VL256 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 REG2=YMM_B():r:qq:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMAXPS
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES:  MXCSR
+PATTERN : VV1 0x5F  VNP V0F VL128 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:dq:f32
+PATTERN : VV1 0x5F  VNP V0F VL128 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:dq:f32
+PATTERN : VV1 0x5F  VNP V0F VL256 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 MEM0:r:qq:f32
+PATTERN : VV1 0x5F  VNP V0F VL256 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 REG2=YMM_B():r:qq:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMAXSD
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES : simd_scalar MXCSR
+PATTERN : VV1 0x5F  VF2 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:q:f64
+PATTERN : VV1 0x5F  VF2 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=XMM_B():r:q:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMAXSS
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES : simd_scalar MXCSR
+PATTERN : VV1 0x5F  VF3 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:d:f32
+PATTERN : VV1 0x5F  VF3 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:d:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMINPD
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES:  MXCSR
+PATTERN : VV1 0x5D  V66 V0F VL128 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:dq:f64
+PATTERN : VV1 0x5D  V66 V0F VL128 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=XMM_B():r:dq:f64
+PATTERN : VV1 0x5D  V66 V0F VL256 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 MEM0:r:qq:f64
+PATTERN : VV1 0x5D  V66 V0F VL256 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 REG2=YMM_B():r:qq:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMINPS
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES:  MXCSR
+PATTERN : VV1 0x5D  VNP V0F VL128 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:dq:f32
+PATTERN : VV1 0x5D  VNP V0F VL128 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:dq:f32
+PATTERN : VV1 0x5D  VNP V0F VL256 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 MEM0:r:qq:f32
+PATTERN : VV1 0x5D  VNP V0F VL256 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 REG2=YMM_B():r:qq:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMINSD
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES : simd_scalar MXCSR
+PATTERN : VV1 0x5D  VF2 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:q:f64
+PATTERN : VV1 0x5D  VF2 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=XMM_B():r:q:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMINSS
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES : simd_scalar MXCSR
+PATTERN : VV1 0x5D  VF3 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:d:f32
+PATTERN : VV1 0x5D  VF3 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:d:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMOVAPD
+EXCEPTIONS: avx-type-1
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+ATTRIBUTES :  REQUIRES_ALIGNMENT
+PATTERN : VV1 0x28  VL128 V66 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64  MEM0:r:dq:f64
+PATTERN : VV1 0x28  VL128 V66 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64  REG1=XMM_B():r:dq:f64
+IFORM     : VMOVAPD_XMMdq_XMMdq_28
+PATTERN : VV1 0x29  VL128 V66 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:dq:f64 REG0=XMM_R():r:dq:f64
+PATTERN : VV1 0x29  VL128 V66 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  :  REG0=XMM_B():w:dq:f64 REG1=XMM_R():r:dq:f64
+IFORM     : VMOVAPD_XMMdq_XMMdq_29
+PATTERN : VV1 0x28  VL256 V66 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f64  MEM0:r:qq:f64
+PATTERN : VV1 0x28  VL256 V66 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f64  REG1=YMM_B():r:qq:f64
+IFORM     : VMOVAPD_YMMqq_YMMqq_28
+PATTERN : VV1 0x29  VL256 V66 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:qq:f64 REG0=YMM_R():r:qq:f64
+PATTERN : VV1 0x29  VL256 V66 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  :  REG0=YMM_B():w:qq:f64 REG1=YMM_R():r:qq:f64
+IFORM     : VMOVAPD_YMMqq_YMMqq_29
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMOVAPS
+EXCEPTIONS: avx-type-1
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+ATTRIBUTES :  REQUIRES_ALIGNMENT
+PATTERN : VV1 0x28  VL128 VNP V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32  MEM0:r:dq:f32
+PATTERN : VV1 0x28  VL128 VNP V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32  REG1=XMM_B():r:dq:f32
+IFORM     : VMOVAPS_XMMdq_XMMdq_28
+PATTERN : VV1 0x29  VL128 VNP V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:dq:f32 REG0=XMM_R():r:dq:f32
+PATTERN : VV1 0x29  VL128 VNP V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  :  REG0=XMM_B():w:dq:f32 REG1=XMM_R():r:dq:f32
+IFORM     : VMOVAPS_XMMdq_XMMdq_29
+PATTERN : VV1 0x28  VL256 VNP V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f32  MEM0:r:qq:f32
+PATTERN : VV1 0x28  VL256 VNP V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f32  REG1=YMM_B():r:qq:f32
+IFORM     : VMOVAPS_YMMqq_YMMqq_28
+PATTERN : VV1 0x29  VL256 VNP V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:qq:f32 REG0=YMM_R():r:qq:f32
+PATTERN : VV1 0x29  VL256 VNP V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  :  REG0=YMM_B():w:qq:f32 REG1=YMM_R():r:qq:f32
+IFORM     : VMOVAPS_YMMqq_YMMqq_29
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMOVD
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+PATTERN : VV1 0x6E  VL128 V66 V0F not64 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq  MEM0:r:d
+PATTERN : VV1 0x6E  VL128 V66 V0F not64  NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq  REG1=GPR32_B():r:d
+PATTERN : VV1 0x7E  VL128 V66 V0F not64  NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:d           REG0=XMM_R():r:d
+PATTERN : VV1 0x7E  VL128 V66 V0F not64  NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=GPR32_B():w:d REG1=XMM_R():r:d
+PATTERN : VV1 0x6E  VL128 V66 V0F mode64 norexw_prefix NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq  MEM0:r:d
+PATTERN : VV1 0x6E  VL128 V66 V0F mode64 norexw_prefix NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq  REG1=GPR32_B():r:d
+PATTERN : VV1 0x7E  VL128 V66 V0F mode64 norexw_prefix NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:d           REG0=XMM_R():r:d
+PATTERN : VV1 0x7E  VL128 V66 V0F mode64 norexw_prefix NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=GPR32_B():w:d REG1=XMM_R():r:d
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMOVQ
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+PATTERN : VV1 0x6E  VL128 V66 V0F mode64 rexw_prefix NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq  MEM0:r:q
+IFORM     : VMOVQ_XMMdq_MEMq_6E
+PATTERN : VV1 0x6E  VL128 V66 V0F mode64 rexw_prefix NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq  REG1=GPR64_B():r:q
+PATTERN : VV1 0x7E  VL128 V66 V0F mode64 rexw_prefix NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:q           REG0=XMM_R():r:q
+IFORM     : VMOVQ_MEMq_XMMq_7E
+PATTERN : VV1 0x7E  VL128 V66 V0F mode64 rexw_prefix NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=GPR64_B():w:q REG1=XMM_R():r:q
+PATTERN : VV1 0x7E  VL128 VF3 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq   MEM0:r:q
+IFORM     : VMOVQ_XMMdq_MEMq_7E
+PATTERN : VV1 0x7E  VL128 VF3 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq   REG1=XMM_B():r:q
+IFORM     : VMOVQ_XMMdq_XMMq_7E
+PATTERN : VV1 0xD6  VL128 V66 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:q   REG0=XMM_R():r:q
+IFORM     : VMOVQ_MEMq_XMMq_D6
+PATTERN : VV1 0xD6  VL128 V66 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_B():w:dq  REG1=XMM_R():r:q
+IFORM     : VMOVQ_XMMdq_XMMq_D6
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMOVDDUP
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+PATTERN : VV1 0x12  VL128 VF2 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64  MEM0:r:q:f64
+PATTERN : VV1 0x12  VL128 VF2 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64  REG1=XMM_B():r:dq:f64
+PATTERN : VV1 0x12  VL256 VF2 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f64  MEM0:r:qq:f64
+PATTERN : VV1 0x12  VL256 VF2 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f64  REG1=YMM_B():r:qq:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMOVDQA
+EXCEPTIONS: avx-type-1
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+ATTRIBUTES :  REQUIRES_ALIGNMENT
+PATTERN : VV1 0x6F  VL128 V66 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq  MEM0:r:dq
+PATTERN : VV1 0x6F  VL128 V66 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq  REG1=XMM_B():r:dq
+IFORM     : VMOVDQA_XMMdq_XMMdq_6F
+PATTERN : VV1 0x7F  VL128 V66 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:dq REG0=XMM_R():r:dq
+PATTERN : VV1 0x7F  VL128 V66 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_B():w:dq REG1=XMM_R():r:dq
+IFORM     : VMOVDQA_XMMdq_XMMdq_7F
+PATTERN : VV1 0x6F  VL256 V66 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq  MEM0:r:qq
+PATTERN : VV1 0x6F  VL256 V66 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq  REG1=YMM_B():r:qq
+IFORM     : VMOVDQA_YMMqq_YMMqq_6F
+PATTERN : VV1 0x7F  VL256 V66 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:qq REG0=YMM_R():r:qq
+PATTERN : VV1 0x7F  VL256 V66 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_B():w:qq REG1=YMM_R():r:qq
+IFORM     : VMOVDQA_YMMqq_YMMqq_7F
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMOVDQU
+EXCEPTIONS: avx-type-4M
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+PATTERN : VV1 0x6F  VL128 VF3 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq  MEM0:r:dq
+PATTERN : VV1 0x6F  VL128 VF3 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq  REG1=XMM_B():r:dq
+IFORM     : VMOVDQU_XMMdq_XMMdq_6F
+PATTERN : VV1 0x6F  VL256 VF3 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq  MEM0:r:qq
+PATTERN : VV1 0x6F  VL256 VF3 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq  REG1=YMM_B():r:qq
+IFORM     : VMOVDQU_YMMqq_YMMqq_6F
+PATTERN : VV1 0x7F  VL128 VF3 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:dq REG0=XMM_R():r:dq
+PATTERN : VV1 0x7F  VL128 VF3 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_B():w:dq REG1=XMM_R():r:dq
+IFORM     : VMOVDQU_XMMdq_XMMdq_7F
+PATTERN : VV1 0x7F  VL256 VF3 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:qq REG0=YMM_R():r:qq
+PATTERN : VV1 0x7F  VL256 VF3 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_B():w:qq REG1=YMM_R():r:qq
+IFORM     : VMOVDQU_YMMqq_YMMqq_7F
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMOVSHDUP
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+PATTERN : VV1 0x16  VL128 VF3 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 MEM0:r:dq:f32
+PATTERN : VV1 0x16  VL128 VF3 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_B():r:dq:f32
+PATTERN : VV1 0x16  VL256 VF3 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f32 MEM0:r:qq:f32
+PATTERN : VV1 0x16  VL256 VF3 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_B():r:qq:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMOVSLDUP
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+PATTERN : VV1 0x12  VL128 VF3 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 MEM0:r:dq:f32
+PATTERN : VV1 0x12  VL128 VF3 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_B():r:dq:f32
+PATTERN : VV1 0x12  VL256 VF3 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f32 MEM0:r:qq:f32
+PATTERN : VV1 0x12  VL256 VF3 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_B():r:qq:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPOR
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : LOGICAL
+EXTENSION : AVX
+PATTERN : VV1 0xEB  VL128 V66 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u128 REG1=XMM_N():r:dq:u128 MEM0:r:dq:u128
+PATTERN : VV1 0xEB  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u128 REG1=XMM_N():r:dq:u128 REG2=XMM_B():r:dq:u128
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPAND
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : LOGICAL
+EXTENSION : AVX
+PATTERN : VV1 0xDB  VL128 V66 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u128 REG1=XMM_N():r:dq:u128 MEM0:r:dq:u128
+PATTERN : VV1 0xDB  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u128 REG1=XMM_N():r:dq:u128 REG2=XMM_B():r:dq:u128
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPANDN
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : LOGICAL
+EXTENSION : AVX
+PATTERN : VV1 0xDF  VL128 V66 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u128 REG1=XMM_N():r:dq:u128 MEM0:r:dq:u128
+PATTERN : VV1 0xDF  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u128 REG1=XMM_N():r:dq:u128 REG2=XMM_B():r:dq:u128
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPXOR
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : LOGICAL
+EXTENSION : AVX
+PATTERN : VV1 0xEF  VL128 V66 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u128 REG1=XMM_N():r:dq:u128 MEM0:r:dq:u128
+PATTERN : VV1 0xEF  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u128 REG1=XMM_N():r:dq:u128 REG2=XMM_B():r:dq:u128
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPABSB
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x1C   V66 V0F38 VL128 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u8 MEM0:r:dq:i8
+PATTERN : VV1 0x1C  V66 V0F38 VL128 NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u8  REG1=XMM_B():r:dq:i8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPABSW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x1D   V66 V0F38 VL128 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u16 MEM0:r:dq:i16
+PATTERN : VV1 0x1D  V66 V0F38 VL128 NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u16  REG1=XMM_B():r:dq:i16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPABSD
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x1E   V66 V0F38 VL128 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u32 MEM0:r:dq:i32
+PATTERN : VV1 0x1E  V66 V0F38 VL128 NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u32  REG1=XMM_B():r:dq:i32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPHMINPOSUW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x41   V66 V0F38 VL128 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u16 MEM0:r:dq:u16
+PATTERN : VV1 0x41  V66 V0F38 VL128 NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u16  REG1=XMM_B():r:dq:u16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSHUFD
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x70  VL128 V66 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq MEM0:r:dq  IMM0:r:b
+PATTERN : VV1 0x70  VL128 V66 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq REG1=XMM_B():r:dq IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSHUFHW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x70  VL128 VF3 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq MEM0:r:dq  IMM0:r:b
+PATTERN : VV1 0x70  VL128 VF3 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq REG1=XMM_B():r:dq IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSHUFLW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x70  VL128 VF2 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq MEM0:r:dq  IMM0:r:b
+PATTERN : VV1 0x70  VL128 VF2 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq REG1=XMM_B():r:dq IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPACKSSWB
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x63  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i8 REG1=XMM_N():r:dq:i16 MEM0:r:dq:i16
+PATTERN : VV1 0x63  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i8 REG1=XMM_N():r:dq:i16 REG2=XMM_B():r:dq:i16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPACKSSDW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x6B  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i32 MEM0:r:dq:i32
+PATTERN : VV1 0x6B  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i32 REG2=XMM_B():r:dq:i32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPACKUSWB
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x67  V66 V0F VL128  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u8 REG1=XMM_N():r:dq:i16 MEM0:r:dq:i16
+PATTERN : VV1 0x67  V66 V0F VL128 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u8 REG1=XMM_N():r:dq:i16 REG2=XMM_B():r:dq:i16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPACKUSDW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x2B  V66 V0F38 VL128  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:i32 MEM0:r:dq:i32
+PATTERN : VV1 0x2B  V66 V0F38 VL128 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:i32 REG2=XMM_B():r:dq:i32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSLLW
+EXCEPTIONS: avx-type-7
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xF1  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u16 MEM0:r:dq:u64
+PATTERN : VV1 0xF1  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u16 REG2=XMM_B():r:dq:u64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSLLD
+EXCEPTIONS: avx-type-7
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xF2  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u32 REG1=XMM_N():r:dq:u32 MEM0:r:dq:u64
+PATTERN : VV1 0xF2  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u32 REG1=XMM_N():r:dq:u32 REG2=XMM_B():r:dq:u64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSLLQ
+EXCEPTIONS: avx-type-7
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xF3  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u64 REG1=XMM_N():r:dq:u64 MEM0:r:dq:u64
+PATTERN : VV1 0xF3  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u64 REG1=XMM_N():r:dq:u64 REG2=XMM_B():r:dq:u64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSRLW
+EXCEPTIONS: avx-type-7
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xD1  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u16 MEM0:r:dq:u64
+PATTERN : VV1 0xD1  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u16 REG2=XMM_B():r:dq:u64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSRLD
+EXCEPTIONS: avx-type-7
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xD2  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u32 REG1=XMM_N():r:dq:u32 MEM0:r:dq:u64
+PATTERN : VV1 0xD2  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u32 REG1=XMM_N():r:dq:u32 REG2=XMM_B():r:dq:u64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSRLQ
+EXCEPTIONS: avx-type-7
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xD3  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u64 REG1=XMM_N():r:dq:u64 MEM0:r:dq:u64
+PATTERN : VV1 0xD3  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u64 REG1=XMM_N():r:dq:u64 REG2=XMM_B():r:dq:u64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSRAW
+EXCEPTIONS: avx-type-7
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xE1  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 MEM0:r:dq:u64
+PATTERN : VV1 0xE1  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 REG2=XMM_B():r:dq:u64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSRAD
+EXCEPTIONS: avx-type-7
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xE2  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_N():r:dq:i32 MEM0:r:dq:u64
+PATTERN : VV1 0xE2  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_N():r:dq:i32 REG2=XMM_B():r:dq:u64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPADDB
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xFC  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i8 REG1=XMM_N():r:dq:i8 MEM0:r:dq:i8
+PATTERN : VV1 0xFC  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i8 REG1=XMM_N():r:dq:i8 REG2=XMM_B():r:dq:i8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPADDW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xFD  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 MEM0:r:dq:i16
+PATTERN : VV1 0xFD  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 REG2=XMM_B():r:dq:i16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPADDD
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xFE  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_N():r:dq:i32 MEM0:r:dq:i32
+PATTERN : VV1 0xFE  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_N():r:dq:i32 REG2=XMM_B():r:dq:i32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPADDQ
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xD4  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i64 REG1=XMM_N():r:dq:i64 MEM0:r:dq:i64
+PATTERN : VV1 0xD4  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i64 REG1=XMM_N():r:dq:i64 REG2=XMM_B():r:dq:i64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPADDSB
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xEC  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i8 REG1=XMM_N():r:dq:i8 MEM0:r:dq:i8
+PATTERN : VV1 0xEC  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i8 REG1=XMM_N():r:dq:i8 REG2=XMM_B():r:dq:i8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPADDSW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xED  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 MEM0:r:dq:i16
+PATTERN : VV1 0xED  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 REG2=XMM_B():r:dq:i16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPADDUSB
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xDC  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u8 REG1=XMM_N():r:dq:u8 MEM0:r:dq:u8
+PATTERN : VV1 0xDC  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u8 REG1=XMM_N():r:dq:u8 REG2=XMM_B():r:dq:u8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPADDUSW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xDD  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u16 MEM0:r:dq:u16
+PATTERN : VV1 0xDD  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u16 REG2=XMM_B():r:dq:u16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPAVGB
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xE0  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u8 REG1=XMM_N():r:dq:u8 MEM0:r:dq:u8
+PATTERN : VV1 0xE0  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u8 REG1=XMM_N():r:dq:u8 REG2=XMM_B():r:dq:u8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPAVGW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xE3  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u16 MEM0:r:dq:u16
+PATTERN : VV1 0xE3  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u16 REG2=XMM_B():r:dq:u16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPCMPEQB
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x74  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u8 REG1=XMM_N():r:dq:u8 MEM0:r:dq:u8
+PATTERN : VV1 0x74  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u8 REG1=XMM_N():r:dq:u8 REG2=XMM_B():r:dq:u8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPCMPEQW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x75  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u16 MEM0:r:dq:u16
+PATTERN : VV1 0x75  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u16 REG2=XMM_B():r:dq:u16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPCMPEQD
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x76  V66 V0F VL128  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u32 REG1=XMM_N():r:dq:u32 MEM0:r:dq:u32
+PATTERN : VV1 0x76  V66 V0F VL128 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u32 REG1=XMM_N():r:dq:u32 REG2=XMM_B():r:dq:u32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPCMPEQQ
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x29  VL128 V66 V0F38  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u64 REG1=XMM_N():r:dq:u64 MEM0:r:dq:u64
+PATTERN : VV1 0x29  VL128 V66 V0F38 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u64 REG1=XMM_N():r:dq:u64 REG2=XMM_B():r:dq:u64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPCMPGTB
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x64  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i8 REG1=XMM_N():r:dq:i8 MEM0:r:dq:i8
+PATTERN : VV1 0x64  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i8 REG1=XMM_N():r:dq:i8 REG2=XMM_B():r:dq:i8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPCMPGTW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x65  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 MEM0:r:dq:i16
+PATTERN : VV1 0x65  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 REG2=XMM_B():r:dq:i16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPCMPGTD
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x66  V66 V0F VL128  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_N():r:dq:i32 MEM0:r:dq:i32
+PATTERN : VV1 0x66  V66 V0F VL128 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_N():r:dq:i32 REG2=XMM_B():r:dq:i32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPCMPGTQ
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x37  V66 V0F38 VL128  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_N():r:dq:i64 MEM0:r:dq:i64
+PATTERN : VV1 0x37  V66 V0F38 VL128 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_N():r:dq:i64 REG2=XMM_B():r:dq:i64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPHADDW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x01  VL128 V66 V0F38  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 MEM0:r:dq:i16
+PATTERN : VV1 0x01  VL128 V66 V0F38 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 REG2=XMM_B():r:dq:i16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPHADDD
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x02  VL128 V66 V0F38  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_N():r:dq:i32 MEM0:r:dq:i32
+PATTERN : VV1 0x02  VL128 V66 V0F38 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_N():r:dq:i32 REG2=XMM_B():r:dq:i32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPHADDSW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x03  VL128 V66 V0F38  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 MEM0:r:dq:i16
+PATTERN : VV1 0x03  VL128 V66 V0F38 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 REG2=XMM_B():r:dq:i16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPHSUBW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x05  VL128 V66 V0F38  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 MEM0:r:dq:i16
+PATTERN : VV1 0x05  VL128 V66 V0F38 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 REG2=XMM_B():r:dq:i16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPHSUBD
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x06  VL128 V66 V0F38  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_N():r:dq:i32 MEM0:r:dq:i32
+PATTERN : VV1 0x06  VL128 V66 V0F38 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_N():r:dq:i32 REG2=XMM_B():r:dq:i32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPHSUBSW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x07  VL128 V66 V0F38  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 MEM0:r:dq:i16
+PATTERN : VV1 0x07  VL128 V66 V0F38 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 REG2=XMM_B():r:dq:i16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMULHUW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xE4  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u16 MEM0:r:dq:u16
+PATTERN : VV1 0xE4  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u16 REG2=XMM_B():r:dq:u16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMULHRSW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x0B  VL128 V66 V0F38  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 MEM0:r:dq:i16
+PATTERN : VV1 0x0B  VL128 V66 V0F38 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 REG2=XMM_B():r:dq:i16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMULHW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xE5  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 MEM0:r:dq:i16
+PATTERN : VV1 0xE5  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 REG2=XMM_B():r:dq:i16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMULLW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xD5  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 MEM0:r:dq:i16
+PATTERN : VV1 0xD5  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 REG2=XMM_B():r:dq:i16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMULLD
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x40  VL128 V66 V0F38  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_N():r:dq:i32 MEM0:r:dq:i32
+PATTERN : VV1 0x40  VL128 V66 V0F38 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_N():r:dq:i32 REG2=XMM_B():r:dq:i32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMULUDQ
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xF4  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u64 REG1=XMM_N():r:dq:u32 MEM0:r:dq:u32
+PATTERN : VV1 0xF4  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u64 REG1=XMM_N():r:dq:u32 REG2=XMM_B():r:dq:u32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMULDQ
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x28  VL128 V66 V0F38  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i64 REG1=XMM_N():r:dq:i32 MEM0:r:dq:i32
+PATTERN : VV1 0x28  VL128 V66 V0F38 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i64 REG1=XMM_N():r:dq:i32 REG2=XMM_B():r:dq:i32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSADBW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xF6  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u8 MEM0:r:dq:u8
+PATTERN : VV1 0xF6  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u8 REG2=XMM_B():r:dq:u8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSHUFB
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x00  VL128 V66 V0F38  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u8 REG1=XMM_N():r:dq:u8 MEM0:r:dq:u8
+PATTERN : VV1 0x00  VL128 V66 V0F38 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u8 REG1=XMM_N():r:dq:u8 REG2=XMM_B():r:dq:u8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSIGNB
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x08  VL128 V66 V0F38  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i8 REG1=XMM_N():r:dq:i8 MEM0:r:dq:i8
+PATTERN : VV1 0x08  VL128 V66 V0F38 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i8 REG1=XMM_N():r:dq:i8 REG2=XMM_B():r:dq:i8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSIGNW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x09  VL128 V66 V0F38  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 MEM0:r:dq:i16
+PATTERN : VV1 0x09  VL128 V66 V0F38 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 REG2=XMM_B():r:dq:i16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSIGND
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x0A  VL128 V66 V0F38  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_N():r:dq:i32 MEM0:r:dq:i32
+PATTERN : VV1 0x0A  VL128 V66 V0F38 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_N():r:dq:i32 REG2=XMM_B():r:dq:i32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSUBSB
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xE8  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i8 REG1=XMM_N():r:dq:i8 MEM0:r:dq:i8
+PATTERN : VV1 0xE8  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i8 REG1=XMM_N():r:dq:i8 REG2=XMM_B():r:dq:i8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSUBSW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xE9  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 MEM0:r:dq:i16
+PATTERN : VV1 0xE9  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 REG2=XMM_B():r:dq:i16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSUBUSB
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xD8  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u8 REG1=XMM_N():r:dq:u8 MEM0:r:dq:u8
+PATTERN : VV1 0xD8  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u8 REG1=XMM_N():r:dq:u8 REG2=XMM_B():r:dq:u8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSUBUSW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xD9  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u16 MEM0:r:dq:u16
+PATTERN : VV1 0xD9  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u16 REG2=XMM_B():r:dq:u16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSUBB
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xF8  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i8 REG1=XMM_N():r:dq:i8 MEM0:r:dq:i8
+PATTERN : VV1 0xF8  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i8 REG1=XMM_N():r:dq:i8 REG2=XMM_B():r:dq:i8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSUBW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xF9  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 MEM0:r:dq:i16
+PATTERN : VV1 0xF9  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 REG2=XMM_B():r:dq:i16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSUBD
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xFA  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_N():r:dq:i32 MEM0:r:dq:i32
+PATTERN : VV1 0xFA  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_N():r:dq:i32 REG2=XMM_B():r:dq:i32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSUBQ
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xFB  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i64 REG1=XMM_N():r:dq:i64 MEM0:r:dq:i64
+PATTERN : VV1 0xFB  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i64 REG1=XMM_N():r:dq:i64 REG2=XMM_B():r:dq:i64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPUNPCKHBW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x68  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u8 REG1=XMM_N():r:dq:u8 MEM0:r:dq:u8
+PATTERN : VV1 0x68  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u8 REG1=XMM_N():r:dq:u8 REG2=XMM_B():r:dq:u8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPUNPCKHWD
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x69  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u16 MEM0:r:dq:u16
+PATTERN : VV1 0x69  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u16 REG2=XMM_B():r:dq:u16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPUNPCKHDQ
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x6A  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u32 REG1=XMM_N():r:dq:u32 MEM0:r:dq:u32
+PATTERN : VV1 0x6A  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u32 REG1=XMM_N():r:dq:u32 REG2=XMM_B():r:dq:u32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPUNPCKHQDQ
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x6D  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u64 REG1=XMM_N():r:dq:u64 MEM0:r:dq:u64
+PATTERN : VV1 0x6D  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u64 REG1=XMM_N():r:dq:u64 REG2=XMM_B():r:dq:u64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPUNPCKLBW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x60  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u8 REG1=XMM_N():r:dq:u8 MEM0:r:dq:u8
+PATTERN : VV1 0x60  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u8 REG1=XMM_N():r:dq:u8 REG2=XMM_B():r:dq:u8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPUNPCKLWD
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x61  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u16 MEM0:r:dq:u16
+PATTERN : VV1 0x61  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u16 REG2=XMM_B():r:dq:u16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPUNPCKLDQ
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x62  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u32 REG1=XMM_N():r:dq:u32 MEM0:r:dq:u32
+PATTERN : VV1 0x62  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u32 REG1=XMM_N():r:dq:u32 REG2=XMM_B():r:dq:u32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPUNPCKLQDQ
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x6C  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u64 REG1=XMM_N():r:dq:u64 MEM0:r:dq:u64
+PATTERN : VV1 0x6C  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u64 REG1=XMM_N():r:dq:u64 REG2=XMM_B():r:dq:u64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSRLDQ
+EXCEPTIONS: avx-type-7
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x73  VL128 V66 V0F MOD[0b11] MOD=3 REG[0b011] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_N():w:dq:u128 REG1=XMM_B():r:dq:u128 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSLLDQ
+EXCEPTIONS: avx-type-7
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x73  VL128 V66 V0F MOD[0b11] MOD=3 REG[0b111] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_N():w:dq:u128 REG1=XMM_B():r:dq:u128 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMOVLHPS
+EXCEPTIONS: avx-type-7
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+PATTERN : VV1 0x16  VL128 VNP V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:q:f32 REG2=XMM_B():r:q:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMOVHLPS
+EXCEPTIONS: avx-type-7
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+PATTERN : VV1 0x12  VL128 VNP V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:dq:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPALIGNR
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x0F  VL128 V66 V0F3A MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:u8 REG1=XMM_N():r:dq:u8 MEM0:r:dq:u8 IMM0:r:b
+PATTERN : VV1 0x0F  VL128 V66 V0F3A MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:u8 REG1=XMM_N():r:dq:u8 REG2=XMM_B():r:dq:u8 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPBLENDW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x0E  VL128 V66 V0F3A MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u16 MEM0:r:dq:u16 IMM0:r:b
+PATTERN : VV1 0x0E  VL128 V66 V0F3A MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u16 REG2=XMM_B():r:dq:u16 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VROUNDPD
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES: MXCSR
+PATTERN : VV1 0x09  VL128 V66 V0F3A NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f64  MEM0:r:dq:f64 IMM0:r:b
+PATTERN : VV1 0x09  VL128 V66 V0F3A NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_B():r:dq:f64 IMM0:r:b
+PATTERN : VV1 0x09  VL256 V66 V0F3A NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f64  MEM0:r:qq:f64 IMM0:r:b
+PATTERN : VV1 0x09  VL256 V66 V0F3A NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_B():r:qq:f64 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VROUNDPS
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES: MXCSR
+PATTERN : VV1 0x08  VL128 V66 V0F3A NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f32  MEM0:r:dq:f32 IMM0:r:b
+PATTERN : VV1 0x08  VL128 V66 V0F3A NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_B():r:dq:f32 IMM0:r:b
+PATTERN : VV1 0x08  VL256 V66 V0F3A NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f32  MEM0:r:qq:f32 IMM0:r:b
+PATTERN : VV1 0x08  VL256 V66 V0F3A NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_B():r:qq:f32 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VROUNDSD
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES: MXCSR simd_scalar
+PATTERN : VV1 0x0B  V66 V0F3A MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f64  REG1=XMM_N():r:dq:f64  MEM0:r:q:f64         IMM0:r:b
+PATTERN : VV1 0x0B  V66 V0F3A MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f64  REG1=XMM_N():r:dq:f64  REG2=XMM_B():r:q:f64 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VROUNDSS
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES: MXCSR simd_scalar
+PATTERN : VV1 0x0A  V66 V0F3A MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f32  REG1=XMM_N():r:dq:f32  MEM0:r:d:f32         IMM0:r:b
+PATTERN : VV1 0x0A  V66 V0F3A MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f32  REG1=XMM_N():r:dq:f32  REG2=XMM_B():r:d:f32 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VSHUFPD
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xC6  VL128 V66 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:dq:f64 IMM0:r:b
+PATTERN : VV1 0xC6  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=XMM_B():r:dq:f64 IMM0:r:b
+PATTERN : VV1 0xC6  VL256 V66 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 MEM0:r:qq:f64 IMM0:r:b
+PATTERN : VV1 0xC6  VL256 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 REG2=YMM_B():r:qq:f64 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VSHUFPS
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xC6  VL128 VNP V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:dq:f32 IMM0:r:b
+PATTERN : VV1 0xC6  VL128 VNP V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:dq:f32 IMM0:r:b
+PATTERN : VV1 0xC6  VL256 VNP V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 MEM0:r:qq:f32 IMM0:r:b
+PATTERN : VV1 0xC6  VL256 VNP V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 REG2=YMM_B():r:qq:f32 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VRCPPS
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x53  VNP VL128 NOVSR V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32  MEM0:r:dq:f32
+PATTERN : VV1 0x53  VNP VL128 NOVSR V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32  REG1=XMM_B():r:dq:f32
+PATTERN : VV1 0x53  VNP VL256 NOVSR V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f32  MEM0:r:qq:f32
+PATTERN : VV1 0x53  VNP VL256 NOVSR V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f32  REG1=YMM_B():r:qq:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VRCPSS
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES: simd_scalar
+PATTERN : VV1 0x53  VF3 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:d:f32
+PATTERN : VV1 0x53  VF3 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:d:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VRSQRTPS
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x52  VNP VL128 NOVSR V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32  MEM0:r:dq:f32
+PATTERN : VV1 0x52  VNP VL128 NOVSR V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32  REG1=XMM_B():r:dq:f32
+PATTERN : VV1 0x52  VNP VL256 NOVSR V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f32  MEM0:r:qq:f32
+PATTERN : VV1 0x52  VNP VL256 NOVSR V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f32  REG1=YMM_B():r:qq:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VRSQRTSS
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES: simd_scalar
+PATTERN : VV1 0x52  VF3 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:d:f32
+PATTERN : VV1 0x52  VF3 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:d:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VSQRTPD
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES: MXCSR
+PATTERN : VV1 0x51  VL128 V66 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64 MEM0:r:dq:f64
+PATTERN : VV1 0x51  VL128 V66 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64  REG1=XMM_B():r:dq:f64
+PATTERN : VV1 0x51  VL256 V66 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f64  MEM0:r:qq:f64
+PATTERN : VV1 0x51  VL256 V66 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f64  REG1=YMM_B():r:qq:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VSQRTPS
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES: MXCSR
+PATTERN : VV1 0x51  VL128 VNP NOVSR V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32  MEM0:r:dq:f32
+PATTERN : VV1 0x51  VL128 VNP NOVSR V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32  REG1=XMM_B():r:dq:f32
+PATTERN : VV1 0x51  VL256 VNP NOVSR V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f32  MEM0:r:qq:f32
+PATTERN : VV1 0x51  VL256 VNP NOVSR V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f32  REG1=YMM_B():r:qq:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VSQRTSD
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES : MXCSR simd_scalar
+PATTERN : VV1 0x51  VF2 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:q:f64
+PATTERN : VV1 0x51  VF2 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=XMM_B():r:q:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VSQRTSS
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES: MXCSR simd_scalar
+PATTERN : VV1 0x51  VF3 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:d:f32
+PATTERN : VV1 0x51  VF3 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:d:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VUNPCKHPD
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x15  VL128 V66 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:dq:f64
+PATTERN : VV1 0x15  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=XMM_B():r:dq:f64
+PATTERN : VV1 0x15  VL256 V66 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 MEM0:r:qq:f64
+PATTERN : VV1 0x15  VL256 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 REG2=YMM_B():r:qq:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VUNPCKHPS
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x15  VL128 VNP V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:dq:f32
+PATTERN : VV1 0x15  VL128 VNP V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:dq:f32
+PATTERN : VV1 0x15  VL256 VNP V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 MEM0:r:qq:f32
+PATTERN : VV1 0x15  VL256 VNP V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 REG2=YMM_B():r:qq:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VSUBPD
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES: MXCSR
+PATTERN : VV1 0x5C  V66 V0F VL128 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:dq:f64
+PATTERN : VV1 0x5C  V66 V0F VL128 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=XMM_B():r:dq:f64
+PATTERN : VV1 0x5C  V66 V0F VL256 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 MEM0:r:qq:f64
+PATTERN : VV1 0x5C  V66 V0F VL256 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 REG2=YMM_B():r:qq:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VSUBPS
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES: MXCSR
+PATTERN : VV1 0x5C  VL128 VNP V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:dq:f32
+PATTERN : VV1 0x5C  VL128 VNP V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:dq:f32
+PATTERN : VV1 0x5C  VL256 VNP V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 MEM0:r:qq:f32
+PATTERN : VV1 0x5C  VL256 VNP V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 REG2=YMM_B():r:qq:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VSUBSD
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES : MXCSR SIMD_SCALAR
+PATTERN : VV1 0x5C  VF2 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:q:f64
+PATTERN : VV1 0x5C  VF2 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=XMM_B():r:q:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VSUBSS
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES: MXCSR simd_scalar
+PATTERN : VV1 0x5C  VF3 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:d:f32
+PATTERN : VV1 0x5C  VF3 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:d:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMULPD
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES: MXCSR
+PATTERN : VV1 0x59  VL128 V66 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:dq:f64
+PATTERN : VV1 0x59  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=XMM_B():r:dq:f64
+PATTERN : VV1 0x59  VL256 V66 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 MEM0:r:qq:f64
+PATTERN : VV1 0x59  VL256 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 REG2=YMM_B():r:qq:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMULPS
+EXCEPTIONS: avx-type-2
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES: MXCSR
+PATTERN : VV1 0x59  VL128 VNP V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:dq:f32
+PATTERN : VV1 0x59  VL128 VNP V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:dq:f32
+PATTERN : VV1 0x59  VL256 VNP V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 MEM0:r:qq:f32
+PATTERN : VV1 0x59  VL256 VNP V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 REG2=YMM_B():r:qq:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMULSD
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES : MXCSR simd_scalar
+PATTERN : VV1 0x59  VF2 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:q:f64
+PATTERN : VV1 0x59  VF2 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=XMM_B():r:q:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMULSS
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES: MXCSR simd_scalar
+PATTERN : VV1 0x59  VF3 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:d:f32
+PATTERN : VV1 0x59  VF3 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:d:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VORPD
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : LOGICAL_FP
+EXTENSION : AVX
+PATTERN : VV1 0x56  VL128 V66 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u64 REG1=XMM_N():r:dq:u64 MEM0:r:dq:u64
+PATTERN : VV1 0x56  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u64 REG1=XMM_N():r:dq:u64 REG2=XMM_B():r:dq:u64
+PATTERN : VV1 0x56  VL256 V66 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:u64 REG1=YMM_N():r:qq:u64 MEM0:r:qq:u64
+PATTERN : VV1 0x56  VL256 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:u64 REG1=YMM_N():r:qq:u64 REG2=YMM_B():r:qq:u64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VORPS
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : LOGICAL_FP
+EXTENSION : AVX
+PATTERN : VV1 0x56  VNP V0F VL128 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u32 REG1=XMM_N():r:dq:u32 MEM0:r:dq:u32
+PATTERN : VV1 0x56  VNP V0F VL128 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u32 REG1=XMM_N():r:dq:u32 REG2=XMM_B():r:dq:u32
+PATTERN : VV1 0x56  VNP V0F VL256 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:u32 REG1=YMM_N():r:qq:u32 MEM0:r:qq:u32
+PATTERN : VV1 0x56  VNP V0F VL256 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:u32 REG1=YMM_N():r:qq:u32 REG2=YMM_B():r:qq:u32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMAXSB
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x3C  VL128 V66 V0F38  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i8 REG1=XMM_N():r:dq:i8 MEM0:r:dq:i8
+PATTERN : VV1 0x3C  VL128 V66 V0F38 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i8 REG1=XMM_N():r:dq:i8 REG2=XMM_B():r:dq:i8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMAXSW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xEE  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 MEM0:r:dq:i16
+PATTERN : VV1 0xEE  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 REG2=XMM_B():r:dq:i16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMAXSD
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x3D  VL128 V66 V0F38  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_N():r:dq:i32 MEM0:r:dq:i32
+PATTERN : VV1 0x3D  VL128 V66 V0F38 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_N():r:dq:i32 REG2=XMM_B():r:dq:i32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMAXUB
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xDE  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u8 REG1=XMM_N():r:dq:u8 MEM0:r:dq:u8
+PATTERN : VV1 0xDE  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u8 REG1=XMM_N():r:dq:u8 REG2=XMM_B():r:dq:u8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMAXUW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x3E  VL128 V66 V0F38  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u16 MEM0:r:dq:u16
+PATTERN : VV1 0x3E  VL128 V66 V0F38 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u16 REG2=XMM_B():r:dq:u16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMAXUD
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x3F  VL128 V66 V0F38  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u32 REG1=XMM_N():r:dq:u32 MEM0:r:dq:u32
+PATTERN : VV1 0x3F  VL128 V66 V0F38 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u32 REG1=XMM_N():r:dq:u32 REG2=XMM_B():r:dq:u32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMINSB
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x38  VL128 V66 V0F38  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i8 REG1=XMM_N():r:dq:i8 MEM0:r:dq:i8
+PATTERN : VV1 0x38  VL128 V66 V0F38 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i8 REG1=XMM_N():r:dq:i8 REG2=XMM_B():r:dq:i8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMINSW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xEA  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 MEM0:r:dq:i16
+PATTERN : VV1 0xEA  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:i16 REG2=XMM_B():r:dq:i16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMINSD
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x39  VL128 V66 V0F38  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_N():r:dq:i32 MEM0:r:dq:i32
+PATTERN : VV1 0x39  VL128 V66 V0F38 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_N():r:dq:i32 REG2=XMM_B():r:dq:i32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMINUB
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xDA  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u8 REG1=XMM_N():r:dq:u8 MEM0:r:dq:u8
+PATTERN : VV1 0xDA  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u8 REG1=XMM_N():r:dq:u8 REG2=XMM_B():r:dq:u8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMINUW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x3A  V66 V0F38 VL128  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u16 MEM0:r:dq:u16
+PATTERN : VV1 0x3A  V66 V0F38 VL128 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u16 REG2=XMM_B():r:dq:u16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMINUD
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x3B  V66 V0F38 VL128  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u32 REG1=XMM_N():r:dq:u32 MEM0:r:dq:u32
+PATTERN : VV1 0x3B  V66 V0F38 VL128 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u32 REG1=XMM_N():r:dq:u32 REG2=XMM_B():r:dq:u32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMADDWD
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xF5  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_N():r:dq:i16 MEM0:r:dq:i16
+PATTERN : VV1 0xF5  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i32 REG1=XMM_N():r:dq:i16 REG2=XMM_B():r:dq:i16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMADDUBSW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x04  VL128 V66 V0F38  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:u8 MEM0:r:dq:i8
+PATTERN : VV1 0x04  VL128 V66 V0F38 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i16 REG1=XMM_N():r:dq:u8 REG2=XMM_B():r:dq:i8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMPSADBW
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x42  VL128 V66 V0F3A MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u8 MEM0:r:dq:u8 IMM0:r:b
+PATTERN : VV1 0x42  VL128 V66 V0F3A MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:u16 REG1=XMM_N():r:dq:u8 REG2=XMM_B():r:dq:u8 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSLLW
+EXCEPTIONS: avx-type-7
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x71  VL128 V66 V0F MOD[0b11] MOD=3 REG[0b110] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_N():w:dq:u16 REG1=XMM_B():r:dq:u16 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSLLD
+EXCEPTIONS: avx-type-7
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x72  VL128 V66 V0F MOD[0b11] MOD=3 REG[0b110] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_N():w:dq:u32 REG1=XMM_B():r:dq:u32 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSLLQ
+EXCEPTIONS: avx-type-7
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x73  VL128 V66 V0F MOD[0b11] MOD=3 REG[0b110] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_N():w:dq:u64 REG1=XMM_B():r:dq:u64 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSRAW
+EXCEPTIONS: avx-type-7
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x71  VL128 V66 V0F MOD[0b11] MOD=3 REG[0b100] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_N():w:dq:i16 REG1=XMM_B():r:dq:i16 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSRAD
+EXCEPTIONS: avx-type-7
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x72  VL128 V66 V0F MOD[0b11] MOD=3 REG[0b100] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_N():w:dq:i32 REG1=XMM_B():r:dq:i32 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSRLW
+EXCEPTIONS: avx-type-7
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x71  VL128 V66 V0F MOD[0b11] MOD=3 REG[0b010] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_N():w:dq:u16 REG1=XMM_B():r:dq:u16 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSRLD
+EXCEPTIONS: avx-type-7
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x72  VL128 V66 V0F MOD[0b11] MOD=3 REG[0b010] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_N():w:dq:u32 REG1=XMM_B():r:dq:u32 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPSRLQ
+EXCEPTIONS: avx-type-7
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x73  VL128 V66 V0F MOD[0b11] MOD=3 REG[0b010] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_N():w:dq:u64 REG1=XMM_B():r:dq:u64 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VUCOMISD
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES : simd_scalar MXCSR
+FLAGS     : MUST [ zf-mod pf-mod cf-mod of-0 af-0 sf-0 ]
+PATTERN : VV1 0x2E V66 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():r:dq:f64  MEM0:r:q:f64
+PATTERN : VV1 0x2E V66 V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():r:dq:f64  REG1=XMM_B():r:q:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VUCOMISS
+EXCEPTIONS: avx-type-3
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES : simd_scalar MXCSR
+FLAGS     : MUST [ zf-mod pf-mod cf-mod of-0 af-0 sf-0 ]
+PATTERN : VV1 0x2E VNP V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():r:dq:f32  MEM0:r:d:f32
+PATTERN : VV1 0x2E VNP V0F NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():r:dq:f32  REG1=XMM_B():r:d:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VUNPCKLPD
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x14  VL128 V66 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:dq:f64
+PATTERN : VV1 0x14  VL128 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=XMM_B():r:dq:f64
+PATTERN : VV1 0x14  VL256 V66 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 MEM0:r:qq:f64
+PATTERN : VV1 0x14  VL256 V66 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 REG2=YMM_B():r:qq:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VUNPCKLPS
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x14  VL128 VNP V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:dq:f32
+PATTERN : VV1 0x14  VL128 VNP V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:dq:f32
+PATTERN : VV1 0x14  VL256 VNP V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 MEM0:r:qq:f32
+PATTERN : VV1 0x14  VL256 VNP V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 REG2=YMM_B():r:qq:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VXORPD
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : LOGICAL_FP
+EXTENSION : AVX
+PATTERN : VV1 0x57  V66 V0F VL128 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u64 REG1=XMM_N():r:dq:u64 MEM0:r:dq:u64
+PATTERN : VV1 0x57  V66 V0F VL128 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u64 REG1=XMM_N():r:dq:u64 REG2=XMM_B():r:dq:u64
+PATTERN : VV1 0x57  V66 V0F VL256 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:u64 REG1=YMM_N():r:qq:u64 MEM0:r:qq:u64
+PATTERN : VV1 0x57  V66 V0F VL256 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:u64 REG1=YMM_N():r:qq:u64 REG2=YMM_B():r:qq:u64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VXORPS
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : LOGICAL_FP
+EXTENSION : AVX
+PATTERN : VV1 0x57  VNP V0F VL128 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq REG1=XMM_N():r:dq MEM0:r:dq
+PATTERN : VV1 0x57  VNP V0F VL128 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq REG1=XMM_N():r:dq REG2=XMM_B():r:dq
+PATTERN : VV1 0x57  VNP V0F VL256 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq REG1=YMM_N():r:qq MEM0:r:qq
+PATTERN : VV1 0x57  VNP V0F VL256 MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq REG1=YMM_N():r:qq REG2=YMM_B():r:qq
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMOVSS
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+ATTRIBUTES : simd_scalar
+PATTERN : VV1 0x10  VF3 V0F MOD[mm] MOD!=3  NOVSR REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32  MEM0:r:d:f32
+PATTERN   : VV1 0x10  VF3 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32  REG1=XMM_N():r:dq:f32    REG2=XMM_B():r:d:f32
+IFORM     : VMOVSS_XMMdq_XMMdq_XMMd_10
+PATTERN : VV1 0x11  VF3 V0F  MOD[mm] MOD!=3 NOVSR  REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:d:f32          REG0=XMM_R():r:d:f32
+PATTERN : VV1 0x11  VF3 V0F  MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_B():w:dq:f32   REG1=XMM_N():r:dq:f32   REG2=XMM_R():r:d:f32
+IFORM     : VMOVSS_XMMdq_XMMdq_XMMd_11
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMOVSD
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+ATTRIBUTES : simd_scalar
+PATTERN : VV1 0x10  VF2 V0F MOD[mm] MOD!=3  NOVSR REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64   MEM0:r:q:f64
+PATTERN : VV1 0x10  VF2 V0F MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64  REG1=XMM_N():r:dq:f64    REG2=XMM_B():r:q:f64
+IFORM     : VMOVSD_XMMdq_XMMdq_XMMq_10
+PATTERN : VV1 0x11  VF2 V0F MOD[mm] MOD!=3 NOVSR REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:q:f64           REG0=XMM_R():r:q:f64
+PATTERN : VV1 0x11  VF2 V0F  MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_B():w:dq:f64   REG1=XMM_N():r:dq:f64  REG2=XMM_R():r:q:f64
+IFORM     : VMOVSD_XMMdq_XMMdq_XMMq_11
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMOVUPD
+EXCEPTIONS: avx-type-4M
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+PATTERN : VV1 0x10  V66 VL128 V0F NOVSR  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64   MEM0:r:dq:f64
+PATTERN : VV1 0x10  V66 VL128 V0F NOVSR  MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f64   REG1=XMM_B():r:dq:f64
+IFORM     : VMOVUPD_XMMdq_XMMdq_10
+PATTERN : VV1 0x11  V66 VL128 V0F NOVSR  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:dq:f64           REG0=XMM_R():r:dq:f64
+PATTERN : VV1 0x11  V66 VL128 V0F NOVSR  MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_B():w:dq:f64   REG1=XMM_R():r:dq:f64
+IFORM     : VMOVUPD_XMMdq_XMMdq_11
+PATTERN : VV1 0x10  V66 VL256 V0F NOVSR  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f64      MEM0:r:qq:f64
+PATTERN : VV1 0x10  V66 VL256 V0F NOVSR  MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f64      REG1=YMM_B():r:qq:f64
+IFORM     : VMOVUPD_YMMqq_YMMqq_10
+PATTERN : VV1 0x11  V66 VL256 V0F NOVSR  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:qq:f64              REG0=YMM_R():r:qq:f64
+PATTERN : VV1 0x11  V66 VL256 V0F NOVSR  MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_B():w:qq:f64      REG1=YMM_R():r:qq:f64
+IFORM     : VMOVUPD_YMMqq_YMMqq_11
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMOVUPS
+EXCEPTIONS: avx-type-4M
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+PATTERN : VV1 0x10  VNP VL128 V0F NOVSR  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32   MEM0:r:dq:f32
+PATTERN : VV1 0x10  VNP VL128 V0F NOVSR  MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:f32   REG1=XMM_B():r:dq:f32
+IFORM     : VMOVUPS_XMMdq_XMMdq_10
+PATTERN : VV1 0x11  VNP VL128 V0F NOVSR  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:dq:f32           REG0=XMM_R():r:dq:f32
+PATTERN : VV1 0x11  VNP VL128 V0F NOVSR  MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_B():w:dq:f32   REG1=XMM_R():r:dq:f32
+IFORM     : VMOVUPS_XMMdq_XMMdq_11
+PATTERN : VV1 0x10  VNP VL256 V0F NOVSR  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=YMM_R():w:qq:f32      MEM0:r:qq:f32
+PATTERN : VV1 0x10  VNP VL256 V0F NOVSR  MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_R():w:qq:f32      REG1=YMM_B():r:qq:f32
+IFORM     : VMOVUPS_YMMqq_YMMqq_10
+PATTERN : VV1 0x11  VNP VL256 V0F NOVSR  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:qq:f32              REG0=YMM_R():r:qq:f32
+PATTERN : VV1 0x11  VNP VL256 V0F NOVSR  MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=YMM_B():w:qq:f32      REG1=YMM_R():r:qq:f32
+IFORM     : VMOVUPS_YMMqq_YMMqq_11
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMOVLPD
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+COMMENT: 3op version uses high part of XMM_N
+PATTERN : VV1 0x12  VL128 V66 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64   REG1=XMM_N():r:dq:f64   MEM0:r:q:f64
+PATTERN : VV1 0x13  VL128 V66 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:q:f64            REG0=XMM_R():r:q:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMOVLPS
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+COMMENT: 3op version uses high part of XMM_N
+PATTERN : VV1 0x12  VL128 VNP V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32   REG1=XMM_N():r:dq:f32   MEM0:r:q:f32
+PATTERN : VV1 0x13  VL128 VNP V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:q:f32            REG0=XMM_R():r:q:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMOVHPD
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+COMMENT:  3op form use low bits of REG1, 2op form uses high bits of REG0
+PATTERN : VV1 0x16  VL128 V66 V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f64   REG1=XMM_N():r:q:f64   MEM0:r:q:f64
+PATTERN : VV1 0x17  VL128 V66 V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:q:f64            REG0=XMM_R():r:dq:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMOVHPS
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+COMMENT:  3op form use low bits of REG1, 2op form uses high bits of REG0
+PATTERN : VV1 0x16  VL128 VNP V0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32   REG1=XMM_N():r:q:f32   MEM0:r:q:f32
+PATTERN : VV1 0x17  VL128 VNP V0F NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:q:f32            REG0=XMM_R():r:dq:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMOVMSKPD
+EXCEPTIONS: avx-type-7
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+PATTERN : VV1 0x50  VL128 V66 V0F  NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=GPR32_R():w:d   REG1=XMM_B():r:dq:f64
+PATTERN : VV1 0x50  VL256 V66 V0F  NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=GPR32_R():w:d   REG1=YMM_B():r:qq:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMOVMSKPS
+EXCEPTIONS: avx-type-7
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+PATTERN : VV1 0x50  VL128 VNP V0F  NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=GPR32_R():w:d   REG1=XMM_B():r:dq:f32
+PATTERN : VV1 0x50  VL256 VNP V0F  NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=GPR32_R():w:d   REG1=YMM_B():r:qq:f32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMOVMSKB
+EXCEPTIONS: avx-type-7
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0xD7  VL128 V66 V0F  NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=GPR32_R():w:d:u32   REG1=XMM_B():r:dq:i8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMOVSXBW
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x20  VL128 V66 V0F38 NOVSR  MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i16   REG1=XMM_B():r:q:i8
+PATTERN : VV1 0x20  VL128 V66 V0F38 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i16  MEM0:r:q:i8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMOVSXBD
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x21  VL128 V66 V0F38 NOVSR  MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i32   REG1=XMM_B():r:d:i8
+PATTERN : VV1 0x21  VL128 V66 V0F38 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i32   MEM0:r:d:i8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMOVSXBQ
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x22  VL128 V66 V0F38 NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i64   REG1=XMM_B():r:w:i8
+PATTERN : VV1 0x22  VL128 V66 V0F38 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i64   MEM0:r:w:i8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMOVSXWD
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x23  VL128 V66 V0F38 NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i32   REG1=XMM_B():r:q:i16
+PATTERN : VV1 0x23  VL128 V66 V0F38 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i32   MEM0:r:q:i16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMOVSXWQ
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x24  VL128 V66 V0F38 NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i64   REG1=XMM_B():r:d:i16
+PATTERN : VV1 0x24  VL128 V66 V0F38 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i64   MEM0:r:d:i16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMOVSXDQ
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x25  VL128 V66 V0F38 NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:i64   REG1=XMM_B():r:q:i32
+PATTERN : VV1 0x25  VL128 V66 V0F38 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:i64   MEM0:r:q:i32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMOVZXBW
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x30  VL128 V66 V0F38 NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u16   REG1=XMM_B():r:q:u8
+PATTERN : VV1 0x30  VL128 V66 V0F38 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u16   MEM0:r:q:u8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMOVZXBD
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x31  VL128 V66 V0F38 NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u32   REG1=XMM_B():r:d:u8
+PATTERN : VV1 0x31  VL128 V66 V0F38 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u32   MEM0:r:d:u8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMOVZXBQ
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x32  V66 V0F38 VL128 NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u64   REG1=XMM_B():r:w:u8
+PATTERN : VV1 0x32  V66 V0F38 VL128 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u64   MEM0:r:w:u8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMOVZXWD
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x33  V66 V0F38 VL128 NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u32   REG1=XMM_B():r:q:u16
+PATTERN : VV1 0x33  V66 V0F38 VL128 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u32   MEM0:r:q:u16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMOVZXWQ
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x34  VL128 V66 V0F38 NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u64   REG1=XMM_B():r:d:u16
+PATTERN : VV1 0x34  VL128 V66 V0F38 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u64   MEM0:r:d:u16
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPMOVZXDQ
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x35  VL128 V66 V0F38 NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:dq:u64   REG1=XMM_B():r:q:u32
+PATTERN : VV1 0x35  VL128 V66 V0F38 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:u64   MEM0:r:q:u32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPEXTRB
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+COMMENT: WIG
+PATTERN : VV1 0x14  VL128 V66 V0F3A NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : MEM0:w:b           REG0=XMM_R():r:dq:u8 IMM0:r:b
+PATTERN : VV1 0x14  VL128 V66 V0F3A NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=GPR32_B():w:d REG1=XMM_R():r:dq:u8 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPEXTRW
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+COMMENT: WIG
+PATTERN : VV1 0x15  VL128 V66 V0F3A NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : MEM0:w:w           REG0=XMM_R():r:dq:u16 IMM0:r:b
+PATTERN : VV1 0x15  VL128 V66 V0F3A NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=GPR32_B():w:d REG1=XMM_R():r:dq:u16 IMM0:r:b
+IFORM     : VPEXTRW_GPR32d_XMMdq_IMMb_15
+PATTERN   : VV1 0xC5  VL128 V66 V0F  NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=GPR32_R():w:d    REG1=XMM_B():r:dq:u16 IMM0:r:b
+IFORM     : VPEXTRW_GPR32d_XMMdq_IMMb_C5
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPEXTRQ
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x16  VL128 V66 V0F3A mode64 rexw_prefix  NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : MEM0:w:q              REG0=XMM_R():r:dq:u64 IMM0:r:b
+PATTERN : VV1 0x16  VL128 V66 V0F3A mode64 rexw_prefix NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=GPR64_B():w:q    REG1=XMM_R():r:dq:u64 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPEXTRD
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+COMMENT   : SNB had an errata where it would
+PATTERN   : VV1 0x16 VL128 V66 V0F3A mode64 norexw_prefix NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : MEM0:w:d REG0=XMM_R():r:dq:u32 IMM0:r:b
+PATTERN   : VV1 0x16 VL128 V66 V0F3A mode64 norexw_prefix NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=GPR32_B():w:d REG1=XMM_R():r:dq:u32 IMM0:r:b
+PATTERN   : VV1 0x16 VL128 V66 V0F3A not64  NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : MEM0:w:d REG0=XMM_R():r:dq:u32 IMM0:r:b
+PATTERN   : VV1 0x16 VL128 V66 V0F3A not64  NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=GPR32_B():w:d REG1=XMM_R():r:dq:u32 IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPINSRB
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+COMMENT: WIG
+PATTERN : VV1 0x20  VL128 V66 V0F3A  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:u8     REG1=XMM_N():r:dq:u8  MEM0:r:b:u8            IMM0:r:b
+PATTERN : VV1 0x20  VL128 V66 V0F3A  MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:u8     REG1=XMM_N():r:dq:u8  REG2=GPR32_B():r:d:u8  IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPINSRW
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+COMMENT : WIG
+PATTERN : VV1 0xC4  VL128 V66 V0F  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:u16     REG1=XMM_N():r:dq:u16  MEM0:r:w:u16           IMM0:r:b
+PATTERN : VV1 0xC4  VL128 V66 V0F  MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:u16     REG1=XMM_N():r:dq:u16  REG2=GPR32_B():r:d:u16  IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPINSRD
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+COMMENT   : SNB had an errata where it would
+PATTERN : VV1 0x22  VL128 V66 V0F3A mode64 norexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:u32     REG1=XMM_N():r:dq:u32  MEM0:r:d:u32            IMM0:r:b
+PATTERN : VV1 0x22  VL128 V66 V0F3A mode64 norexw_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:u32     REG1=XMM_N():r:dq:u32  REG2=GPR32_B():r:d:u32  IMM0:r:b
+PATTERN : VV1 0x22  VL128 V66 V0F3A not64 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:u32     REG1=XMM_N():r:dq:u32  MEM0:r:d:u32            IMM0:r:b
+PATTERN : VV1 0x22  VL128 V66 V0F3A not64 MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:u32     REG1=XMM_N():r:dq:u32  REG2=GPR32_B():r:d:u32  IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPINSRQ
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x22  VL128 V66 V0F3A mode64 rexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:u64     REG1=XMM_N():r:dq:u64  MEM0:r:q:u64            IMM0:r:b
+PATTERN : VV1 0x22  VL128 V66 V0F3A mode64 rexw_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:u64     REG1=XMM_N():r:dq:u64  REG2=GPR64_B():r:q:u64  IMM0:r:b
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPCMPESTRI
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : STTNI
+EXTENSION : AVX
+FLAGS     : MUST [ cf-mod zf-mod sf-mod of-mod af-0 pf-0 ]
+PATTERN : VV1 0x61  VL128 V66 V0F3A NOVSR not64 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():r:dq     MEM0:r:dq         IMM0:r:b REG1=XED_REG_EAX:r:SUPP REG2=XED_REG_EDX:r:SUPP REG3=XED_REG_ECX:w:SUPP
+PATTERN : VV1 0x61  VL128 V66 V0F3A NOVSR not64 MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():r:dq     REG1=XMM_B():r:dq IMM0:r:b REG2=XED_REG_EAX:r:SUPP REG3=XED_REG_EDX:r:SUPP REG4=XED_REG_ECX:w:SUPP
+PATTERN : VV1 0x61  VL128 V66 V0F3A NOVSR mode64 W0 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():r:dq     MEM0:r:dq         IMM0:r:b REG1=XED_REG_EAX:r:SUPP REG2=XED_REG_EDX:r:SUPP REG3=XED_REG_ECX:w:SUPP
+PATTERN : VV1 0x61  VL128 V66 V0F3A NOVSR mode64 W0 MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():r:dq     REG1=XMM_B():r:dq IMM0:r:b REG2=XED_REG_EAX:r:SUPP REG3=XED_REG_EDX:r:SUPP REG4=XED_REG_ECX:w:SUPP
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPCMPESTRI64
+DISASM    : vpcmpestri
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : STTNI
+EXTENSION : AVX
+FLAGS     : MUST [ cf-mod zf-mod sf-mod of-mod af-0 pf-0 ]
+PATTERN : VV1 0x61  VL128 V66 V0F3A NOVSR mode64 W1 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():r:dq     MEM0:r:dq         IMM0:r:b REG1=XED_REG_RAX:r:SUPP REG2=XED_REG_RDX:r:SUPP REG3=XED_REG_RCX:w:SUPP
+PATTERN : VV1 0x61  VL128 V66 V0F3A NOVSR mode64 W1 MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():r:dq     REG1=XMM_B():r:dq IMM0:r:b REG2=XED_REG_RAX:r:SUPP REG3=XED_REG_RDX:r:SUPP REG4=XED_REG_RCX:w:SUPP
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPCMPISTRI
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : STTNI
+EXTENSION : AVX
+FLAGS     : MUST [ cf-mod zf-mod sf-mod of-mod af-0 pf-0 ]
+PATTERN : VV1 0x63  VL128 V66 V0F3A NOVSR  not64  MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():r:dq     MEM0:r:dq         IMM0:r:b REG1=XED_REG_ECX:w:SUPP
+PATTERN : VV1 0x63  VL128 V66 V0F3A NOVSR  not64  MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():r:dq     REG1=XMM_B():r:dq IMM0:r:b REG2=XED_REG_ECX:w:SUPP
+PATTERN : VV1 0x63  VL128 V66 V0F3A NOVSR mode64 W0 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():r:dq     MEM0:r:dq         IMM0:r:b REG1=XED_REG_ECX:w:SUPP
+PATTERN : VV1 0x63  VL128 V66 V0F3A NOVSR mode64 W0 MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():r:dq     REG1=XMM_B():r:dq IMM0:r:b REG2=XED_REG_ECX:w:SUPP
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPCMPISTRI64
+DISASM    : vpcmpistri
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : STTNI
+EXTENSION : AVX
+FLAGS     : MUST [ cf-mod zf-mod sf-mod of-mod af-0 pf-0 ]
+PATTERN : VV1 0x63  VL128 V66 V0F3A NOVSR mode64 W1 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():r:dq     MEM0:r:dq         IMM0:r:b REG1=XED_REG_RCX:w:SUPP
+PATTERN : VV1 0x63  VL128 V66 V0F3A NOVSR mode64 W1 MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():r:dq     REG1=XMM_B():r:dq IMM0:r:b REG2=XED_REG_RCX:w:SUPP
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPCMPESTRM
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : STTNI
+EXTENSION : AVX
+FLAGS     : MUST [ cf-mod zf-mod sf-mod of-mod af-0 pf-0 ]
+PATTERN : VV1 0x60  VL128 V66 V0F3A NOVSR not64 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():r:dq     MEM0:r:dq         IMM0:r:b REG1=XED_REG_EAX:r:SUPP REG2=XED_REG_EDX:r:SUPP REG3=XED_REG_XMM0:w:dq:SUPP
+PATTERN : VV1 0x60  VL128 V66 V0F3A NOVSR not64 MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():r:dq     REG1=XMM_B():r:dq IMM0:r:b REG2=XED_REG_EAX:r:SUPP REG3=XED_REG_EDX:r:SUPP REG4=XED_REG_XMM0:w:dq:SUPP
+PATTERN : VV1 0x60  VL128 V66 V0F3A NOVSR mode64 W0 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():r:dq     MEM0:r:dq         IMM0:r:b REG1=XED_REG_EAX:r:SUPP REG2=XED_REG_EDX:r:SUPP REG3=XED_REG_XMM0:w:dq:SUPP
+PATTERN : VV1 0x60  VL128 V66 V0F3A NOVSR mode64 W0 MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():r:dq     REG1=XMM_B():r:dq IMM0:r:b REG2=XED_REG_EAX:r:SUPP REG3=XED_REG_EDX:r:SUPP REG4=XED_REG_XMM0:w:dq:SUPP
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPCMPESTRM64
+DISASM    : vpcmpestrm
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : STTNI
+EXTENSION : AVX
+FLAGS     : MUST [ cf-mod zf-mod sf-mod of-mod af-0 pf-0 ]
+PATTERN : VV1 0x60  VL128 V66 V0F3A NOVSR mode64 W1 MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():r:dq     MEM0:r:dq         IMM0:r:b REG1=XED_REG_RAX:r:SUPP REG2=XED_REG_RDX:r:SUPP REG3=XED_REG_XMM0:w:dq:SUPP
+PATTERN : VV1 0x60  VL128 V66 V0F3A NOVSR mode64 W1 MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():r:dq     REG1=XMM_B():r:dq IMM0:r:b REG2=XED_REG_RAX:r:SUPP REG3=XED_REG_RDX:r:SUPP REG4=XED_REG_XMM0:w:dq:SUPP
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPCMPISTRM
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : STTNI
+EXTENSION : AVX
+FLAGS     : MUST [ cf-mod zf-mod sf-mod of-mod af-0 pf-0 ]
+PATTERN : VV1 0x62  VL128 V66 V0F3A NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():r:dq     MEM0:r:dq         IMM0:r:b REG1=XED_REG_XMM0:w:dq:SUPP
+PATTERN : VV1 0x62  VL128 V66 V0F3A NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn] UIMM8()
+OPERANDS  : REG0=XMM_R():r:dq     REG1=XMM_B():r:dq IMM0:r:b REG2=XED_REG_XMM0:w:dq:SUPP
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMASKMOVDQU
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES : maskop fixed_base0 NOTSX NONTEMPORAL
+PATTERN : VV1 0xF7 V0F V66 VL128  NOVSR MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():r:dq:u8 REG1=XMM_B():r:dq:u8 MEM0:w:SUPP:dq:u8 BASE0=ArDI():r:SUPP SEG0=FINAL_DSEG():r:SUPP
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VLDMXCSR
+EXCEPTIONS: avx-type-5L
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES: MXCSR
+PATTERN   : VV1 0xAE VL128 VNP V0F NOVSR MOD[mm] MOD!=3 REG[0b010] RM[nnn] MODRM()
+OPERANDS  : MEM0:r:d REG0=XED_REG_MXCSR:w:SUPP
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VSTMXCSR
+EXCEPTIONS: avx-type-5
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+ATTRIBUTES: MXCSR_RD
+PATTERN   : VV1 0xAE VL128 VNP V0F NOVSR MOD[mm] MOD!=3 REG[0b011] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:d REG0=XED_REG_MXCSR:r:SUPP
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VPBLENDVB
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x4C   VL128 V66 V0F3A norexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() SE_IMM8()
+OPERANDS  : REG0=XMM_R():w:dq:i8 REG1=XMM_N():r:dq:i8 MEM0:r:dq:i8 REG2=XMM_SE():r:dq:i8
+PATTERN : VV1 0x4C   VL128 V66 V0F3A norexw_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn] SE_IMM8()
+OPERANDS  : REG0=XMM_R():w:dq:i8 REG1=XMM_N():r:dq:i8 REG2=XMM_B():r:dq:i8 REG3=XMM_SE():r:dq:i8
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VBLENDVPD
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x4B   V66 V0F3A VL128 norexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() SE_IMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 MEM0:r:dq:f64 REG2=XMM_SE():r:dq:u64
+PATTERN : VV1 0x4B   V66 V0F3A VL128 norexw_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn] SE_IMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f64 REG1=XMM_N():r:dq:f64 REG2=XMM_B():r:dq:f64 REG3=XMM_SE():r:dq:u64
+PATTERN : VV1 0x4B   V66 V0F3A VL256 norexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() SE_IMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 MEM0:r:qq:f64 REG2=YMM_SE():r:qq:u64
+PATTERN : VV1 0x4B   V66 V0F3A VL256 norexw_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn] SE_IMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f64 REG1=YMM_N():r:qq:f64 REG2=YMM_B():r:qq:f64 REG3=YMM_SE():r:qq:u64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VBLENDVPS
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x4A   V66 V0F3A VL128 norexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() SE_IMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 MEM0:r:dq:f32 REG2=XMM_SE():r:dq:u32
+PATTERN : VV1 0x4A   V66 V0F3A VL128 norexw_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn] SE_IMM8()
+OPERANDS  : REG0=XMM_R():w:dq:f32 REG1=XMM_N():r:dq:f32 REG2=XMM_B():r:dq:f32 REG3=XMM_SE():r:dq:u32
+PATTERN : VV1 0x4A   V66 V0F3A VL256 norexw_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() SE_IMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 MEM0:r:qq:f32 REG2=YMM_SE():r:qq:u32
+PATTERN : VV1 0x4A   V66 V0F3A VL256 norexw_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn] SE_IMM8()
+OPERANDS  : REG0=YMM_R():w:qq:f32 REG1=YMM_N():r:qq:f32 REG2=YMM_B():r:qq:f32 REG3=YMM_SE():r:qq:u32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMOVNTDQA
+EXCEPTIONS: avx-type-1
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+ATTRIBUTES :  REQUIRES_ALIGNMENT NOTSX  NONTEMPORAL
+PATTERN : VV1 0x2A  V66 V0F38 VL128 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : REG0=XMM_R():w:dq MEM0:r:dq
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMOVNTDQ
+EXCEPTIONS: avx-type-1
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+ATTRIBUTES :  REQUIRES_ALIGNMENT NOTSX NONTEMPORAL
+PATTERN : VV1 0xE7  V66 V0F VL128 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS : MEM0:w:dq:i32  REG0=XMM_R():r:dq:i32
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMOVNTPD
+EXCEPTIONS: avx-type-1
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+ATTRIBUTES :  REQUIRES_ALIGNMENT NOTSX NONTEMPORAL
+PATTERN : VV1 0x2B  V66 V0F VL128 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS : MEM0:w:dq:f64  REG0=XMM_R():r:dq:f64
+}
+###FILE: ./datafiles/avx/avx-isa.txt
+{
+ICLASS    : VMOVNTPS
+EXCEPTIONS: avx-type-1
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+ATTRIBUTES :  REQUIRES_ALIGNMENT NOTSX NONTEMPORAL
+PATTERN : VV1 0x2B  VNP V0F VL128 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS : MEM0:w:dq:f32  REG0=XMM_R():r:dq:f32
+}
+###FILE: ./datafiles/avx/avx-movnt-store.txt
+{
+ICLASS    : VMOVNTDQ
+EXCEPTIONS: avx-type-1
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+ATTRIBUTES :  REQUIRES_ALIGNMENT NOTSX NONTEMPORAL
+PATTERN : VV1 0xE7  V66 V0F VL256 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS : MEM0:w:qq:i32  REG0=YMM_R():r:qq:i32
+}
+###FILE: ./datafiles/avx/avx-movnt-store.txt
+{
+ICLASS    : VMOVNTPD
+EXCEPTIONS: avx-type-1
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+ATTRIBUTES :  REQUIRES_ALIGNMENT NOTSX NONTEMPORAL
+PATTERN : VV1 0x2B  V66 V0F VL256 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS : MEM0:w:qq:f64  REG0=YMM_R():r:qq:f64
+}
+###FILE: ./datafiles/avx/avx-movnt-store.txt
+{
+ICLASS    : VMOVNTPS
+EXCEPTIONS: avx-type-1
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : AVX
+ATTRIBUTES :  REQUIRES_ALIGNMENT NOTSX NONTEMPORAL
+PATTERN : VV1 0x2B  VNP V0F VL256 NOVSR MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS : MEM0:w:qq:f32  REG0=YMM_R():r:qq:f32
+}
+###FILE: ./datafiles/avx/avx-pclmul-isa.txt
+{
+ICLASS    : VPCLMULQDQ
+EXCEPTIONS: avx-type-4
+CPL       : 3
+CATEGORY  : AVX
+EXTENSION : AVX
+PATTERN : VV1 0x44  V66 V0F3A  MOD[0b11]  MOD=3  REG[rrr] RM[nnn] VL128 UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:u128  REG1=XMM_N():r:dq:u64 REG2=XMM_B():r:dq:u64 IMM0:r:b
+PATTERN : VV1 0x44  V66 V0F3A  MOD[mm]  MOD!=3 REG[rrr] RM[nnn] MODRM() VL128 UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq:u128  REG1=XMM_N():r:dq:u64 MEM0:r:dq:u64 IMM0:r:b
+}

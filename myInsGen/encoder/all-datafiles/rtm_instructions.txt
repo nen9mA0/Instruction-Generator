@@ -1,0 +1,41 @@
+###FILE: ./datafiles/hsw/rtm-isa.xed.txt
+{
+ICLASS    : XBEGIN
+CPL       : 3
+CATEGORY  : COND_BR
+EXTENSION : RTM
+COMMENT   : Not always a branch. If aborts, then branches & eax is written
+PATTERN   : 0xC7 MOD[0b11] MOD=3 REG[0b111] RM[0b000] BRDISPz()
+OPERANDS  : RELBR:r:z REG0=rIP():rw:SUPP REG1=XED_REG_EAX:cw:SUPP
+}
+###FILE: ./datafiles/hsw/rtm-isa.xed.txt
+{
+ICLASS    : XEND
+CPL       : 3
+CATEGORY  : COND_BR
+EXTENSION : RTM
+COMMENT   : Transaction end. may branch
+PATTERN   : 0x0F 0x01 MOD[0b11] MOD=3 REG[0b010] RM[0b101]  no_refining_prefix
+OPERANDS  :
+}
+###FILE: ./datafiles/hsw/rtm-isa.xed.txt
+{
+ICLASS    : XABORT
+CPL       : 3
+CATEGORY  : UNCOND_BR
+EXTENSION : RTM
+COMMENT   : Transaction abort. Branches. NOP outside of transaction; Thus eax is rcw.
+PATTERN   : 0xC6 MOD[0b11] MOD=3 REG[0b111] RM[0b000]  UIMM8()
+OPERANDS  : REG0=XED_REG_EAX:rcw:SUPP IMM0:r:b
+}
+###FILE: ./datafiles/hsw/rtm-isa.xed.txt
+{
+ICLASS    : XTEST
+CPL       : 3
+CATEGORY  : LOGICAL
+EXTENSION : RTM
+COMMENT   : test if in RTM transaction mode
+FLAGS     : MUST [ of-0 sf-0 zf-mod af-0 pf-0 cf-0 ]
+PATTERN   : 0x0F 0x01 MOD[0b11] MOD=3 REG[0b010] RM[0b110]  no_refining_prefix
+OPERANDS  :
+}

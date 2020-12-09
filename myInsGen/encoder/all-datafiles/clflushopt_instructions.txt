@@ -1,0 +1,11 @@
+###FILE: ./datafiles/clflushopt/clflushopt.xed.txt
+{
+ICLASS: CLFLUSHOPT
+CPL: 3
+CATEGORY:  CLFLUSHOPT
+EXTENSION: CLFLUSHOPT
+ISA_SET:   CLFLUSHOPT
+ATTRIBUTES: PREFETCH
+PATTERN   : 0x0F 0xAE  MOD[mm] MOD!=3 REG[0b111] RM[nnn]  osz_refining_prefix REFINING66() MODRM()
+OPERANDS  : MEM0:r:mprefetch
+}

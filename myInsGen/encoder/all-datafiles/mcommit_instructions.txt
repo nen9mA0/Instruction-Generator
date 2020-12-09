@@ -1,0 +1,12 @@
+###FILE: ./datafiles/xed-amd-mcommit.txt
+{
+ICLASS    : MCOMMIT
+CPL       : 3
+CATEGORY  : MISC
+EXTENSION : MCOMMIT
+ISA_SET   : MCOMMIT
+ATTRIBUTES: AMDONLY
+FLAGS     : MUST [  cf-mod ]
+PATTERN   : 0x0F 0x01 MOD[0b11] MOD=3 REG[0b111] RM[0b010] f3_refining_prefix
+OPERANDS  :
+}

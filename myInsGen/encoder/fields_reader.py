@@ -1,4 +1,5 @@
 import re
+import util
 
 
 class operand_field_t(object):
@@ -28,13 +29,13 @@ class operand_field_t(object):
             pass
         else:
             err = "Bad Encoder IO value: %s -- need one of {EI,EO}"
-            genutil.die(err % self.eio)
+            util.die(err % self.eio)
 
         if self.dio in ['DI', 'DO', 'DS']:
             pass
         else:
             err = "Bad decoder IO value: %s -- need one of {DI,DO,DS}"
-            genutil.die(err % self.eio)
+            util.die(err % self.eio)
 
         if self.eio == 'EI':
             self.encoder_input = True
@@ -105,17 +106,17 @@ class operands_storage_t(object):
                 continue
             wrds = pline.split()
             if len(wrds) != 9:
-                genutil.die("Bad number of tokens on line: " + line)
+                util.die("Bad number of tokens on line: " + line)
             # aggtype is "SCALAR"
             (name, aggtype, ctype, width, default_visibility,
              xprint, internal_or_public, dio, eio) = wrds
             if name in operand_types:
-                genutil.die("Duplicate name %s in input-fields file." % (name))
+                util.die("Duplicate name %s in input-fields file." % (name))
 
             if aggtype != 'SCALAR':
                 err = ("type different than SCALAR is not" +
                        " supported in: %s" % (line))
-                genutil.die(err)
+                util.die(err)
 
             if ctype == 'xed_reg_enum_t':
                 default_initializer = 'XED_REG_INVALID'

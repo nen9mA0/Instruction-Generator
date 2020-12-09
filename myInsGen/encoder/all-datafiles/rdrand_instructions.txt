@@ -1,0 +1,11 @@
+###FILE: ./datafiles/rdrand/rdrand-isa.xed.txt
+{
+ICLASS    : RDRAND
+CPL       : 3
+CATEGORY  : RDRAND
+EXTENSION : RDRAND
+ISA_SET   : RDRAND
+FLAGS     : MUST [ cf-mod zf-0 of-0 af-0 pf-0 sf-0 ]
+PATTERN   : 0x0F 0xC7  MOD[0b11] MOD=3 REG[0b110] RM[nnn] not_refining
+OPERANDS  : REG0=GPRv_B():w
+}

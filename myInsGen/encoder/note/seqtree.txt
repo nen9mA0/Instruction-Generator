@@ -1,0 +1,219 @@
+ICLASS OR_LOCK
+        IFORM 1
+                action: emit 0b10000000 emit_type=numeric value=0x80 nbits=8
+                action: emit mod=mm emit_type=letters nbits=2
+                action: emit reg=0b001 emit_type=numeric value=0x1 nbits=3  
+                action: emit rm=nnn emit_type=letters nbits=3
+                action: nt NT[MODRM]
+                action: nt NT[SIMM8]
+                action: FB LOCK=1 value=0x1
+                conditon: MEM0=1
+                conditon: MEM_WIDTH (MEMOP b)=*
+                conditon: IMM0=1
+ICLASS FADD
+        IFORM 1
+                action: emit 0b11011000 emit_type=numeric value=0xd8 nbits=8
+                action: emit mod=mm emit_type=letters nbits=2
+                action: emit reg=0b000 emit_type=numeric value=0x0 nbits=3
+                action: emit rm=nnn emit_type=letters nbits=3
+                action: nt NT[MODRM]
+                conditon: REG0=XED_REG_ST0
+                conditon: MEM0=1
+                conditon: MEM_WIDTH (MEMOP mem32real)=*
+        IFORM 2
+                action: emit 0b11011000 emit_type=numeric value=0xd8 nbits=8
+                action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+                action: emit reg=0b000 emit_type=numeric value=0x0 nbits=3
+                action: emit rm=nnn emit_type=letters nbits=3
+                conditon: REG0=XED_REG_ST0
+                conditon: REG1=X87()
+        IFORM 3
+                action: emit 0b11011100 emit_type=numeric value=0xdc nbits=8
+                action: emit mod=mm emit_type=letters nbits=2
+                action: emit reg=0b000 emit_type=numeric value=0x0 nbits=3
+                action: emit rm=nnn emit_type=letters nbits=3
+                action: nt NT[MODRM]
+                conditon: REG0=XED_REG_ST0
+                conditon: MEM0=1
+                conditon: MEM_WIDTH (MEMOP m64real)=*
+        IFORM 4
+                action: emit 0b11011100 emit_type=numeric value=0xdc nbits=8
+                action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+                action: emit reg=0b000 emit_type=numeric value=0x0 nbits=3
+                action: emit rm=nnn emit_type=letters nbits=3
+                conditon: REG0=X87()
+                conditon: REG1=XED_REG_ST0
+ICLASS FADDP
+        IFORM 1
+                action: emit 0b11011110 emit_type=numeric value=0xde nbits=8
+                action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+                action: emit reg=0b000 emit_type=numeric value=0x0 nbits=3
+                action: emit rm=nnn emit_type=letters nbits=3
+                conditon: REG0=X87()
+                conditon: REG1=XED_REG_ST0
+
+
+
+
+
+MODRM_BIND
+    nt   :SIB_REQUIRED_ENCODE_BIND   
+    nt   :SIBSCALE_ENCODE_BIND       
+    nt   :SIBINDEX_ENCODE_BIND       
+    nt   :SIBBASE_ENCODE_BIND        
+    nt   :MODRM_RM_ENCODE_BIND       
+    nt   :MODRM_MOD_ENCODE_BIND      
+    nt   :SEGMENT_DEFAULT_ENCODE_BIND
+    nt   :SEGMENT_ENCODE_BIND        
+    nt   :SIB_NT_BIND
+    nt   :DISP_NT_BIND
+MODRM_EMIT
+    nt   :SIB_NT_EMIT
+    nt   :DISP_NT_EMIT
+ISA_ENCODE
+  ISA_BINDINGS
+      nt   :FIXUP_EOSZ_ENC_BIND
+      nt   :FIXUP_EASZ_ENC_BIND
+      nt   :ASZ_NONTERM_BIND
+cannot find nt_name:INSTRUCTIONS raw_nt_name:INSTRUCTIONS_BIND
+      nt   :OSZ_NONTERM_ENC_BIND
+      nt   :PREFIX_ENC_BIND
+      nt   :VEXED_REX_BIND
+  ISA_EMIT
+      nt   :PREFIX_ENC_EMIT
+      nt   :VEXED_REX_EMIT
+cannot find nt_name:INSTRUCTIONS raw_nt_name:INSTRUCTIONS_EMIT
+ISA_BINDINGS
+    nt   :FIXUP_EOSZ_ENC_BIND
+    nt   :FIXUP_EASZ_ENC_BIND
+    nt   :ASZ_NONTERM_BIND
+cannot find nt_name:INSTRUCTIONS raw_nt_name:INSTRUCTIONS_BIND
+    nt   :OSZ_NONTERM_ENC_BIND
+    nt   :PREFIX_ENC_BIND
+    nt   :VEXED_REX_BIND
+ISA_EMIT
+    nt   :PREFIX_ENC_EMIT
+    nt   :VEXED_REX_EMIT
+cannot find nt_name:INSTRUCTIONS raw_nt_name:INSTRUCTIONS_EMIT
+XOP_ENC_BIND
+    nt   :XOP_TYPE_ENC_BIND
+    nt   :VEX_REXR_ENC_BIND
+    nt   :XOP_REXXB_ENC_BIND
+    nt   :XOP_MAP_ENC_BIND
+    nt   :VEX_REG_ENC_BIND
+    nt   :VEX_ESCVL_ENC_BIND
+XOP_ENC_EMIT
+    nt   :XOP_TYPE_ENC_EMIT
+    nt   :VEX_REXR_ENC_EMIT
+    nt   :XOP_REXXB_ENC_EMIT
+    nt   :XOP_MAP_ENC_EMIT
+    nt   :VEX_REG_ENC_EMIT
+    nt   :VEX_ESCVL_ENC_EMIT
+NEWVEX_ENC_BIND
+    nt   :VEX_TYPE_ENC_BIND
+    nt   :VEX_REXR_ENC_BIND
+    nt   :VEX_REXXB_ENC_BIND
+    nt   :VEX_MAP_ENC_BIND
+    nt   :VEX_REG_ENC_BIND
+    nt   :VEX_ESCVL_ENC_BIND
+NEWVEX_ENC_EMIT
+    nt   :VEX_TYPE_ENC_EMIT
+    nt   :VEX_REXR_ENC_EMIT
+    nt   :VEX_REXXB_ENC_EMIT
+    nt   :VEX_MAP_ENC_EMIT
+    nt   :VEX_REG_ENC_EMIT
+    nt   :VEX_ESCVL_ENC_EMIT
+VMODRM_XMM_BIND
+    nt   :VMODRM_MOD_ENCODE_BIND
+    nt   :VSIB_ENC_BASE_BIND
+    nt   :VSIB_ENC_INDEX_XMM_BIND
+    nt   :VSIB_ENC_SCALE_BIND
+    nt   :VSIB_ENC_BIND
+    nt   :SEGMENT_DEFAULT_ENCODE_BIND
+    nt   :SEGMENT_ENCODE_BIND
+    nt   :DISP_NT_BIND
+VMODRM_YMM_BIND
+    nt   :VMODRM_MOD_ENCODE_BIND
+    nt   :VSIB_ENC_BASE_BIND
+    nt   :VSIB_ENC_INDEX_YMM_BIND
+    nt   :VSIB_ENC_SCALE_BIND
+    nt   :VSIB_ENC_BIND
+    nt   :SEGMENT_DEFAULT_ENCODE_BIND
+    nt   :SEGMENT_ENCODE_BIND
+    nt   :DISP_NT_BIND
+VMODRM_XMM_EMIT
+    nt   :VSIB_ENC_EMIT
+    nt   :DISP_NT_EMIT
+VMODRM_YMM_EMIT
+    nt   :VSIB_ENC_EMIT
+    nt   :DISP_NT_EMIT
+EVEX_ENC_BIND
+    nt   :EVEX_62_REXR_ENC_BIND
+    nt   :EVEX_REXX_ENC_BIND
+    nt   :EVEX_REXB_ENC_BIND
+    nt   :EVEX_REXRR_ENC_BIND
+    nt   :EVEX_MAP_ENC_BIND
+    nt   :EVEX_REXW_VVVV_ENC_BIND
+    nt   :EVEX_UPP_ENC_BIND
+    nt   :EVEX_LL_ENC_BIND
+    nt   :AVX512_EVEX_BYTE3_ENC_BIND
+EVEX_ENC_EMIT
+    nt   :EVEX_62_REXR_ENC_EMIT
+    nt   :EVEX_REXX_ENC_EMIT
+    nt   :EVEX_REXB_ENC_EMIT
+    nt   :EVEX_REXRR_ENC_EMIT
+    nt   :EVEX_MAP_ENC_EMIT
+    nt   :EVEX_REXW_VVVV_ENC_EMIT
+    nt   :EVEX_UPP_ENC_EMIT
+    nt   :EVEX_LL_ENC_EMIT
+    nt   :AVX512_EVEX_BYTE3_ENC_EMIT
+NEWVEX3_ENC_BIND
+    nt   :VEX_TYPE_ENC_BIND
+    nt   :VEX_REXR_ENC_BIND
+    nt   :VEX_REXXB_ENC_BIND
+    nt   :VEX_MAP_ENC_BIND
+    nt   :VEX_REG_ENC_BIND
+    nt   :VEX_ESCVL_ENC_BIND
+NEWVEX3_ENC_EMIT
+    nt   :VEX_TYPE_ENC_EMIT
+    nt   :VEX_REXR_ENC_EMIT
+    nt   :VEX_REXXB_ENC_EMIT
+    nt   :VEX_MAP_ENC_EMIT
+    nt   :VEX_REG_ENC_EMIT
+    nt   :VEX_ESCVL_ENC_EMIT
+UISA_VMODRM_ZMM_BIND
+    nt   :VMODRM_MOD_ENCODE_BIND
+    nt   :VSIB_ENC_BASE_BIND
+    nt   :UISA_ENC_INDEX_ZMM_BIND
+    nt   :VSIB_ENC_SCALE_BIND
+    nt   :VSIB_ENC_BIND
+    nt   :SEGMENT_DEFAULT_ENCODE_BIND
+    nt   :SEGMENT_ENCODE_BIND
+    nt   :DISP_NT_BIND
+UISA_VMODRM_YMM_BIND
+    nt   :VMODRM_MOD_ENCODE_BIND
+    nt   :VSIB_ENC_BASE_BIND
+    nt   :UISA_ENC_INDEX_YMM_BIND
+    nt   :VSIB_ENC_SCALE_BIND
+    nt   :VSIB_ENC_BIND
+    nt   :SEGMENT_DEFAULT_ENCODE_BIND
+    nt   :SEGMENT_ENCODE_BIND
+    nt   :DISP_NT_BIND
+UISA_VMODRM_XMM_BIND
+    nt   :VMODRM_MOD_ENCODE_BIND
+    nt   :VSIB_ENC_BASE_BIND
+    nt   :UISA_ENC_INDEX_XMM_BIND
+    nt   :VSIB_ENC_SCALE_BIND
+    nt   :VSIB_ENC_BIND
+    nt   :SEGMENT_DEFAULT_ENCODE_BIND
+    nt   :SEGMENT_ENCODE_BIND
+    nt   :DISP_NT_BIND
+UISA_VMODRM_ZMM_EMIT
+    nt   :VSIB_ENC_EMIT
+    nt   :DISP_NT_EMIT
+UISA_VMODRM_YMM_EMIT
+    nt   :VSIB_ENC_EMIT
+    nt   :DISP_NT_EMIT
+UISA_VMODRM_XMM_EMIT
+    nt   :VSIB_ENC_EMIT
+    nt   :DISP_NT_EMIT

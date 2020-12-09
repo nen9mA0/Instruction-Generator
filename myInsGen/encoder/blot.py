@@ -14,7 +14,10 @@ class operand_t(object):
     code. Memops must have the length code."""
 
     convert_pattern = re.compile(r'TXT=(?P<rhs>[0-9A-Za-z_]+)')
-    
+
+    opnd_type = ('MEM', "IMM", "REG", "MOD", "RM", "RELBR", "SEG", "BASE", "PTR", "INDEX", "AGEN", "SCALE")
+    # now only test on BASE instructions
+
     def __init__(self,s):
         pieces=s.split(':')
         op_or_binding = pieces[0]
@@ -70,6 +73,25 @@ class operand_t(object):
                 self.vis = 'ECOND'
             else:
                 die("unhandled default visibility: %s for %s" % (default_vis, self.var))
+
+    def InOpndType(self):
+        flag = False
+        for op_type in self.opnd_type:
+            if op_type in self.var:
+                flag = True
+        return flag
+
+    def IsInput(self):
+        if 'r' in self.rw:
+            return True
+        else:
+            return False
+
+    def IsOutput(self):
+        if 'w' in self.rw:
+            return True
+        else:
+            return False
 
     def make_condition(self):
         """
@@ -133,6 +155,14 @@ class operand_t(object):
 
 class iform_t(object):
     """One form of an instruction"""
+    mask = max_int
+    if int_width == 64:
+        hash_mask_low = 0x7fffffff
+        hash_mask_high = mask ^ hash_mask_low
+    else:
+        hash_mask_low = 0x7fff
+        hash_mask_high = mask ^ hash_mask_low
+
     def __init__(self, iclass, enc_conditions, enc_actions, modal_patterns, uname=None):
         self.iclass = iclass
         self.uname = uname
@@ -149,7 +179,38 @@ class iform_t(object):
         
         self._fixup_vex_conditions()
         self.rule = self.make_rule()
-        
+
+        self.input_op = []
+        self.output_op = []
+        self.GetInputOutput()
+
+        tmp1 = hash(self.iclass)
+        tmp2 = hash(str(self.rule))
+        self.hash = (tmp1 & iform_t.hash_mask_high) | (tmp2 & iform_t.hash_mask_low)  # hash for using set
+
+
+    def __hash__(self):     # modify for using set structure
+        return self.hash
+
+    def __eq__(self, rhs):
+        if not isinstance(rhs, type(self)):
+            return NotImplemented
+        return self.hash == rhs.hash
+
+    def GetInputOutput(self):
+        for opnd in self.enc_conditions:
+            if opnd.InOpndType():
+                if opnd.type == "ntluf":
+                    nt = True
+                else:
+                    nt = False
+                if opnd.IsInput():
+                    self.input_op.append((opnd.var, nt, opnd.value))
+                if opnd.IsOutput():
+                    self.output_op.append((opnd.var, nt, opnd.value))
+            else:
+                logger.error("%s Not in Opnd Type" %opnd.var)
+
     def _fixup_vex_conditions(self):
         """if action has VEXVALID=1, add modal_pattern MUST_USE_AVX512=0. 
            The modal_patterns become conditions later on."""
@@ -162,8 +223,7 @@ class iform_t(object):
         drives encode operand order checking. """
         operand_names = []
         for opnd in self.enc_conditions:
-            if voperand2():
-                msg( "EOLIST iclass %s opnd %s vis %s" % (self.iclass, opnd.var, opnd.vis))
+            logger.info( "EOLIST iclass %s opnd %s vis %s" % (self.iclass, opnd.var, opnd.vis))
             if opnd.vis == 'SUPP':
                 continue
             if opnd.vis == 'ECOND':
@@ -255,8 +315,8 @@ class iform_t(object):
         rule = rule_t(cond,action_list, None)
         self._remove_overlapping_actions(rule.actions)
         return rule
-    
-    
+
+
     def _remove_overlapping_actions(self, action_list):
         ''' for some actions the generated code looks exactly the same.
             for example:
@@ -287,7 +347,7 @@ class iform_t(object):
                         action_to_remove.append(fb)
                     else:
                         err = "FB and emit action for %s has different values"
-                        genutil.die(err % fb.field_name) 
+                        die(err % fb.field_name) 
         
         #remove the overlapping actions
         for action in action_to_remove:
@@ -342,9 +402,9 @@ class blot_t(object):
             return "%s[%s]" % (self.field_name,self.letters)
         elif self.type == 'od':
             if self.od_equals == False:
-                #return "%s!=0x%x" % (self.field_name, self.value) #EXPERIMENT 2007-08-07
-                logger.warning("Ignoring OD != relationships in actions: %s" % str(self))
-                return None
+                return "%s!=0x%x" % (self.field_name, self.value) #EXPERIMENT 2007-08-07
+                # logger.warning("Ignoring OD != relationships in actions: %s" % str(self))
+                # return None
             return "%s=0x%x" % (self.field_name, self.value)
         elif self.type == 'nt':
             return "%s()" % self.nt

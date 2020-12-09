@@ -1,0 +1,15 @@
+###FILE: ./datafiles/via-padlock-isa.xed.txt
+{
+ICLASS    : REP_MONTMUL
+DISASM    : montmul
+CPL       : 3
+CATEGORY  : VIA_PADLOCK
+EXTENSION : VIA_PADLOCK_MONTMUL
+ISA_SET   : VIA_PADLOCK_MONTMUL
+ATTRIBUTES : REP FIXED_BASE0
+COMMENT   : EAX output value undefined, so list as write.
+PATTERN   : 0x0F 0xA6 MOD[0b11] REG[0b000] RM[0b000] f3_refining_prefix eamode16
+OPERANDS  : REG0=XED_REG_EAX:rw:SUPP             REG1=XED_REG_ECX:rw:SUPP             REG2=XED_REG_EDX:w:SUPP             MEM0:rw:SUPP:pmmsz16             BASE0=ArSI():r:SUPP             SEG0=FINAL_ESEG():r:SUPP
+PATTERN   : 0x0F 0xA6 MOD[0b11] REG[0b000] RM[0b000] f3_refining_prefix eamode32
+OPERANDS  : REG0=XED_REG_EAX:rw:SUPP             REG1=XED_REG_ECX:rw:SUPP             REG2=XED_REG_EDX:w:SUPP             MEM0:rw:SUPP:pmmsz32             BASE0=ArSI():r:SUPP             SEG0=FINAL_ESEG():r:SUPP
+}

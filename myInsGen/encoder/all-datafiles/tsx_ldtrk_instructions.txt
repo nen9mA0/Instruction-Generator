@@ -1,0 +1,24 @@
+###FILE: ./datafiles/tsx-ldtrk/tsx-ldtrk-isa.xed.txt
+{
+ICLASS:      XRESLDTRK
+CPL:         3
+CATEGORY:    TSX_LDTRK
+EXTENSION:   TSX_LDTRK
+ISA_SET:     TSX_LDTRK
+REAL_OPCODE: N
+PATTERN:    0x0F 0x01 MOD[0b11] MOD=3  REG[0b101] RM[0b001]  f2_refining_prefix
+OPERANDS:
+IFORM:       XRESLDTRK
+}
+###FILE: ./datafiles/tsx-ldtrk/tsx-ldtrk-isa.xed.txt
+{
+ICLASS:      XSUSLDTRK
+CPL:         3
+CATEGORY:    TSX_LDTRK
+EXTENSION:   TSX_LDTRK
+ISA_SET:     TSX_LDTRK
+REAL_OPCODE: N
+PATTERN:    0x0F 0x01 MOD[0b11] MOD=3  REG[0b101] RM[0b000]  f2_refining_prefix
+OPERANDS:
+IFORM:       XSUSLDTRK
+}

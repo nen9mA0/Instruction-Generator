@@ -33,7 +33,7 @@ class action_t(object):
     
     def __init__(self, arg_action):
         # field bindings (FB) are OD=value
-        self.type = None #  'FB', 'emit', 'nt', 'error', 'nothing', 'return'
+        self.type = None #  'FB', 'emit', 'nt', 'error', 'nothing', 'return'  Modify add NEQ
         self.field_name = None
         self.value = None
         self.nt = None
@@ -41,6 +41,7 @@ class action_t(object):
         self.int_value = None
         self.emit_type = None # 'numeric', 'letters', 'reg'
         self.nbits = 0
+        self.not_equal = False
 
         if arg_action in ['nothing', "NOTHING"]:
             self.type = 'nothing'
@@ -83,7 +84,24 @@ class action_t(object):
                 
             self.type = 'FB'
             return
-        
+        # ====== add handler for not equal ======
+        a = patterns.not_equals_pattern.search(action)
+        if a:
+            self.field_name = a.group('lhs').lower()
+            rhs = a.group('rhs')
+            if patterns.decimal_pattern.match(rhs) or \
+               patterns.binary_pattern.match(rhs) or \
+               patterns.hex_pattern.match(rhs):
+                self.int_value = util.make_numeric(rhs)
+                self.value = str(self.int_value)
+            else:
+                self.value = rhs
+
+            self.type = 'NEQ'
+            self.not_equal = True
+            return
+
+
         nt = patterns.nt_name_pattern.match(action)
         if nt:
             # NTLUF or NT. Only shows up on decode-oriented rules
@@ -191,14 +209,21 @@ class action_t(object):
             return True
         return False
 
+    def is_not_equal(self):
+        return self.not_equal
+
     def __str__(self):
         s = []
         s.append(str(self.type))
         if self.nt:
             s.append(" NT[%s]" % (self.nt))
         if self.field_name:
-            s.append(" ")
-            s.extend([self.field_name,'=',self.value])
+            if self.is_not_equal():
+                s.append(" ")
+                s.extend([self.field_name, '!=', self.value])
+            else:
+                s.append(" ")
+                s.extend([self.field_name,'=',self.value])
         elif self.value != None:
             s.append(" ")
             s.append(self.value)

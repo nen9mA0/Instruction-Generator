@@ -1,0 +1,44 @@
+###FILE: ./datafiles/xed-amd-snp.txt
+{
+ICLASS    : PSMASH
+CPL       : 0
+CATEGORY  : SYSTEM
+EXTENSION : SNP
+ATTRIBUTES: AMDONLY
+FLAGS     : MUST [ of-mod sf-mod zf-mod af-mod pf-mod ]
+PATTERN   : 0x0F 0x01 MOD[0b11] MOD=3 REG[0b111] RM[0b111] f3_refining_prefix mode64
+OPERANDS  : REG0=XED_REG_RAX:rw:IMPL
+}
+###FILE: ./datafiles/xed-amd-snp.txt
+{
+ICLASS    : PVALIDATE
+CPL       : 0
+CATEGORY  : SYSTEM
+EXTENSION : SNP
+ATTRIBUTES: AMDONLY
+FLAGS     : MUST [ of-mod sf-mod zf-mod af-mod pf-mod cf-mod ]
+PATTERN   : 0x0F 0x01 MOD[0b11] MOD=3 REG[0b111] RM[0b111] f2_refining_prefix mode64
+OPERANDS  : REG0=XED_REG_RAX:rw:IMPL REG1=XED_REG_ECX:r:IMPL REG2=XED_REG_EDX:r:IMPL
+}
+###FILE: ./datafiles/xed-amd-snp.txt
+{
+ICLASS    : RMPADJUST
+CPL       : 0
+CATEGORY  : SYSTEM
+EXTENSION : SNP
+ATTRIBUTES: AMDONLY
+FLAGS     : MUST [ of-mod sf-mod zf-mod af-mod pf-mod  ]
+PATTERN   : 0x0F 0x01 MOD[0b11] MOD=3 REG[0b111] RM[0b110] f3_refining_prefix mode64
+OPERANDS  : REG0=XED_REG_RAX:rw:IMPL REG1=XED_REG_RCX:r:IMPL REG2=XED_REG_RDX:r:IMPL
+}
+###FILE: ./datafiles/xed-amd-snp.txt
+{
+ICLASS    : RMPUPDATE
+CPL       : 0
+CATEGORY  : SYSTEM
+EXTENSION : SNP
+ATTRIBUTES: AMDONLY
+FLAGS     : MUST [ of-mod sf-mod zf-mod af-mod pf-mod  ]
+PATTERN   : 0x0F 0x01 MOD[0b11] MOD=3 REG[0b111] RM[0b110] f2_refining_prefix mode64
+OPERANDS  : REG0=XED_REG_RAX:rw:IMPL REG1=XED_REG_RCX:r:IMPL
+}

@@ -1,6 +1,8 @@
 */*
 
 !myInsGen/encoder/
-
+myInsGen/encoder/log
+myInsGen/encoder/.VSCodeCounter/
 
 *.pyc
+*.pkl

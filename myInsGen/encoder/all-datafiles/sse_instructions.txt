@@ -1,0 +1,734 @@
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : FXSAVE
+CPL       : 3
+CATEGORY  : SSE
+EXTENSION : SSE
+ISA_SET   : FXSAVE
+ATTRIBUTES : xmm_state_r REQUIRES_ALIGNMENT x87_mmx_state_r X87_NOWAIT X87_CONTROL NOTSX
+PATTERN   : 0x0F 0xAE  MOD[mm] MOD!=3 REG[0b000] RM[nnn]  no_refining_prefix norexw_prefix MODRM()
+OPERANDS  : MEM0:w:mfpxenv REG0=XED_REG_X87CONTROL:r:SUPP
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : FXRSTOR
+CPL       : 3
+CATEGORY  : SSE
+EXTENSION : SSE
+ISA_SET   : FXSAVE
+ATTRIBUTES : xmm_state_w REQUIRES_ALIGNMENT x87_mmx_state_w X87_NOWAIT X87_CONTROL NOTSX
+PATTERN   : 0x0F 0xAE MOD[mm] MOD!=3 REG[0b001] RM[nnn]   no_refining_prefix norexw_prefix MODRM()
+OPERANDS  : MEM0:r:mfpxenv REG0=XED_REG_X87CONTROL:w:SUPP
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : FXSAVE64
+CPL       : 3
+CATEGORY  : SSE
+EXTENSION : SSE
+ISA_SET   : FXSAVE64
+ATTRIBUTES : xmm_state_r REQUIRES_ALIGNMENT x87_mmx_state_r X87_NOWAIT X87_CONTROL NOTSX
+PATTERN   : 0x0F 0xAE  MOD[mm] MOD!=3 REG[0b000] RM[nnn]  no_refining_prefix rexw_prefix MODRM()
+OPERANDS  : MEM0:w:mfpxenv REG0=XED_REG_X87CONTROL:r:SUPP
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : FXRSTOR64
+CPL       : 3
+CATEGORY  : SSE
+EXTENSION : SSE
+ISA_SET   : FXSAVE64
+ATTRIBUTES : xmm_state_w REQUIRES_ALIGNMENT x87_mmx_state_w X87_NOWAIT X87_CONTROL NOTSX
+PATTERN   : 0x0F 0xAE MOD[mm] MOD!=3 REG[0b001] RM[nnn]   no_refining_prefix rexw_prefix MODRM()
+OPERANDS  : MEM0:r:mfpxenv REG0=XED_REG_X87CONTROL:w:SUPP
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : LDMXCSR
+CPL       : 3
+CATEGORY  : SSE
+EXTENSION : SSE
+ISA_SET   : SSEMXCSR
+EXCEPTIONS: SSE_TYPE_5
+ATTRIBUTES :  MXCSR
+PATTERN   : 0x0F 0xAE MOD[mm] MOD!=3 REG[0b010] RM[nnn]  no_refining_prefix MODRM()
+OPERANDS  : MEM0:r:d REG0=XED_REG_MXCSR:w:SUPP
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : STMXCSR
+CPL       : 3
+CATEGORY  : SSE
+EXTENSION : SSE
+ISA_SET   : SSEMXCSR
+EXCEPTIONS: SSE_TYPE_5
+ATTRIBUTES :  MXCSR_RD
+PATTERN   : 0x0F 0xAE MOD[mm] MOD!=3 REG[0b011] RM[nnn] no_refining_prefix  MODRM()
+OPERANDS  : MEM0:w:d REG0=XED_REG_MXCSR:r:SUPP
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : PREFETCHNTA
+CPL       : 3
+CATEGORY  : PREFETCH
+ATTRIBUTES: PREFETCH NONTEMPORAL
+EXTENSION : SSE
+ISA_SET   : SSE_PREFETCH
+PATTERN   : 0x0F 0x18 MOD[mm] MOD!=3 REG[0b000] RM[nnn] MODRM()
+OPERANDS  : MEM0:r:mprefetch
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : PREFETCHT0
+CPL       : 3
+CATEGORY  : PREFETCH
+ATTRIBUTES: PREFETCH
+EXTENSION : SSE
+ISA_SET   : SSE_PREFETCH
+PATTERN   : 0x0F 0x18 MOD[mm] MOD!=3 REG[0b001] RM[nnn] MODRM()
+OPERANDS  : MEM0:r:mprefetch
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : PREFETCHT1
+CPL       : 3
+CATEGORY  : PREFETCH
+ATTRIBUTES: PREFETCH
+EXTENSION : SSE
+ISA_SET   : SSE_PREFETCH
+PATTERN   : 0x0F 0x18 MOD[mm] MOD!=3 REG[0b010] RM[nnn] MODRM()
+OPERANDS  : MEM0:r:mprefetch
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : PREFETCHT2
+CPL       : 3
+CATEGORY  : PREFETCH
+ATTRIBUTES: PREFETCH
+EXTENSION : SSE
+ISA_SET   : SSE_PREFETCH
+PATTERN   : 0x0F 0x18 MOD[mm] MOD!=3 REG[0b011] RM[nnn] MODRM()
+OPERANDS  : MEM0:r:mprefetch
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : SFENCE
+CPL       : 3
+CATEGORY  : MISC
+EXTENSION : SSE
+ATTRIBUTES: IGNORES_OSFXSR
+PATTERN   : 0x0F 0xAE  MOD[0b11] MOD=3 REG[0b111] RM[nnn]  no_refining_prefix
+OPERANDS  :
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : MOVHLPS
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_7
+PATTERN   : 0x0F 0x12 no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:q:f32 REG1=XMM_B():r:q:f32
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : MOVLPS
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_5
+ATTRIBUTES :
+PATTERN   : 0x0F 0x12 no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : REG0=XMM_R():w:q:f32 MEM0:r:q:f32
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : MOVLHPS
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_7
+PATTERN   : 0x0F 0x16 no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:q:f32 REG1=XMM_B():r:q:f32
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : MOVHPS
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_5
+ATTRIBUTES :
+PATTERN   : 0x0F 0x16 no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : REG0=XMM_R():w:q:f32 MEM0:r:q:f32
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : MOVUPS
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_4M
+ATTRIBUTES :
+PATTERN   : 0x0F 0x10 no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : REG0=XMM_R():w:ps MEM0:r:ps
+PATTERN   : 0x0F 0x10 no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:ps REG1=XMM_B():r:ps
+IFORM     : MOVUPS_XMMps_XMMps_0F10
+PATTERN   : 0x0F 0x11 no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : MEM0:w:ps REG0=XMM_R():r:ps
+PATTERN   : 0x0F 0x11 no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_B():w:ps REG1=XMM_R():r:ps
+IFORM     : MOVUPS_XMMps_XMMps_0F11
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : MOVLPS
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_5
+ATTRIBUTES :
+PATTERN   : 0x0F 0x13 no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:q:f32 REG0=XMM_R():r:ps:f32
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : UNPCKLPS
+CPL       : 3
+CATEGORY  : SSE
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_4
+ATTRIBUTES :  REQUIRES_ALIGNMENT
+COMMENT   : mem form only uses q portion of the dq load. See SDM.
+PATTERN   : 0x0F 0x14 no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : REG0=XMM_R():rw:ps MEM0:r:dq
+PATTERN   : 0x0F 0x14 no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():rw:ps REG1=XMM_B():r:q
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : UNPCKHPS
+CPL       : 3
+CATEGORY  : SSE
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_4
+ATTRIBUTES : SKIPLOW64  REQUIRES_ALIGNMENT
+PATTERN   : 0x0F 0x15 no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : REG0=XMM_R():rw:ps MEM0:r:dq
+PATTERN   : 0x0F 0x15 no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():rw:ps REG1=XMM_B():r:dq
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : MOVHPS
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_5
+ATTRIBUTES :
+PATTERN   : 0x0F 0x17 no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM()
+OPERANDS  : MEM0:w:q:f32 REG0=XMM_R():r:ps:f32
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : MOVSS
+CPL       : 3
+ATTRIBUTES : simd_scalar
+CATEGORY  : DATAXFER
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_5
+PATTERN   : 0x0F 0x10 f3_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  IGNORE66() MODRM()
+OPERANDS  : REG0=XMM_R():w:dq:f32 MEM0:r:ss
+PATTERN   : 0x0F 0x10 f3_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]  IGNORE66()
+OPERANDS  : REG0=XMM_R():w:ss REG1=XMM_B():r:ss
+IFORM     : MOVSS_XMMss_XMMss_0F10
+PATTERN   : 0x0F 0x11 f3_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  IGNORE66() MODRM()
+OPERANDS  : MEM0:w:ss REG0=XMM_R():r:ss
+PATTERN   : 0x0F 0x11 f3_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]  IGNORE66()
+OPERANDS  : REG0=XMM_B():w:ss REG1=XMM_R():r:ss
+IFORM     : MOVSS_XMMss_XMMss_0F11
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : MOVMSKPS
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_7
+PATTERN   : 0x0F 0x50 no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=GPR32_R():w REG1=XMM_B():r:ps
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : SQRTPS
+CPL       : 3
+CATEGORY  : SSE
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_2
+ATTRIBUTES :  REQUIRES_ALIGNMENT MXCSR
+PATTERN   : 0x0F 0x51 no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : REG0=XMM_R():w:ps MEM0:r:ps
+PATTERN   : 0x0F 0x51 no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:ps REG1=XMM_B():r:ps
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : RSQRTPS
+CPL       : 3
+CATEGORY  : SSE
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_4
+ATTRIBUTES :  REQUIRES_ALIGNMENT
+PATTERN   : 0x0F 0x52 no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : REG0=XMM_R():w:ps MEM0:r:ps
+PATTERN   : 0x0F 0x52 no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:ps REG1=XMM_B():r:ps
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : RCPPS
+CPL       : 3
+CATEGORY  : SSE
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_4
+ATTRIBUTES :  REQUIRES_ALIGNMENT
+PATTERN   : 0x0F 0x53 no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : REG0=XMM_R():w:ps MEM0:r:ps
+PATTERN   : 0x0F 0x53 no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:ps REG1=XMM_B():r:ps
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : ANDPS
+CPL       : 3
+CATEGORY  : LOGICAL_FP
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_4
+ATTRIBUTES :  REQUIRES_ALIGNMENT
+PATTERN   : 0x0F 0x54 no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : REG0=XMM_R():rw:xud MEM0:r:xud
+PATTERN   : 0x0F 0x54 no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():rw:xud REG1=XMM_B():r:xud
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : ANDNPS
+CPL       : 3
+CATEGORY  : LOGICAL_FP
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_4
+ATTRIBUTES :  REQUIRES_ALIGNMENT
+PATTERN   : 0x0F 0x55 no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : REG0=XMM_R():rw:xud MEM0:r:xud
+PATTERN   : 0x0F 0x55 no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():rw:xud REG1=XMM_B():r:xud
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : ORPS
+CPL       : 3
+CATEGORY  : LOGICAL_FP
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_4
+ATTRIBUTES :  REQUIRES_ALIGNMENT
+PATTERN   : 0x0F 0x56 no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : REG0=XMM_R():rw:xud MEM0:r:xud
+PATTERN   : 0x0F 0x56 no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():rw:xud REG1=XMM_B():r:xud
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : XORPS
+CPL       : 3
+CATEGORY  : LOGICAL_FP
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_4
+ATTRIBUTES :  REQUIRES_ALIGNMENT
+PATTERN   : 0x0F 0x57 no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : REG0=XMM_R():rw:xud MEM0:r:xud
+PATTERN   : 0x0F 0x57 no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():rw:xud REG1=XMM_B():r:xud
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : SQRTSS
+CPL       : 3
+ATTRIBUTES : simd_scalar  MXCSR
+CATEGORY  : SSE
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_3
+PATTERN   : 0x0F 0x51 f3_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  IGNORE66() MODRM()
+OPERANDS  : REG0=XMM_R():w:ss MEM0:r:ss
+PATTERN   : 0x0F 0x51 f3_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]  IGNORE66()
+OPERANDS  : REG0=XMM_R():w:ss REG1=XMM_B():r:ss
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : RSQRTSS
+CPL       : 3
+ATTRIBUTES : simd_scalar
+CATEGORY  : SSE
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_5
+PATTERN   : 0x0F 0x52 f3_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  IGNORE66() MODRM()
+OPERANDS  : REG0=XMM_R():w:ss MEM0:r:ss
+PATTERN   : 0x0F 0x52 f3_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]  IGNORE66()
+OPERANDS  : REG0=XMM_R():w:ss REG1=XMM_B():r:ss
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : RCPSS
+CPL       : 3
+ATTRIBUTES : simd_scalar
+CATEGORY  : SSE
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_5
+PATTERN   : 0x0F 0x53 f3_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  IGNORE66() MODRM()
+OPERANDS  : REG0=XMM_R():w:ss MEM0:r:ss
+PATTERN   : 0x0F 0x53 f3_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]  IGNORE66()
+OPERANDS  : REG0=XMM_R():w:ss REG1=XMM_B():r:ss
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : CMPPS
+CPL       : 3
+CATEGORY  : SSE
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_2
+ATTRIBUTES :  REQUIRES_ALIGNMENT MXCSR
+PATTERN   : 0x0F 0xC2 no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():rw:ps MEM0:r:ps IMM0:r:b
+PATTERN   : 0x0F 0xC2 no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]  UIMM8()
+OPERANDS  : REG0=XMM_R():rw:ps REG1=XMM_B():r:ps IMM0:r:b
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : SHUFPS
+CPL       : 3
+CATEGORY  : SSE
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_4
+ATTRIBUTES :  REQUIRES_ALIGNMENT
+PATTERN   : 0x0F 0xC6 no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():rw:ps MEM0:r:ps IMM0:r:b
+PATTERN   : 0x0F 0xC6 no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]  UIMM8()
+OPERANDS  : REG0=XMM_R():rw:ps REG1=XMM_B():r:ps IMM0:r:b
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : CMPSS
+CPL       : 3
+ATTRIBUTES : simd_scalar  MXCSR
+CATEGORY  : SSE
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_3
+PATTERN   : 0x0F 0xC2 f3_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  IGNORE66() MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():rw:ss MEM0:r:ss IMM0:r:b
+PATTERN   : 0x0F 0xC2 f3_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]  IGNORE66() UIMM8()
+OPERANDS  : REG0=XMM_R():rw:ss REG1=XMM_B():r:ss IMM0:r:b
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : MOVAPS
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_1
+ATTRIBUTES :  REQUIRES_ALIGNMENT
+PATTERN   : 0x0F 0x28 no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : REG0=XMM_R():w:ps MEM0:r:ps
+PATTERN   : 0x0F 0x28 no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:ps REG1=XMM_B():r:ps
+IFORM     : MOVAPS_XMMps_XMMps_0F28
+PATTERN   : 0x0F 0x29 no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : MEM0:w:ps REG0=XMM_R():r:ps
+PATTERN   : 0x0F 0x29 no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_B():w:ps REG1=XMM_R():r:ps
+IFORM     : MOVAPS_XMMps_XMMps_0F29
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : CVTPI2PS
+EXCEPTIONS: mmx-fp
+CPL       : 3
+CATEGORY  : CONVERT
+EXTENSION : SSE
+ATTRIBUTES : MXCSR MMX_EXCEPT NOTSX
+PATTERN   : 0x0F 0x2A no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : REG0=XMM_R():w:q:f32 MEM0:r:q:i32
+PATTERN   : 0x0F 0x2A no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():w:q:f32 REG1=MMX_B():r:q:i32
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : MOVNTPS
+ATTRIBUTES: NOTSX REQUIRES_ALIGNMENT NONTEMPORAL
+CPL       : 3
+CATEGORY  : DATAXFER
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_1
+PATTERN   : 0x0F 0x2B no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : MEM0:w:dq REG0=XMM_R():r:ps
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : CVTTPS2PI
+EXCEPTIONS: mmx-fp
+CPL       : 3
+CATEGORY  : CONVERT
+EXTENSION : SSE
+ATTRIBUTES : MXCSR MMX_EXCEPT NOTSX
+PATTERN   : 0x0F 0x2C no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : REG0=MMX_R():w:q:i32 MEM0:r:q:f32
+PATTERN   : 0x0F 0x2C no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=MMX_R():w:q:i32 REG1=XMM_B():r:q:f32
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : CVTPS2PI
+EXCEPTIONS: mmx-fp
+CPL       : 3
+CATEGORY  : CONVERT
+EXTENSION : SSE
+ATTRIBUTES : MXCSR MMX_EXCEPT NOTSX
+PATTERN   : 0x0F 0x2D no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : REG0=MMX_R():w:q:i32 MEM0:r:q:f32
+PATTERN   : 0x0F 0x2D no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=MMX_R():w:q:i32 REG1=XMM_B():r:q:f32
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : UCOMISS
+CPL       : 3
+ATTRIBUTES : simd_scalar  MXCSR
+CATEGORY  : SSE
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_3
+FLAGS     : MUST [ of-0 sf-0 zf-mod af-0 pf-mod cf-mod ]
+PATTERN   : 0x0F 0x2E no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : REG0=XMM_R():r:ss MEM0:r:ss
+PATTERN   : 0x0F 0x2E no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():r:ss REG1=XMM_B():r:ss
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : COMISS
+CPL       : 3
+ATTRIBUTES : simd_scalar  MXCSR
+CATEGORY  : SSE
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_3
+FLAGS     : MUST [ of-0 sf-0 zf-mod af-0 pf-mod cf-mod ]
+PATTERN   : 0x0F 0x2F no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : REG0=XMM_R():r:ss MEM0:r:ss
+PATTERN   : 0x0F 0x2F no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():r:ss REG1=XMM_B():r:ss
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : CVTSI2SS
+CPL       : 3
+ATTRIBUTES : simd_scalar  MXCSR
+CATEGORY  : CONVERT
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_3
+PATTERN   : 0x0F 0x2A f3_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  IGNORE66() norexw_prefix MODRM()
+OPERANDS  : REG0=XMM_R():w:ss:f32 MEM0:r:d:i32
+PATTERN   : 0x0F 0x2A f3_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]  IGNORE66() norexw_prefix
+OPERANDS  : REG0=XMM_R():w:ss:f32 REG1=GPR32_B():r:d:i32
+PATTERN   : 0x0F 0x2A f3_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  IGNORE66() rexw_prefix MODRM()
+OPERANDS  : REG0=XMM_R():w:ss:f32 MEM0:r:q:i32
+PATTERN   : 0x0F 0x2A f3_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]  IGNORE66() rexw_prefix
+OPERANDS  : REG0=XMM_R():w:ss:f32 REG1=GPR64_B():r:q:i32
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : CVTTSS2SI
+CPL       : 3
+ATTRIBUTES : simd_scalar  MXCSR
+CATEGORY  : CONVERT
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_3
+PATTERN   : 0x0F 0x2C f3_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  IGNORE66() norexw_prefix MODRM()
+OPERANDS  : REG0=GPR32_R():w:d:i32 MEM0:r:ss:f32
+PATTERN   : 0x0F 0x2C f3_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]  IGNORE66() norexw_prefix
+OPERANDS  : REG0=GPR32_R():w:d:i32 REG1=XMM_B():r:ss:f32
+PATTERN   : 0x0F 0x2C f3_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  IGNORE66() rexw_prefix MODRM()
+OPERANDS  : REG0=GPR64_R():w:q:i64 MEM0:r:ss:f32
+PATTERN   : 0x0F 0x2C f3_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]  IGNORE66() rexw_prefix
+OPERANDS  : REG0=GPR64_R():w:q:i64 REG1=XMM_B():r:ss:f32
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : CVTSS2SI
+CPL       : 3
+ATTRIBUTES : simd_scalar  MXCSR
+CATEGORY  : CONVERT
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_3
+PATTERN   : 0x0F 0x2D f3_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  IGNORE66() norexw_prefix MODRM()
+OPERANDS  : REG0=GPR32_R():w:d:i32 MEM0:r:ss:f32
+PATTERN   : 0x0F 0x2D f3_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]  IGNORE66() norexw_prefix
+OPERANDS  : REG0=GPR32_R():w:d:i32 REG1=XMM_B():r:ss:f32
+PATTERN   : 0x0F 0x2D f3_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  IGNORE66() rexw_prefix MODRM()
+OPERANDS  : REG0=GPR64_R():w:q:i64 MEM0:r:ss:f32
+PATTERN   : 0x0F 0x2D f3_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]  IGNORE66() rexw_prefix
+OPERANDS  : REG0=GPR64_R():w:q:i64 REG1=XMM_B():r:ss:f32
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : ADDPS
+CPL       : 3
+CATEGORY  : SSE
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_2
+ATTRIBUTES :  REQUIRES_ALIGNMENT MXCSR
+PATTERN   : 0x0F 0x58 no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : REG0=XMM_R():rw:ps MEM0:r:ps
+PATTERN   : 0x0F 0x58 no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():rw:ps REG1=XMM_B():r:ps
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : MULPS
+CPL       : 3
+CATEGORY  : SSE
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_2
+ATTRIBUTES :  REQUIRES_ALIGNMENT MXCSR
+PATTERN   : 0x0F 0x59 no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : REG0=XMM_R():rw:ps MEM0:r:ps
+PATTERN   : 0x0F 0x59 no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():rw:ps REG1=XMM_B():r:ps
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : SUBPS
+CPL       : 3
+CATEGORY  : SSE
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_2
+ATTRIBUTES :  REQUIRES_ALIGNMENT MXCSR
+PATTERN   : 0x0F 0x5C no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : REG0=XMM_R():rw:ps MEM0:r:ps
+PATTERN   : 0x0F 0x5C no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():rw:ps REG1=XMM_B():r:ps
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : MINPS
+CPL       : 3
+CATEGORY  : SSE
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_2
+ATTRIBUTES :  REQUIRES_ALIGNMENT MXCSR
+PATTERN   : 0x0F 0x5D no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : REG0=XMM_R():rw:ps MEM0:r:ps
+PATTERN   : 0x0F 0x5D no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():rw:ps REG1=XMM_B():r:ps
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : DIVPS
+CPL       : 3
+CATEGORY  : SSE
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_2
+ATTRIBUTES :  REQUIRES_ALIGNMENT MXCSR
+PATTERN   : 0x0F 0x5E no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : REG0=XMM_R():rw:ps MEM0:r:ps
+PATTERN   : 0x0F 0x5E no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():rw:ps REG1=XMM_B():r:ps
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : MAXPS
+CPL       : 3
+CATEGORY  : SSE
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_2
+ATTRIBUTES :  REQUIRES_ALIGNMENT MXCSR
+PATTERN   : 0x0F 0x5F no_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  MODRM()
+OPERANDS  : REG0=XMM_R():rw:ps MEM0:r:ps
+PATTERN   : 0x0F 0x5F no_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]
+OPERANDS  : REG0=XMM_R():rw:ps REG1=XMM_B():r:ps
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : ADDSS
+CPL       : 3
+ATTRIBUTES : simd_scalar  MXCSR
+CATEGORY  : SSE
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_3
+PATTERN   : 0x0F 0x58 f3_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  IGNORE66() MODRM()
+OPERANDS  : REG0=XMM_R():rw:ss MEM0:r:ss
+PATTERN   : 0x0F 0x58 f3_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]  IGNORE66()
+OPERANDS  : REG0=XMM_R():rw:ss REG1=XMM_B():r:ss
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : MULSS
+CPL       : 3
+ATTRIBUTES : simd_scalar  MXCSR
+CATEGORY  : SSE
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_3
+PATTERN   : 0x0F 0x59 f3_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  IGNORE66() MODRM()
+OPERANDS  : REG0=XMM_R():rw:ss MEM0:r:ss
+PATTERN   : 0x0F 0x59 f3_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]  IGNORE66()
+OPERANDS  : REG0=XMM_R():rw:ss REG1=XMM_B():r:ss
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : SUBSS
+CPL       : 3
+ATTRIBUTES : simd_scalar  MXCSR
+CATEGORY  : SSE
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_3
+PATTERN   : 0x0F 0x5C f3_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  IGNORE66() MODRM()
+OPERANDS  : REG0=XMM_R():rw:ss MEM0:r:ss
+PATTERN   : 0x0F 0x5C f3_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]  IGNORE66()
+OPERANDS  : REG0=XMM_R():rw:ss REG1=XMM_B():r:ss
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : MINSS
+CPL       : 3
+ATTRIBUTES : simd_scalar  MXCSR
+CATEGORY  : SSE
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_3
+PATTERN   : 0x0F 0x5D f3_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  IGNORE66() MODRM()
+OPERANDS  : REG0=XMM_R():rw:ss MEM0:r:ss
+PATTERN   : 0x0F 0x5D f3_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]  IGNORE66()
+OPERANDS  : REG0=XMM_R():rw:ss REG1=XMM_B():r:ss
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : DIVSS
+CPL       : 3
+ATTRIBUTES : simd_scalar  MXCSR
+CATEGORY  : SSE
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_3
+PATTERN   : 0x0F 0x5E f3_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  IGNORE66() MODRM()
+OPERANDS  : REG0=XMM_R():rw:ss MEM0:r:ss
+PATTERN   : 0x0F 0x5E f3_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]  IGNORE66()
+OPERANDS  : REG0=XMM_R():rw:ss REG1=XMM_B():r:ss
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : MAXSS
+CPL       : 3
+ATTRIBUTES : simd_scalar  MXCSR
+CATEGORY  : SSE
+EXTENSION : SSE
+EXCEPTIONS: SSE_TYPE_3
+PATTERN   : 0x0F 0x5F f3_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  IGNORE66() MODRM()
+OPERANDS  : REG0=XMM_R():rw:ss MEM0:r:ss
+PATTERN   : 0x0F 0x5F f3_refining_prefix MOD[0b11] MOD=3 REG[rrr] RM[nnn]  IGNORE66()
+OPERANDS  : REG0=XMM_R():rw:ss REG1=XMM_B():r:ss
+}

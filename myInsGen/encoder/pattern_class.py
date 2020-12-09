@@ -19,6 +19,20 @@ class nonterminal_t(object):
     def add(self,rule):
         self.rules.append(rule)
 
+    def multiple_otherwise_rules(self):
+        c = 0
+        for r in self.rules:
+            if r.has_otherwise_rule():
+                c = c + 1
+        if c > 1:
+            return True
+        return False
+
+    def has_otherwise_rule(self):
+        if self.conditions.has_otherwise():
+            return True
+        return False
+
 
 class rvalue_t(object):
     """The right hand side of an operand decider equation. It could be
@@ -145,6 +159,24 @@ class condition_t(object):
             return True
         return False
 
+    def memory_condition(self): # MEM_WIDTH
+        if self.lencode != None:
+            return True
+        return False
+
+    def __str__(self):
+        s = [ self.field_name ]
+        if self.memory_condition(): # MEM_WIDTH
+            s.append(" (MEMOP %s)" % self.lencode)
+        if self.bits:
+            s.append( '[%s]' % (self.bits))
+        if self.equals:
+            s.append( '=' )
+        else:
+            s.append('!=')
+        s.append(str(self.rvalue))
+        return ''.join(s)
+
 
 class conditions_t(object):
     """Two lists of condition_t's. One gets ANDed together and one gets
@@ -233,3 +265,15 @@ class rule_t(object):
                 self.enc_preferred = False
         return conditions
 
+    def has_otherwise_rule(self):
+        if self.conditions.has_otherwise():
+            return True
+        return False
+
+    def __str__(self):
+        s = ""
+        for i in self.conditions.and_conditions:
+            s += "%s " %str(i)
+        for i in self.actions:
+            s += "%s " %str(i)
+        return s

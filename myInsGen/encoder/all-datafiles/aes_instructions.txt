@@ -1,0 +1,78 @@
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : AESKEYGENASSIST
+CPL       : 3
+CATEGORY  : AES
+EXTENSION : AES
+EXCEPTIONS: SSE_TYPE_4
+ATTRIBUTES :  REQUIRES_ALIGNMENT
+PATTERN   : 0x0F 0x3A 0xDF osz_refining_prefix MOD[0b11] MOD=3  REG[rrr] RM[nnn]  REFINING66()  UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq  REG1=XMM_B():r:dq IMM0:r:b
+PATTERN   : 0x0F 0x3A 0xDF osz_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  REFINING66() MODRM() UIMM8()
+OPERANDS  : REG0=XMM_R():w:dq  MEM0:r:dq IMM0:r:b
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : AESENC
+CPL       : 3
+CATEGORY  : AES
+EXTENSION : AES
+EXCEPTIONS: SSE_TYPE_4
+ATTRIBUTES :  REQUIRES_ALIGNMENT
+PATTERN   : 0x0F 0x38 0xDC osz_refining_prefix MOD[0b11] MOD=3  REG[rrr] RM[nnn]  REFINING66()
+OPERANDS  : REG0=XMM_R():rw:dq  REG1=XMM_B():r:dq
+PATTERN   : 0x0F 0x38 0xDC osz_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  REFINING66() MODRM()
+OPERANDS  : REG0=XMM_R():rw:dq  MEM0:r:dq
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : AESENCLAST
+CPL       : 3
+CATEGORY  : AES
+EXTENSION : AES
+EXCEPTIONS: SSE_TYPE_4
+ATTRIBUTES :  REQUIRES_ALIGNMENT
+PATTERN   : 0x0F 0x38 0xDD osz_refining_prefix MOD[0b11] MOD=3  REG[rrr] RM[nnn]  REFINING66()
+OPERANDS  : REG0=XMM_R():rw:dq  REG1=XMM_B():r:dq
+PATTERN   : 0x0F 0x38 0xDD osz_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  REFINING66() MODRM()
+OPERANDS  : REG0=XMM_R():rw:dq  MEM0:r:dq
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : AESDEC
+CPL       : 3
+CATEGORY  : AES
+EXTENSION : AES
+EXCEPTIONS: SSE_TYPE_4
+ATTRIBUTES :  REQUIRES_ALIGNMENT
+PATTERN   : 0x0F 0x38 0xDE osz_refining_prefix MOD[0b11] MOD=3  REG[rrr] RM[nnn]  REFINING66()
+OPERANDS  : REG0=XMM_R():rw:dq  REG1=XMM_B():r:dq
+PATTERN   : 0x0F 0x38 0xDE osz_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  REFINING66() MODRM()
+OPERANDS  : REG0=XMM_R():rw:dq  MEM0:r:dq
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : AESDECLAST
+CPL       : 3
+CATEGORY  : AES
+EXTENSION : AES
+EXCEPTIONS: SSE_TYPE_4
+ATTRIBUTES :  REQUIRES_ALIGNMENT
+PATTERN   : 0x0F 0x38 0xDF osz_refining_prefix MOD[0b11] MOD=3  REG[rrr] RM[nnn]  REFINING66()
+OPERANDS  : REG0=XMM_R():rw:dq  REG1=XMM_B():r:dq
+PATTERN   : 0x0F 0x38 0xDF osz_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  REFINING66() MODRM()
+OPERANDS  : REG0=XMM_R():rw:dq  MEM0:r:dq
+}
+###FILE: ./datafiles/xed-isa.txt
+{
+ICLASS    : AESIMC
+CPL       : 3
+CATEGORY  : AES
+EXTENSION : AES
+EXCEPTIONS: SSE_TYPE_4
+ATTRIBUTES :  REQUIRES_ALIGNMENT
+PATTERN   : 0x0F 0x38 0xDB osz_refining_prefix MOD[0b11] MOD=3  REG[rrr] RM[nnn]  REFINING66()
+OPERANDS  : REG0=XMM_R():w:dq  REG1=XMM_B():r:dq
+PATTERN   : 0x0F 0x38 0xDB osz_refining_prefix MOD[mm] MOD!=3 REG[rrr] RM[nnn]  REFINING66() MODRM()
+OPERANDS  : REG0=XMM_R():w:dq  MEM0:r:dq
+}

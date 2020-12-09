@@ -1,55 +1,61 @@
-import pickle
 import os
 
 class SaveData(object):
-    def __init__(self, filename, logger=None):
+    def __init__(self, filename, pkl_dir=None, logger=None):
+        filename = filename.lower()
         if ".txt" in filename:
             pkl_name = filename.replace(".txt", ".pkl")
         else:
             pkl_name = filename + ".pkl"
 
+        if pkl_dir:
+            raw_filename = os.path.split(pkl_name)[-1]
+            pkl_name = os.path.join(pkl_dir, raw_filename)
+
         self.name = pkl_name
         self.logger = logger
+        self.ext_filename = ""
         if os.path.exists(pkl_name):
             self.haspkl = True
         else:
             self.haspkl = False
 
-    def Save(self, obj):
+    def SetFilename(self, name):
+        self.ext_filename = name
+
+    def ResetFilename(self):
+        self.ext_filename = ""
+
+    def Save(self, fn, *args):
+        if self.ext_filename != "":
+            name = self.ext_filename
+        else:
+            name = self.name
         try:
-            with open(self.name, "wb") as f:
-                    pickle.dump(obj.storage_fields, f)
-                    pickle.dump(obj.state_bits, f)
-                    pickle.dump(obj.seqs, f)
-                    pickle.dump(obj.nts, f)
-                    pickle.dump(obj.ntlufs, f)
-                    pickle.dump(obj.deleted_unames, f)
-                    pickle.dump(obj.deleted_instructions, f)
-                    pickle.dump(obj.iarray, f)
+            with open(name, "wb") as f:
+                fn(f, *args)
         except Exception as e:
             print(e)
-            if os.path.exists(self.name):
-                os.remove(self.name)
+            if os.path.exists(name):
+                os.remove(name)
             return
         self.haspkl = True
         if self.logger:
-            self.logger.info("data saved at %s" %self.name)
+            self.logger.info("data saved at %s" %name)
         return
 
-    def Load(self, obj):
+    def Load(self, fn, *args):
         if self.haspkl:
+            if self.ext_filename != "":
+                name = self.ext_filename
+            else:
+                name = self.name
+
             if self.logger:
-                self.logger.info("load data from %s" %self.name)
+                self.logger.info("load data from %s" %name)
             try:
-                with open(self.name, "rb") as f:
-                    obj.storage_fields = pickle.load(f)
-                    obj.state_bits = pickle.load(f)
-                    obj.seqs = pickle.load(f)
-                    obj.nts = pickle.load(f)
-                    obj.ntlufs = pickle.load(f)
-                    obj.deleted_unames = pickle.load(f)
-                    obj.deleted_instructions = pickle.load(f)
-                    obj.iarray = pickle.load(f)
+                with open(name, "rb") as f:
+                    fn(f, *args)
             except Exception as e:
                 print(e)
                 return None

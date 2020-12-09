@@ -1,0 +1,2142 @@
+parse end
+ADD
+		action: emit 0b10000000 emit_type=numeric value=0x80 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b000 emit_type=numeric value=0x0 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMM8]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b10000001 emit_type=numeric value=0x81 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b000 emit_type=numeric value=0x0 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMMz]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b10000010 emit_type=numeric value=0x82 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b000 emit_type=numeric value=0x0 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMM8]
+		conditon: MODE!=2
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b10000011 emit_type=numeric value=0x83 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b000 emit_type=numeric value=0x0 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMM8]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b00000000 emit_type=numeric value=0x0 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+		conditon: REG1=GPR8_R()
+
+		action: emit 0b00000001 emit_type=numeric value=0x1 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00000010 emit_type=numeric value=0x2 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_R()
+		conditon: REG1=GPR8_B()
+
+		action: emit 0b00000011 emit_type=numeric value=0x3 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+OR
+		action: emit 0b10000000 emit_type=numeric value=0x80 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b001 emit_type=numeric value=0x1 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMM8]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b10000001 emit_type=numeric value=0x81 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b001 emit_type=numeric value=0x1 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMMz]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b10000010 emit_type=numeric value=0x82 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b001 emit_type=numeric value=0x1 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMM8]
+		conditon: MODE!=2
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b10000011 emit_type=numeric value=0x83 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b001 emit_type=numeric value=0x1 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMM8]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b00001000 emit_type=numeric value=0x8 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+		conditon: REG1=GPR8_R()
+
+		action: emit 0b00001001 emit_type=numeric value=0x9 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001010 emit_type=numeric value=0xa nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_R()
+		conditon: REG1=GPR8_B()
+
+		action: emit 0b00001011 emit_type=numeric value=0xb nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+ADC
+		action: emit 0b10000000 emit_type=numeric value=0x80 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b010 emit_type=numeric value=0x2 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMM8]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b10000001 emit_type=numeric value=0x81 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b010 emit_type=numeric value=0x2 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMMz]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b10000010 emit_type=numeric value=0x82 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b010 emit_type=numeric value=0x2 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMM8]
+		conditon: MODE!=2
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b10000011 emit_type=numeric value=0x83 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b010 emit_type=numeric value=0x2 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMM8]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b00010000 emit_type=numeric value=0x10 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+		conditon: REG1=GPR8_R()
+
+		action: emit 0b00010001 emit_type=numeric value=0x11 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00010010 emit_type=numeric value=0x12 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_R()
+		conditon: REG1=GPR8_B()
+
+		action: emit 0b00010011 emit_type=numeric value=0x13 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+SBB
+		action: emit 0b10000000 emit_type=numeric value=0x80 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b011 emit_type=numeric value=0x3 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMM8]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b10000001 emit_type=numeric value=0x81 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b011 emit_type=numeric value=0x3 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMMz]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b10000010 emit_type=numeric value=0x82 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b011 emit_type=numeric value=0x3 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMM8]
+		conditon: MODE!=2
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b10000011 emit_type=numeric value=0x83 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b011 emit_type=numeric value=0x3 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMM8]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b00011000 emit_type=numeric value=0x18 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+		conditon: REG1=GPR8_R()
+
+		action: emit 0b00011001 emit_type=numeric value=0x19 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00011010 emit_type=numeric value=0x1a nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_R()
+		conditon: REG1=GPR8_B()
+
+		action: emit 0b00011011 emit_type=numeric value=0x1b nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+AND
+		action: emit 0b10000000 emit_type=numeric value=0x80 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b100 emit_type=numeric value=0x4 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b10000001 emit_type=numeric value=0x81 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b100 emit_type=numeric value=0x4 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMMz]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b10000010 emit_type=numeric value=0x82 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b100 emit_type=numeric value=0x4 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: MODE!=2
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b10000011 emit_type=numeric value=0x83 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b100 emit_type=numeric value=0x4 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMM8]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b00100000 emit_type=numeric value=0x20 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+		conditon: REG1=GPR8_R()
+
+		action: emit 0b00100001 emit_type=numeric value=0x21 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00100010 emit_type=numeric value=0x22 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_R()
+		conditon: REG1=GPR8_B()
+
+		action: emit 0b00100011 emit_type=numeric value=0x23 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+SUB
+		action: emit 0b10000000 emit_type=numeric value=0x80 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b101 emit_type=numeric value=0x5 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMM8]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b10000001 emit_type=numeric value=0x81 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b101 emit_type=numeric value=0x5 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMMz]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b10000010 emit_type=numeric value=0x82 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b101 emit_type=numeric value=0x5 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMM8]
+		conditon: MODE!=2
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b10000011 emit_type=numeric value=0x83 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b101 emit_type=numeric value=0x5 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMM8]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b00101000 emit_type=numeric value=0x28 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+		conditon: REG1=GPR8_R()
+
+		action: emit 0b00101001 emit_type=numeric value=0x29 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00101010 emit_type=numeric value=0x2a nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_R()
+		conditon: REG1=GPR8_B()
+
+		action: emit 0b00101011 emit_type=numeric value=0x2b nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+XOR
+		action: emit 0b10000000 emit_type=numeric value=0x80 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b110 emit_type=numeric value=0x6 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b10000001 emit_type=numeric value=0x81 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b110 emit_type=numeric value=0x6 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMMz]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b10000010 emit_type=numeric value=0x82 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b110 emit_type=numeric value=0x6 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: MODE!=2
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b10000011 emit_type=numeric value=0x83 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b110 emit_type=numeric value=0x6 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMM8]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b00110000 emit_type=numeric value=0x30 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+		conditon: REG1=GPR8_R()
+
+		action: emit 0b00110001 emit_type=numeric value=0x31 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00110010 emit_type=numeric value=0x32 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_R()
+		conditon: REG1=GPR8_B()
+
+		action: emit 0b00110011 emit_type=numeric value=0x33 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+CMP
+		action: emit 0b10000000 emit_type=numeric value=0x80 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b111 emit_type=numeric value=0x7 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMM8]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b10000001 emit_type=numeric value=0x81 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b111 emit_type=numeric value=0x7 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMMz]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b10000010 emit_type=numeric value=0x82 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b111 emit_type=numeric value=0x7 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMM8]
+		conditon: MODE!=2
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b10000011 emit_type=numeric value=0x83 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b111 emit_type=numeric value=0x7 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMM8]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b00111000 emit_type=numeric value=0x38 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+		conditon: REG1=GPR8_R()
+
+		action: emit 0b00111001 emit_type=numeric value=0x39 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00111010 emit_type=numeric value=0x3a nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_R()
+		conditon: REG1=GPR8_B()
+
+		action: emit 0b00111011 emit_type=numeric value=0x3b nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+POP
+		action: emit 0b10001111 emit_type=numeric value=0x8f nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b000 emit_type=numeric value=0x0 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[DF64]
+		conditon: REG0=GPRv_B()
+
+ROL
+		action: emit 0b11000000 emit_type=numeric value=0xc0 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b000 emit_type=numeric value=0x0 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b11000001 emit_type=numeric value=0xc1 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b000 emit_type=numeric value=0x0 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b11010000 emit_type=numeric value=0xd0 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b000 emit_type=numeric value=0x0 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[ONE]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b11010001 emit_type=numeric value=0xd1 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b000 emit_type=numeric value=0x0 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[ONE]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b11010010 emit_type=numeric value=0xd2 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b000 emit_type=numeric value=0x0 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+		conditon: REG1=XED_REG_CL
+
+		action: emit 0b11010011 emit_type=numeric value=0xd3 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b000 emit_type=numeric value=0x0 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=XED_REG_CL
+
+ROR
+		action: emit 0b11000000 emit_type=numeric value=0xc0 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b001 emit_type=numeric value=0x1 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b11000001 emit_type=numeric value=0xc1 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b001 emit_type=numeric value=0x1 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b11010000 emit_type=numeric value=0xd0 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b001 emit_type=numeric value=0x1 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[ONE]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b11010001 emit_type=numeric value=0xd1 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b001 emit_type=numeric value=0x1 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[ONE]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b11010010 emit_type=numeric value=0xd2 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b001 emit_type=numeric value=0x1 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+		conditon: REG1=XED_REG_CL
+
+		action: emit 0b11010011 emit_type=numeric value=0xd3 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b001 emit_type=numeric value=0x1 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=XED_REG_CL
+
+RCL
+		action: emit 0b11000000 emit_type=numeric value=0xc0 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b010 emit_type=numeric value=0x2 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b11000001 emit_type=numeric value=0xc1 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b010 emit_type=numeric value=0x2 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b11010000 emit_type=numeric value=0xd0 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b010 emit_type=numeric value=0x2 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[ONE]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b11010001 emit_type=numeric value=0xd1 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b010 emit_type=numeric value=0x2 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[ONE]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b11010010 emit_type=numeric value=0xd2 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b010 emit_type=numeric value=0x2 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+		conditon: REG1=XED_REG_CL
+
+		action: emit 0b11010011 emit_type=numeric value=0xd3 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b010 emit_type=numeric value=0x2 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=XED_REG_CL
+
+RCR
+		action: emit 0b11000000 emit_type=numeric value=0xc0 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b011 emit_type=numeric value=0x3 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b11000001 emit_type=numeric value=0xc1 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b011 emit_type=numeric value=0x3 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b11010000 emit_type=numeric value=0xd0 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b011 emit_type=numeric value=0x3 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[ONE]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b11010001 emit_type=numeric value=0xd1 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b011 emit_type=numeric value=0x3 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[ONE]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b11010010 emit_type=numeric value=0xd2 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b011 emit_type=numeric value=0x3 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+		conditon: REG1=XED_REG_CL
+
+		action: emit 0b11010011 emit_type=numeric value=0xd3 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b011 emit_type=numeric value=0x3 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=XED_REG_CL
+
+SHL
+		action: emit 0b11000000 emit_type=numeric value=0xc0 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b100 emit_type=numeric value=0x4 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b11000000 emit_type=numeric value=0xc0 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b110 emit_type=numeric value=0x6 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b11000001 emit_type=numeric value=0xc1 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b100 emit_type=numeric value=0x4 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b11000001 emit_type=numeric value=0xc1 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b110 emit_type=numeric value=0x6 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b11010000 emit_type=numeric value=0xd0 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b100 emit_type=numeric value=0x4 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[ONE]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b11010000 emit_type=numeric value=0xd0 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b110 emit_type=numeric value=0x6 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[ONE]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b11010001 emit_type=numeric value=0xd1 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b110 emit_type=numeric value=0x6 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[ONE]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b11010001 emit_type=numeric value=0xd1 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b100 emit_type=numeric value=0x4 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[ONE]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b11010010 emit_type=numeric value=0xd2 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b100 emit_type=numeric value=0x4 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+		conditon: REG1=XED_REG_CL
+
+		action: emit 0b11010010 emit_type=numeric value=0xd2 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b110 emit_type=numeric value=0x6 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+		conditon: REG1=XED_REG_CL
+
+		action: emit 0b11010011 emit_type=numeric value=0xd3 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b100 emit_type=numeric value=0x4 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=XED_REG_CL
+
+		action: emit 0b11010011 emit_type=numeric value=0xd3 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b110 emit_type=numeric value=0x6 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=XED_REG_CL
+
+SHR
+		action: emit 0b11000000 emit_type=numeric value=0xc0 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b101 emit_type=numeric value=0x5 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b11000001 emit_type=numeric value=0xc1 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b101 emit_type=numeric value=0x5 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b11010000 emit_type=numeric value=0xd0 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b101 emit_type=numeric value=0x5 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[ONE]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b11010001 emit_type=numeric value=0xd1 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b101 emit_type=numeric value=0x5 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[ONE]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b11010010 emit_type=numeric value=0xd2 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b101 emit_type=numeric value=0x5 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+		conditon: REG1=XED_REG_CL
+
+		action: emit 0b11010011 emit_type=numeric value=0xd3 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b101 emit_type=numeric value=0x5 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=XED_REG_CL
+
+SAR
+		action: emit 0b11000000 emit_type=numeric value=0xc0 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b111 emit_type=numeric value=0x7 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b11000001 emit_type=numeric value=0xc1 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b111 emit_type=numeric value=0x7 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b11010000 emit_type=numeric value=0xd0 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b111 emit_type=numeric value=0x7 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[ONE]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b11010001 emit_type=numeric value=0xd1 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b111 emit_type=numeric value=0x7 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[ONE]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b11010010 emit_type=numeric value=0xd2 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b111 emit_type=numeric value=0x7 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+		conditon: REG1=XED_REG_CL
+
+		action: emit 0b11010011 emit_type=numeric value=0xd3 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b111 emit_type=numeric value=0x7 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=XED_REG_CL
+
+TEST
+		action: emit 0b11110110 emit_type=numeric value=0xf6 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b000 emit_type=numeric value=0x0 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMM8]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b11110110 emit_type=numeric value=0xf6 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b001 emit_type=numeric value=0x1 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMM8]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b11110111 emit_type=numeric value=0xf7 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b000 emit_type=numeric value=0x0 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMMz]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b11110111 emit_type=numeric value=0xf7 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b001 emit_type=numeric value=0x1 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMMz]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b10000100 emit_type=numeric value=0x84 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+		conditon: REG1=GPR8_R()
+
+		action: emit 0b10000101 emit_type=numeric value=0x85 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+NOT
+		action: emit 0b11110110 emit_type=numeric value=0xf6 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b010 emit_type=numeric value=0x2 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+
+		action: emit 0b11110111 emit_type=numeric value=0xf7 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b010 emit_type=numeric value=0x2 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+
+NEG
+		action: emit 0b11110110 emit_type=numeric value=0xf6 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b011 emit_type=numeric value=0x3 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+
+		action: emit 0b11110111 emit_type=numeric value=0xf7 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b011 emit_type=numeric value=0x3 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+
+MUL
+		action: emit 0b11110110 emit_type=numeric value=0xf6 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b100 emit_type=numeric value=0x4 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+
+		action: emit 0b11110111 emit_type=numeric value=0xf7 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b100 emit_type=numeric value=0x4 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+
+IMUL
+		action: emit 0b11110110 emit_type=numeric value=0xf6 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b101 emit_type=numeric value=0x5 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+
+		action: emit 0b11110111 emit_type=numeric value=0xf7 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b101 emit_type=numeric value=0x5 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+
+		action: emit 0b01101001 emit_type=numeric value=0x69 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMMz]
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b01101011 emit_type=numeric value=0x6b nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMM8]
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10101111 emit_type=numeric value=0xaf nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+DIV
+		action: emit 0b11110110 emit_type=numeric value=0xf6 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b110 emit_type=numeric value=0x6 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+
+		action: emit 0b11110111 emit_type=numeric value=0xf7 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b110 emit_type=numeric value=0x6 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+
+IDIV
+		action: emit 0b11110110 emit_type=numeric value=0xf6 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b111 emit_type=numeric value=0x7 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+
+		action: emit 0b11110111 emit_type=numeric value=0xf7 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b111 emit_type=numeric value=0x7 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+
+INC
+		action: emit 0b11111110 emit_type=numeric value=0xfe nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b000 emit_type=numeric value=0x0 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+
+		action: emit 0b11111111 emit_type=numeric value=0xff nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b000 emit_type=numeric value=0x0 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+
+DEC
+		action: emit 0b11111110 emit_type=numeric value=0xfe nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b001 emit_type=numeric value=0x1 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+
+		action: emit 0b11111111 emit_type=numeric value=0xff nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b001 emit_type=numeric value=0x1 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+
+CALL_NEAR
+		action: emit 0b11111111 emit_type=numeric value=0xff nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b010 emit_type=numeric value=0x2 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[DF64]
+		action: nt NT[IMMUNE66_LOOP64]
+		conditon: REG0=GPRv_B()
+
+JMP
+		action: emit 0b11111111 emit_type=numeric value=0xff nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b100 emit_type=numeric value=0x4 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[DF64]
+		action: nt NT[IMMUNE66_LOOP64]
+		conditon: REG0=GPRv_B()
+
+PUSH
+		action: emit 0b11111111 emit_type=numeric value=0xff nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b110 emit_type=numeric value=0x6 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[DF64]
+		conditon: REG0=GPRv_B()
+
+SLDT
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00000000 emit_type=numeric value=0x0 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b000 emit_type=numeric value=0x0 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+
+STR
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00000000 emit_type=numeric value=0x0 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b001 emit_type=numeric value=0x1 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+
+LLDT
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00000000 emit_type=numeric value=0x0 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b010 emit_type=numeric value=0x2 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR16_B()
+
+LTR
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00000000 emit_type=numeric value=0x0 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b011 emit_type=numeric value=0x3 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR16_B()
+
+VERR
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00000000 emit_type=numeric value=0x0 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b100 emit_type=numeric value=0x4 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR16_B()
+
+VERW
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00000000 emit_type=numeric value=0x0 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b101 emit_type=numeric value=0x5 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR16_B()
+
+SMSW
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00000001 emit_type=numeric value=0x1 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b100 emit_type=numeric value=0x4 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+
+LMSW
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00000001 emit_type=numeric value=0x1 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b110 emit_type=numeric value=0x6 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR16_B()
+
+BT
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10111010 emit_type=numeric value=0xba nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b100 emit_type=numeric value=0x4 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10100011 emit_type=numeric value=0xa3 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+BTS
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10111010 emit_type=numeric value=0xba nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b101 emit_type=numeric value=0x5 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10101011 emit_type=numeric value=0xab nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+BTR
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10111010 emit_type=numeric value=0xba nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b110 emit_type=numeric value=0x6 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10110011 emit_type=numeric value=0xb3 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+BTC
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10111010 emit_type=numeric value=0xba nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b111 emit_type=numeric value=0x7 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10111011 emit_type=numeric value=0xbb nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+MOV
+		action: emit 0b11000110 emit_type=numeric value=0xc6 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b000 emit_type=numeric value=0x0 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: REG0=GPR8_B()
+		conditon: IMM0=1
+
+		action: emit 0b11000111 emit_type=numeric value=0xc7 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b000 emit_type=numeric value=0x0 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[SIMMz]
+		conditon: REG0=GPRv_B()
+		conditon: IMM0=1
+
+		action: emit 0b10001000 emit_type=numeric value=0x88 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+		conditon: REG1=GPR8_R()
+
+		action: emit 0b10001001 emit_type=numeric value=0x89 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b10001010 emit_type=numeric value=0x8a nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_R()
+		conditon: REG1=GPR8_B()
+
+		action: emit 0b10001011 emit_type=numeric value=0x8b nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+		action: emit 0b10001100 emit_type=numeric value=0x8c nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=SEG()
+
+		action: emit 0b10001110 emit_type=numeric value=0x8e nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=SEG_MOV()
+		conditon: REG1=GPR16_B()
+
+NOP
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011000 emit_type=numeric value=0x18 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b000 emit_type=numeric value=0x0 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011000 emit_type=numeric value=0x18 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b001 emit_type=numeric value=0x1 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011000 emit_type=numeric value=0x18 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b010 emit_type=numeric value=0x2 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011000 emit_type=numeric value=0x18 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b011 emit_type=numeric value=0x3 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011000 emit_type=numeric value=0x18 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b100 emit_type=numeric value=0x4 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011000 emit_type=numeric value=0x18 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b101 emit_type=numeric value=0x5 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011000 emit_type=numeric value=0x18 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b110 emit_type=numeric value=0x6 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011000 emit_type=numeric value=0x18 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b111 emit_type=numeric value=0x7 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011001 emit_type=numeric value=0x19 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011010 emit_type=numeric value=0x1a nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011011 emit_type=numeric value=0x1b nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011100 emit_type=numeric value=0x1c nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011101 emit_type=numeric value=0x1d nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011110 emit_type=numeric value=0x1e nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011111 emit_type=numeric value=0x1f nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00001101 emit_type=numeric value=0xd nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011010 emit_type=numeric value=0x1a nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: FB REP=0 value=0x0
+		action: FB OSZ=0 value=0x0
+		conditon: MPXMODE=1
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011011 emit_type=numeric value=0x1b nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: FB REP=0 value=0x0
+		action: FB OSZ=0 value=0x0
+		conditon: MPXMODE=1
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011011 emit_type=numeric value=0x1b nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: FB REP=3 value=0x3
+		conditon: MPXMODE=1
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011010 emit_type=numeric value=0x1a nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: MPXMODE=0
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011011 emit_type=numeric value=0x1b nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: MPXMODE=0
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011110 emit_type=numeric value=0x1e nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: FB REP=0 value=0x0
+		action: FB OSZ=0 value=0x0
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011110 emit_type=numeric value=0x1e nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: FB REP=2 value=0x2
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011110 emit_type=numeric value=0x1e nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: FB REP=0 value=0x0
+		action: FB OSZ=1 value=0x1
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011110 emit_type=numeric value=0x1e nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b000 emit_type=numeric value=0x0 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: FB REP=3 value=0x3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011110 emit_type=numeric value=0x1e nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b010 emit_type=numeric value=0x2 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: FB REP=3 value=0x3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011110 emit_type=numeric value=0x1e nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b011 emit_type=numeric value=0x3 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: FB REP=3 value=0x3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011110 emit_type=numeric value=0x1e nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b100 emit_type=numeric value=0x4 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: FB REP=3 value=0x3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011110 emit_type=numeric value=0x1e nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b101 emit_type=numeric value=0x5 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: FB REP=3 value=0x3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011110 emit_type=numeric value=0x1e nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b110 emit_type=numeric value=0x6 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: FB REP=3 value=0x3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011110 emit_type=numeric value=0x1e nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b111 emit_type=numeric value=0x7 nbits=3
+		action: emit rm=0b000 emit_type=numeric value=0x0 nbits=3
+		action: FB REP=3 value=0x3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011110 emit_type=numeric value=0x1e nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b111 emit_type=numeric value=0x7 nbits=3
+		action: emit rm=0b001 emit_type=numeric value=0x1 nbits=3
+		action: FB REP=3 value=0x3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011110 emit_type=numeric value=0x1e nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b111 emit_type=numeric value=0x7 nbits=3
+		action: emit rm=0b100 emit_type=numeric value=0x4 nbits=3
+		action: FB REP=3 value=0x3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011110 emit_type=numeric value=0x1e nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b111 emit_type=numeric value=0x7 nbits=3
+		action: emit rm=0b101 emit_type=numeric value=0x5 nbits=3
+		action: FB REP=3 value=0x3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011110 emit_type=numeric value=0x1e nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b111 emit_type=numeric value=0x7 nbits=3
+		action: emit rm=0b110 emit_type=numeric value=0x6 nbits=3
+		action: FB REP=3 value=0x3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011110 emit_type=numeric value=0x1e nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b111 emit_type=numeric value=0x7 nbits=3
+		action: emit rm=0b111 emit_type=numeric value=0x7 nbits=3
+		action: FB REP=3 value=0x3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011110 emit_type=numeric value=0x1e nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b111 emit_type=numeric value=0x7 nbits=3
+		action: emit rm=0b010 emit_type=numeric value=0x2 nbits=3
+		action: FB REP=3 value=0x3
+		action: FB CET=0 value=0x0
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011110 emit_type=numeric value=0x1e nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b111 emit_type=numeric value=0x7 nbits=3
+		action: emit rm=0b011 emit_type=numeric value=0x3 nbits=3
+		action: FB REP=3 value=0x3
+		action: FB CET=0 value=0x0
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011110 emit_type=numeric value=0x1e nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b001 emit_type=numeric value=0x1 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: FB REP=3 value=0x3
+		action: FB REXW=0 value=0x0
+		action: FB CET=0 value=0x0
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011110 emit_type=numeric value=0x1e nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=0b001 emit_type=numeric value=0x1 nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: FB REP=3 value=0x3
+		action: FB REXW=1 value=0x1
+		action: FB CET=0 value=0x0
+		conditon: MODE=2
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00011100 emit_type=numeric value=0x1c nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+ARPL
+		action: emit 0b01100011 emit_type=numeric value=0x63 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: MODE!=2
+		conditon: REG0=GPR16_B()
+		conditon: REG1=GPR16_R()
+
+XCHG
+		action: emit 0b10000110 emit_type=numeric value=0x86 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+		conditon: REG1=GPR8_R()
+
+		action: emit 0b10000111 emit_type=numeric value=0x87 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+LAR
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00000010 emit_type=numeric value=0x2 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+LSL
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b00000011 emit_type=numeric value=0x3 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRz_B()
+
+CMOVO
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b01000000 emit_type=numeric value=0x40 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+CMOVNO
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b01000001 emit_type=numeric value=0x41 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+CMOVB
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b01000010 emit_type=numeric value=0x42 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+CMOVNB
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b01000011 emit_type=numeric value=0x43 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+CMOVZ
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b01000100 emit_type=numeric value=0x44 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+CMOVNZ
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b01000101 emit_type=numeric value=0x45 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+CMOVBE
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b01000110 emit_type=numeric value=0x46 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+CMOVNBE
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b01000111 emit_type=numeric value=0x47 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+SETO
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10010000 emit_type=numeric value=0x90 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+
+SETNO
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10010001 emit_type=numeric value=0x91 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+
+SETB
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10010010 emit_type=numeric value=0x92 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+
+SETNB
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10010011 emit_type=numeric value=0x93 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+
+SETZ
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10010100 emit_type=numeric value=0x94 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+
+SETNZ
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10010101 emit_type=numeric value=0x95 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+
+SETBE
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10010110 emit_type=numeric value=0x96 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+
+SETNBE
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10010111 emit_type=numeric value=0x97 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+
+CMPXCHG
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10110000 emit_type=numeric value=0xb0 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+		conditon: REG1=GPR8_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10110001 emit_type=numeric value=0xb1 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+MOVZX
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10110110 emit_type=numeric value=0xb6 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPR8_B()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10110111 emit_type=numeric value=0xb7 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPR16_B()
+
+XADD
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b11000000 emit_type=numeric value=0xc0 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+		conditon: REG1=GPR8_R()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b11000001 emit_type=numeric value=0xc1 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+
+UD0
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b11111111 emit_type=numeric value=0xff nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR32_R()
+		conditon: REG1=GPR32_B()
+
+UD1
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10111001 emit_type=numeric value=0xb9 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR32_R()
+		conditon: REG1=GPR32_B()
+
+CMOVS
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b01001000 emit_type=numeric value=0x48 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+CMOVNS
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b01001001 emit_type=numeric value=0x49 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+CMOVP
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b01001010 emit_type=numeric value=0x4a nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+CMOVNP
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b01001011 emit_type=numeric value=0x4b nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+CMOVL
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b01001100 emit_type=numeric value=0x4c nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+CMOVNL
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b01001101 emit_type=numeric value=0x4d nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+CMOVLE
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b01001110 emit_type=numeric value=0x4e nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+CMOVNLE
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b01001111 emit_type=numeric value=0x4f nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+SETS
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10011000 emit_type=numeric value=0x98 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+
+SETNS
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10011001 emit_type=numeric value=0x99 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+
+SETP
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10011010 emit_type=numeric value=0x9a nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+
+SETNP
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10011011 emit_type=numeric value=0x9b nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+
+SETL
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10011100 emit_type=numeric value=0x9c nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+
+SETNL
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10011101 emit_type=numeric value=0x9d nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+
+SETLE
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10011110 emit_type=numeric value=0x9e nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+
+SETNLE
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10011111 emit_type=numeric value=0x9f nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPR8_B()
+
+SHRD
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10101100 emit_type=numeric value=0xac nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+		conditon: IMM0=1
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10101101 emit_type=numeric value=0xad nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+		conditon: REG2=XED_REG_CL
+
+SHLD
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10100100 emit_type=numeric value=0xa4 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		action: nt NT[UIMM8]
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+		conditon: IMM0=1
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10100101 emit_type=numeric value=0xa5 nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_B()
+		conditon: REG1=GPRv_R()
+		conditon: REG2=XED_REG_CL
+
+BSF
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10111100 emit_type=numeric value=0xbc nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10111100 emit_type=numeric value=0xbc nbits=8
+		action: FB rep!=3 value=0x3
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10111100 emit_type=numeric value=0xbc nbits=8
+		action: FB REP=3 value=0x3
+		action: FB TZCNT=0 value=0x0
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+BSR
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10111101 emit_type=numeric value=0xbd nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10111101 emit_type=numeric value=0xbd nbits=8
+		action: FB rep!=3 value=0x3
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10111101 emit_type=numeric value=0xbd nbits=8
+		action: FB rep!=3 value=0x3
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10111101 emit_type=numeric value=0xbd nbits=8
+		action: FB REP=3 value=0x3
+		action: FB LZCNT=0 value=0x0
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPRv_B()
+
+MOVSX
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10111110 emit_type=numeric value=0xbe nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPR8_B()
+
+		action: emit 0b00001111 emit_type=numeric value=0xf nbits=8
+		action: emit 0b10111111 emit_type=numeric value=0xbf nbits=8
+		action: emit mod=0b11 emit_type=numeric value=0x3 nbits=2
+		action: emit reg=rrr emit_type=letters nbits=3
+		action: emit rm=nnn emit_type=letters nbits=3
+		conditon: REG0=GPRv_R()
+		conditon: REG1=GPR16_B()
+

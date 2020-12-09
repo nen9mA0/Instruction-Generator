@@ -1,0 +1,561 @@
+###FILE: ./datafiles/xed-amd-prefetch.txt
+{
+ICLASS    : PREFETCH_EXCLUSIVE
+CPL       : 3
+ATTRIBUTES: PREFETCH
+CATEGORY  : PREFETCH
+EXTENSION : 3DNOW
+ISA_SET   : PREFETCH_NOP
+PATTERN   : 0x0F 0x0D MOD[mm] MOD!=3 REG[0b000] RM[nnn] MODRM()
+OPERANDS  : MEM0:r:mprefetch
+}
+###FILE: ./datafiles/xed-amd-prefetch.txt
+{
+ICLASS    : PREFETCHW
+CPL       : 3
+ATTRIBUTES: PREFETCH
+CATEGORY  : PREFETCH
+EXTENSION : 3DNOW
+COMMENT   : was PREFETCH_MODIFIED, prefetch on >=broadwell and >=silvermont
+ISA_SET   : PREFETCH_NOP
+PATTERN   : 0x0F 0x0D MOD[mm] MOD!=3 REG[0b001] RM[nnn] MODRM()
+OPERANDS  : MEM0:r:mprefetch
+IFORM     : PREFETCHW_0F0Dr1
+}
+###FILE: ./datafiles/xed-amd-prefetch.txt
+{
+ICLASS    : PREFETCH_RESERVED
+CPL       : 3
+ATTRIBUTES: PREFETCH
+CATEGORY  : PREFETCH
+EXTENSION : 3DNOW
+ISA_SET   : PREFETCH_NOP
+PATTERN   : 0x0F 0x0D MOD[mm] MOD!=3 REG[0b010] RM[nnn] MODRM()
+OPERANDS  : MEM0:r:mprefetch
+IFORM     : PREFETCH_RESERVED_0F0Dr2
+UNAME     : PREFETCH_RESERVED_0F0Dr2
+}
+###FILE: ./datafiles/xed-amd-prefetch.txt
+{
+ICLASS    : PREFETCHW
+CPL       : 3
+ATTRIBUTES: PREFETCH
+CATEGORY  : PREFETCH
+EXTENSION : 3DNOW
+COMMENT   : was PREFETCH_MODIFIED
+ISA_SET   : PREFETCH_NOP
+PATTERN   : 0x0F 0x0D MOD[mm] MOD!=3 REG[0b011] RM[nnn] MODRM()
+OPERANDS  : MEM0:r:mprefetch
+IFORM     : PREFETCHW_0F0Dr3
+}
+###FILE: ./datafiles/xed-amd-prefetch.txt
+{
+ICLASS    : PREFETCH_RESERVED
+CPL       : 3
+ATTRIBUTES: PREFETCH
+CATEGORY  : PREFETCH
+EXTENSION : 3DNOW
+ISA_SET   : PREFETCH_NOP
+PATTERN   : 0x0F 0x0D MOD[mm] MOD!=3 REG[0b100] RM[nnn] MODRM()
+OPERANDS  : MEM0:r:mprefetch
+IFORM     : PREFETCH_RESERVED_0F0Dr4
+PATTERN   : 0x0F 0x0D MOD[mm] MOD!=3 REG[0b101] RM[nnn] MODRM()
+OPERANDS  : MEM0:r:mprefetch
+IFORM     : PREFETCH_RESERVED_0F0Dr5
+PATTERN   : 0x0F 0x0D MOD[mm] MOD!=3 REG[0b110] RM[nnn] MODRM()
+OPERANDS  : MEM0:r:mprefetch
+IFORM     : PREFETCH_RESERVED_0F0Dr6
+PATTERN   : 0x0F 0x0D MOD[mm] MOD!=3 REG[0b111] RM[nnn] MODRM()
+OPERANDS  : MEM0:r:mprefetch
+IFORM     : PREFETCH_RESERVED_0F0Dr7
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : FEMMS
+CPL       : 3
+CATEGORY  : MMX
+EXTENSION : 3DNOW
+ATTRIBUTES : x87_mmx_state_w AMDONLY
+PATTERN   : 0x0F 0x0E
+OPERANDS  :
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PI2FW
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() 0x0C
+OPERANDS  : REG0=MMX_R():rw:q MEM0:r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PI2FW
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] 0x0C
+OPERANDS  : REG0=MMX_R():rw:q REG1=MMX_B():r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PI2FD
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() 0x0D
+OPERANDS  : REG0=MMX_R():rw:q MEM0:r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PI2FD
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] 0x0D
+OPERANDS  : REG0=MMX_R():rw:q REG1=MMX_B():r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PF2IW
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() 0x1C
+OPERANDS  : REG0=MMX_R():rw:q MEM0:r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PF2IW
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] 0x1C
+OPERANDS  : REG0=MMX_R():rw:q REG1=MMX_B():r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PF2ID
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() 0x1D
+OPERANDS  : REG0=MMX_R():rw:q MEM0:r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PF2ID
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] 0x1D
+OPERANDS  : REG0=MMX_R():rw:q REG1=MMX_B():r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFNACC
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() 0x8A
+OPERANDS  : REG0=MMX_R():rw:q MEM0:r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFNACC
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] 0x8A
+OPERANDS  : REG0=MMX_R():rw:q REG1=MMX_B():r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFPNACC
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() 0x8E
+OPERANDS  : REG0=MMX_R():rw:q MEM0:r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFPNACC
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] 0x8E
+OPERANDS  : REG0=MMX_R():rw:q REG1=MMX_B():r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFCMPGE
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() 0x90
+OPERANDS  : REG0=MMX_R():rw:q MEM0:r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFCMPGE
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] 0x90
+OPERANDS  : REG0=MMX_R():rw:q REG1=MMX_B():r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFMIN
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() 0x94
+OPERANDS  : REG0=MMX_R():rw:q MEM0:r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFMIN
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] 0x94
+OPERANDS  : REG0=MMX_R():rw:q REG1=MMX_B():r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFRCP
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() 0x96
+OPERANDS  : REG0=MMX_R():rw:q MEM0:r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFRCP
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] 0x96
+OPERANDS  : REG0=MMX_R():rw:q REG1=MMX_B():r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFRSQRT
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() 0x97
+OPERANDS  : REG0=MMX_R():rw:q MEM0:r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFRSQRT
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] 0x97
+OPERANDS  : REG0=MMX_R():rw:q REG1=MMX_B():r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFSUB
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() 0x9A
+OPERANDS  : REG0=MMX_R():rw:q MEM0:r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFSUB
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] 0x9A
+OPERANDS  : REG0=MMX_R():rw:q REG1=MMX_B():r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFADD
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() 0x9E
+OPERANDS  : REG0=MMX_R():rw:q MEM0:r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFADD
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] 0x9E
+OPERANDS  : REG0=MMX_R():rw:q REG1=MMX_B():r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFCMPGT
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() 0xA0
+OPERANDS  : REG0=MMX_R():rw:q MEM0:r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFCMPGT
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] 0xA0
+OPERANDS  : REG0=MMX_R():rw:q REG1=MMX_B():r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFMAX
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() 0xA4
+OPERANDS  : REG0=MMX_R():rw:q MEM0:r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFMAX
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] 0xA4
+OPERANDS  : REG0=MMX_R():rw:q REG1=MMX_B():r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFRCPIT1
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() 0xA6
+OPERANDS  : REG0=MMX_R():rw:q MEM0:r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFRCPIT1
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] 0xA6
+OPERANDS  : REG0=MMX_R():rw:q REG1=MMX_B():r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFRSQIT1
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() 0xA7
+OPERANDS  : REG0=MMX_R():rw:q MEM0:r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFRSQIT1
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] 0xA7
+OPERANDS  : REG0=MMX_R():rw:q REG1=MMX_B():r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFSUBR
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() 0xAA
+OPERANDS  : REG0=MMX_R():rw:q MEM0:r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFSUBR
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] 0xAA
+OPERANDS  : REG0=MMX_R():rw:q REG1=MMX_B():r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFACC
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() 0xAE
+OPERANDS  : REG0=MMX_R():rw:q MEM0:r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFACC
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] 0xAE
+OPERANDS  : REG0=MMX_R():rw:q REG1=MMX_B():r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFCMPEQ
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() 0xB0
+OPERANDS  : REG0=MMX_R():rw:q MEM0:r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFCMPEQ
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] 0xB0
+OPERANDS  : REG0=MMX_R():rw:q REG1=MMX_B():r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFMUL
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() 0xB4
+OPERANDS  : REG0=MMX_R():rw:q MEM0:r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFMUL
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] 0xB4
+OPERANDS  : REG0=MMX_R():rw:q REG1=MMX_B():r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFRCPIT2
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() 0xB6
+OPERANDS  : REG0=MMX_R():rw:q MEM0:r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PFRCPIT2
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] 0xB6
+OPERANDS  : REG0=MMX_R():rw:q REG1=MMX_B():r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PMULHRW
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() 0xB7
+OPERANDS  : REG0=MMX_R():rw:q MEM0:r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PMULHRW
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] 0xB7
+OPERANDS  : REG0=MMX_R():rw:q REG1=MMX_B():r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PSWAPD
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() 0xBB
+OPERANDS  : REG0=MMX_R():rw:q MEM0:r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PSWAPD
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] 0xBB
+OPERANDS  : REG0=MMX_R():rw:q REG1=MMX_B():r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PAVGUSB
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[mm] MOD!=3 REG[rrr] RM[nnn] MODRM() 0xBF
+OPERANDS  : REG0=MMX_R():rw:q MEM0:r:q
+}
+###FILE: ./datafiles/xed-amd-3dnow.txt
+{
+ICLASS    : PAVGUSB
+CPL       : 3
+CATEGORY  : 3DNOW
+EXTENSION : 3DNOW
+ATTRIBUTES : AMDONLY
+PATTERN   : 0x0F 0x0F MOD[0b11] MOD=3 REG[rrr] RM[nnn] 0xBF
+OPERANDS  : REG0=MMX_R():rw:q REG1=MMX_B():r:q
+}
