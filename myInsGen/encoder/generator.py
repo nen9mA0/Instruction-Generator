@@ -224,13 +224,12 @@ class Generator(object):
     def __getattr__(self, item):
         return getattr(self.context, item)
 
-    def _ExecNT(self, nt):
+    def _ExecNT(self, nt, exec_type="bind"):        # exec_type: bind/emit
         for context in self.context:
             root_index = self.context.current_index
             for rule in nt.rules:
                 self.ForkFrom(root_index)
                 flag = True
-                isforked = False
                 for cond in rule.conditions.and_conditions:
                     if cond.equals == True:
                         if not self.TestAndAssignment(cond.field_name, cond.rvalue.value):      # for conditions, we must test first to verify if conditions are satisfied
@@ -251,13 +250,41 @@ class Generator(object):
                         pass
         return self.context
 
-    def _ExecSeq(self, seqname):
+    def _InstructionNT(self, iform):
+        nts = []
+        flag = True                             # Record if context satisfy conditions
+        for cond in iform.rule.conditions.and_conditions:
+            if cond.rvalue.nt:
+                nt_name = cond.rvalue.value
+                if not nt_name in self.gens.ntlufs:
+                    logger.error("err: GeneratorIform: Can not find nt %s" %nt_name)
+                    exit(-1)
+                nts.append(nt_name)             # execute nt after all equality handled
+            elif cond.equals:
+                if not self.context.TestAndAssignment(cond.field_name, cond.rvalue.value):
+                    flag = False                # if test return false, means that context has this key while value is different, indicates that condition unsatisfy
+                    break
+            else:
+                logger.error("err: GeneratorIform: Can not execute conditions %s\niform: %s" %(str(cond), str(iform)))
+
+        if not flag:
+            return None
+                                                # until now, there is only one context in NTContext
+        for nt_name in nts:                     # execute nonterminals
+            self._ExecNT(self.gens.ntlufs[nt_name])
+        return self.context
+
+
+    def _ExecSeqBind(self, seqname, iform):
         if not seqname in self.gens.seqs:
             raise KeyError("_ExecSeq: Cannot find seqname: %s" %seqname)
         for name in self.gens.seqs[seqname].nonterminals:
             nt_name = name[:-5]                         # [:-5] to remove the _BIND or _EMIT
             if not nt_name in self.gens.nts:
-                raise KeyError("_ExecSeq: Cannot find ntname: %s" %nt_name)
+                if nt_name == "INSTRUCTIONS":
+                    self._InstructionNT(iform)
+                else:
+                    raise KeyError("_ExecSeq: Cannot find ntname: %s" %nt_name)
             else:
                 self._ExecNT(self.gens.nts[nt_name])
             pass
@@ -307,31 +334,7 @@ class Generator(object):
 
         tst_nocomplete = False
 
-        nts = []
-        flag = True                             # Record if context satisfy conditions
-
-        self._ExecSeq("ISA_BINDINGS")
-
-        for cond in iform.rule.conditions.and_conditions:
-            if cond.rvalue.nt:
-                nt_name = cond.rvalue.value
-                if not nt_name in self.gens.ntlufs:
-                    logger.error("err: GeneratorIform: Can not find nt %s" %nt_name)
-                    exit(-1)
-                nts.append(nt_name)             # execute nt after all equality handled
-            elif cond.equals:
-                if not self.context.TestAndAssignment(cond.field_name, cond.rvalue.value):
-                    flag = False                # if test return false, means that context has this key while value is different, indicates that condition unsatisfy
-                    break
-            else:
-                logger.error("err: GeneratorIform: Can not execute conditions %s\niform: %s" %(str(cond), str(iform)))
-
-        if not flag:
-            return None
-
-                                                # until now, there is only one context in NTContext
-        for nt_name in nts:                     # execute nonterminals
-            self._ExecNT(self.gens.ntlufs[nt_name])
+        self._ExecSeqBind("ISA_BINDINGS", iform)
 
         for context in self.context:
             ins_hex = []

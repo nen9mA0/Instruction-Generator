@@ -8,7 +8,7 @@ generate_file_prefix = "basic-test-"
 subdir_name = "basic_test"
 
 config_filename_pattern = re.compile(r"files.*.cfg$")
-config_pattern = re.compile(r"^(?P<config>[A-Za-z-]+)\s*:\s*(?P<filename>[A-Za-z-.]+)$")
+config_pattern = re.compile(r"(?P<config>[\w-]+)\s*:\s*(?P<filename>[\w.-]+)")
 
 def SearchDir(dir_name, lst):
     if os.path.isdir(dir_name):
@@ -104,7 +104,7 @@ if __name__ == "__main__":
     for key in config_dict:
         print("%s : %s" %(key, config_dict[key]))
 
-    # GenerateConfigFiles(xed_datafile_dir, out_dir, config_dict, subdir=subdir_name, name_prefix=generate_file_prefix)
-    code = GenConfigCode(config_dict, subdir=subdir_name, name_prefix=generate_file_prefix)
-    for line in code:
-        print(line)
+    GenerateConfigFiles(xed_datafile_dir, out_dir, config_dict, subdir=subdir_name, name_prefix=generate_file_prefix)
+    # code = GenConfigCode(config_dict, subdir=subdir_name, name_prefix=generate_file_prefix)
+    # for line in code:
+    #     print(line)

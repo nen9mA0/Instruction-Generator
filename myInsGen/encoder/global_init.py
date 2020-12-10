@@ -17,7 +17,10 @@ class GlobalStruct(object):
         self.deleted_unames = {}
         self.deleted_instructions = {}
         self.iarray = {}
-        pass
+
+        self.seq_context = []       # For quick executing sequence in generator/_ExecSeqBind.
+                                    # Because for every iform_t, we should rebuild sequence context before instruction
+
 
 def GsSave(f, obj):
     pickle.dump(obj.regs_lst, f)
