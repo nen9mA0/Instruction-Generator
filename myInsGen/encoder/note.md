@@ -1,0 +1,9 @@
+#### 20201209
+V1.0	最简单的版本，可以生成部分指令，但只添加了对NT的处理，没有处理sequence，因此只能处理最简单的寄存器为操作数的指令，对于MODRM等没法处理。
+	这版本的context采用一个统一的类NTContext，这个类只在每个iform_t创建时被创建。每个nonterminal被执行时新的状态都保存在其中，因此contexts是个树状结构，所有执行NT后的context都存放在这棵树内。迭代器只迭代叶子节点，因此造成了很多空间浪费（除了叶子节点外的其他节点没什么用，因为已经执行过了）
+
+##### TODO: 
+
+在写处理sequence的代码时发现一个问题，就是最常用的sequence ISA_BINDING对于每个iform_t只有INSTRUCTION这一个NT不同，但按照目前方式所有iform_t传入时都需要把INSTRUCTION前的NT重新执行一遍，每个大概有100+个状态。完全是浪费
+
+此外还有路径爆炸的问题。测试的一个两个8位寄存器操作数的iform_t context数目到了12000+个。考虑使用DFS解决

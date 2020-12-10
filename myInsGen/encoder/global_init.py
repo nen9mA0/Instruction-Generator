@@ -18,8 +18,15 @@ class GlobalStruct(object):
         self.deleted_instructions = {}
         self.iarray = {}
 
-        self.seq_context = []       # For quick executing sequence in generator/_ExecSeqBind.
+        self.seq_context = {}       # For quick executing sequence in generator/_ExecSeqBind.
                                     # Because for every iform_t, we should rebuild sequence context before instruction
+
+    def StoreContext(self, seqname, contextlst):
+        self.seq_context[seqname] = contextlst
+
+    def GetContext(self):
+        return self.seq_context[seqname]
+
 
 
 def GsSave(f, obj):

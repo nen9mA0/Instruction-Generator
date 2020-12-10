@@ -1,5 +1,6 @@
 import pickle
 import copy
+from typing import TypeVar, Optional, Generic
 
 from global_init import *
 
@@ -137,20 +138,53 @@ class GeneratorStorage(object):
 #         self.filter_context["LOCK"] = "1"
 
 
-class NTContext(object):
-    def __init__(self, ins_filter=None):
+
+# ====== ContextNode ======
+# A ContextNode save contexts of current NT that inherit from the same context from previous NT
+# Eg.
+# Both NT1 and NT2 have 4 rules, and there is only one input context. And we assume that every condition is satisfied
+#                   -----------
+#                  |   [c00]   |   ContextNode 1
+#                   -----------
+#                        |
+#                     -------
+#                    |  NT_1 |
+#                      -------
+#                     /  |  |  \            NTContext 1
+#                    /   |  |   \           /
+#              --------------------------- /
+#             |  ______________________   |
+#             | | [c10, c11, c12, c13] |<-+-- ContextNode 2, inherit from c01
+#             |  \____________________/   |
+#              ---------------------------
+#                   \   |    |   /
+#                       -------
+#                      |  NT_2 |
+#           _______________|_____________________________________                         NTContext 2
+#          /               |                \                    \                       /
+#  ------------------------------------------------------------------------------------ /
+# |  _________________    _________________    _________________    _________________  |
+# | |[c20 c21 c22 c23]|  |[c24 c25 c26 c27]|  |[c28 c29 c2A c2B]|  |[c2C c2D c2E c2F]| |
+# | \_________________/   \_______________/    \_______________/    \_______________/  |
+# |        ^                    ^                   ^                   ^              |
+#  --------+--------------------+-------------------+-------------------+--------------
+#  ContextNode31        ContextNode32         ContextNode33         ContextNode34
+#   inherit from c10     inherit from c11    inherit from c12       inherit from c13
+
+class ContextNode(object):
+    def __init__(self, init_context:dict=None):
         self.i = 0
         self.contexts = []                  # a tuple (parent, child_lst, context_dict), to construct a context tree 
-        if ins_filter:
-            tmp = ins_filter.filter_context
-            self.context_init = tmp
-            self.current = tmp
+        if init_context:
+            self.context_init = init_context
+            self.current = None
         else:
             self.context_init = None
             self.current = None
         self.current_index = 0
         self.length = len(self.contexts)
-        self.Fork()
+        self.sat = True                     # used by NTContext.TestAndAssignment
+        # self.Fork()
 
     def __getitem__(self, item):
         return self.current[item]
@@ -160,97 +194,210 @@ class NTContext(object):
 
     def __iter__(self):
         self.length = len(self.contexts)
-        self.i = self.length-1
+        self.i = 0
         return self
 
     # this iterator can only iterate the nodes which is leaf node. Because leaf node means the lastest context of our execute
     def __next__(self):
-        if len(self.contexts[self.i][1]) == 0 and self.i>=0:
+        if self.i < self.length:
             self.current = self.contexts[self.i]
             self.current_index = self.i
-            self.i -= 1
+            self.i += 1
         else:
             raise StopIteration()
-        return self.current[2]
+        return self.current
+
+    def Remove(self):
+        if self.current != None:
+            self.contexts.pop()
+            self.length = len(self.contexts)
+            self.current = None             # TODO: Here current maybe None, and will be fill with value again 
+                                            # after fork. Find a better way to solve it?
+            self.current_index = 0
 
     def TestAndAssignment(self, item, value):
-        if item in self.current:
-            if value != self.current[item]:
-                return False
+        if self.current != None:
+            if item in self.current:
+                if value != self.current[item]:
+                    return False
+                else:
+                    return True
             else:
+                self.current[item] = value
                 return True
-        else:
-            self.current[item] = value
-            return True
+        return False
 
     def Assignment(self, item, value):
-        self.current[item] = value
-        return True
+        if self.current != None:
+            self.current[item] = value
+            return True
+        else:
+            return False
 
-    def Fork(self):                         # fork context
-        if self.current:
-            p = copy.deepcopy(self.current)
+    def Fork(self):                         # fork context from init context, if there is no init_context, create a empty context
+        if self.context_init:
+            p = copy.deepcopy(self.context_init)
         else:
             p = {}
-        root_index = self.current_index
-        self.contexts.append( (root_index, [], p) )
+        self.contexts.append(p)
         self.length = len(self.contexts)
         self.current = p
         self.current_index = self.length-1
-        if root_index != self.current_index:                        # avoid rings
-            self.contexts[root_index][1].append(self.current_index) # add leaf to root
+        self.sat = True
         return self.current_index
 
     def ForkFrom(self, root_index):
         if root_index < self.length:
-            root = self.contexts[root_index][2]
+            root = self.contexts[root_index]
             p = copy.deepcopy(root)
-            self.contexts.append( (root_index, [], p) )
+            self.contexts.append(p)
             self.length = len(self.contexts)
             self.current = p
             self.current_index = self.length-1
-            if root_index != self.current_index:                        # avoid rings
-                self.contexts[root_index][1].append(self.current_index) # add leaf to root
+            self.sat = True
             return self.current_index
         else:
             raise ValueError("ForkFrom root_index error: root_index = %d but len(contexts) = %d" %(root_index, self.length))
 
 
-class Generator(object):
-    def __init__(self):
-        self.gens = GeneratorStorage()
-        self.context = None
+# List of ContextNode, binding with each nonterminal
+class NTContext(object):
+    def __init__(self, prev_ntcontext:Optional['NTContext']=None, init_context:dict=None):     # init_context: ContextNode structure
+        self.context_nodes = []
+        if prev_ntcontext:
+            for cnode in prev_ntcontext.context_nodes:
+                for context in cnode.contexts:
+                    self.context_nodes.append(ContextNode(context))
+        else:                       # for init
+            if init_context:
+                init = init_context
+            else:
+                init = None
+            self.context_nodes.append(ContextNode(init))
+        self.length = len(self.context_nodes)
+        self.current_index = 0
+        self.current = self.context_nodes[0]
 
-    def __getattr__(self, item):
-        return getattr(self.context, item)
+    def __iter__(self):
+        self.i = 0
+        self.length = len(self.context_nodes)
+
+    def __next__(self):
+        if self.i < self.length:
+            return self.context_nodes[self.i]
+
+    def Fork(self):
+        for node in self.context_nodes:
+            node.Fork()
+
+    def TestAndAssignmentWithRemove(self, item, value):
+        unsat = []
+        for node in self.context_nodes:
+            flag = node.TestAndAssignment(item, value)
+            if not flag:
+                unsat.append(node)      # remove the context after loop
+        flag = True
+        for node in unsat:
+            flag = False                # return if all flags are satisfy
+            node.Remove()
+        return flag
+
+    def TestAndAssignment(self, item, value):
+        ret = True
+        for node in self.context_nodes:
+            if node.sat:
+                flag = node.TestAndAssignment(item, value)
+                if not flag:
+                    node.sat = False
+                    ret = False
+        return ret
+
+    def Assignment(self, item, value):
+        for node in self.context_nodes:
+            if node.current:
+                node.Assignment(item, value)
+
+    def GetSatNode(self):
+        sat = []
+        for node in self.context_nodes:
+            if node.sat:
+                sat.append(node)
+        return sat
+
+    def CleanRedundantUnsat(self):
+        for node in self.context_nodes:
+            if not node.sat:
+                node.Remove()
+
+
+class SeqContext(object):
+    def __init__(self, init_context:dict=None):
+        self.nt_contexts = {}
+        self.init_context = init_context
+
+    def __getitem__(self, item):
+        return self.nt_contexts[item]
+
+    def __setitem__(self, item, value):
+        self.nt_contexts[item] = value
+
+    def AddNT(self, ntname, prev_ntcontext=None):
+        if prev_ntcontext:
+            self.nt_contexts[ntname] = NTContext(prev_ntcontext=prev_ntcontext)
+        else:
+            self.nt_contexts[ntname] = NTContext(init_context=self.init_context)
+        return self.nt_contexts[ntname]
+
+
+class Emulator(object):
+    def __init__(self, gens):
+        self.gens = gens
+        self.context = None                         # save a NTContext structure for ExecNT
 
     def _ExecNT(self, nt, exec_type="bind"):        # exec_type: bind/emit
-        for context in self.context:
-            root_index = self.context.current_index
-            for rule in nt.rules:
-                self.ForkFrom(root_index)
-                flag = True
-                for cond in rule.conditions.and_conditions:
-                    if cond.equals == True:
-                        if not self.TestAndAssignment(cond.field_name, cond.rvalue.value):      # for conditions, we must test first to verify if conditions are satisfied
-                            flag = False                        # conditions unsatisfy
-                            break
+        has_otherwise = False
+        first = True
+        if hasattr(nt, "otherwise"):
+            has_otherwise = True                    # TODO: for now we regard all otherwise as nothing, and it can be error(in REX_PREFIX_ENC)
+        for rule in nt.rules:
+            self.context.Fork()
+            flag = True
+            for cond in rule.conditions.and_conditions:
+                if cond.equals == True:
+                    if not has_otherwise:           # rule has no otherwise, if any condition is unsatisfy, the context will be removed
+                        if not self.context.TestAndAssignmentWithRemove(cond.field_name, cond.rvalue.value):      # for conditions, we must test first to verify if conditions are satisfied
+                            flag = False                        # Deplicate: conditions unsatisfy
                         else:                                   # if context don't have the value
                             pass                                #fork context
-                    else:
-                        logger.error("_ExecNT: Not Equal condition %s in\n%s" %(cond, rule))
+                    else:                           # rule has otherwise nothing, if condition is unsatisfy, just go on
+                        self.context.TestAndAssignment(cond.field_name, cond.rvalue.value)
+                                                    # sat save all context node that satisfy conditions
+                else:
+                    logger.error("_ExecNT: Not Equal condition %s in\n%s" %(cond, rule))
 
-                for act in rule.actions:
-                    if act.type == "FB":                        # for actions, we don't need to test, for whose key has been in context, just overwrite it
-                        #if not self.TestAndAssignment(act.field_name, act.value):
-                        #raise ValueError("_ExecNT: Action conflict with condition: %s=%s" %(act.field_name, act.value))
-                        self.Assignment(act.field_name, act.value)
-                    else:
-                        a = 0
-                        pass
+            for act in rule.actions:
+                if act.type == "FB":                        # for actions, we don't need to test, for whose key has been in context, just overwrite it
+                    #if not self.TestAndAssignment(act.field_name, act.value):
+                    #raise ValueError("_ExecNT: Action conflict with condition: %s=%s" %(act.field_name, act.value))
+                    if not act.field_name == "ERROR":
+                        if has_otherwise:
+                            sat = self.context.GetSatNode()
+                            for node in sat:
+                                node.Assignment(act.field_name, act.value)
+                        else:
+                            self.context.Assignment(act.field_name, act.value)
+                    else:                               # if error, delete
+                        for node in self.context:
+                            node.sat = False
+                else:
+                    pass
+            if first:                                       # only reserve one unsat node because every unsat node are the same
+                first = False
+            else:
+                self.context.CleanRedundantUnsat()
         return self.context
 
-    def _InstructionNT(self, iform):
+    def _InstructionNTBind(self, iform):
         nts = []
         flag = True                             # Record if context satisfy conditions
         for cond in iform.rule.conditions.and_conditions:
@@ -275,20 +422,55 @@ class Generator(object):
         return self.context
 
 
-    def _ExecSeqBind(self, seqname, iform):
+    def BFSExecSeqBind(self, seqname, iform):
+        seq_context = SeqContext()              # TODO: add initial context
+        prev_ntcontext = None
         if not seqname in self.gens.seqs:
             raise KeyError("_ExecSeq: Cannot find seqname: %s" %seqname)
+
         for name in self.gens.seqs[seqname].nonterminals:
             nt_name = name[:-5]                         # [:-5] to remove the _BIND or _EMIT
             if not nt_name in self.gens.nts:
                 if nt_name == "INSTRUCTIONS":
-                    self._InstructionNT(iform)
+                    self._InstructionNTBind(iform)
                 else:
                     raise KeyError("_ExecSeq: Cannot find ntname: %s" %nt_name)
             else:
+                prev_ntcontext = seq_context.AddNT(nt_name, prev_ntcontext)
+                self.context = prev_ntcontext           # NTContext structure
                 self._ExecNT(self.gens.nts[nt_name])
             pass
         return self.context
+
+    def DFSExecSeqBind(self, seqname, iform):
+        seq_context = SeqContext()              # TODO: add initial context
+        prev_ntcontext = None
+        if not seqname in self.gens.seqs:
+            raise KeyError("_ExecSeq: Cannot find seqname: %s" %seqname)
+
+        for name in self.gens.seqs[seqname].nonterminals:
+            nt_name = name[:-5]                         # [:-5] to remove the _BIND or _EMIT
+            if not nt_name in self.gens.nts:
+                if nt_name == "INSTRUCTIONS":
+                    self._InstructionNTBind(iform)
+                else:
+                    raise KeyError("_ExecSeq: Cannot find ntname: %s" %nt_name)
+            else:
+                prev_ntcontext = seq_context.AddNT(nt_name, prev_ntcontext)
+                self.context = prev_ntcontext           # NTContext structure
+                self._ExecNT(self.gens.nts[nt_name])
+            pass
+        return self.context
+
+
+class Generator(object):
+    def __init__(self):
+        self.gens = GeneratorStorage()
+        self.emu = Emulator(self.gens)
+        self.context = None
+
+    def __getattr__(self, item):
+        return getattr(self.emu, item)
 
     def GetOutputRegIform(self, reg):
         if reg not in self.gens.reg_names:
@@ -328,13 +510,13 @@ class Generator(object):
         tmp_num = 0         # fill bits from bottom
         shift_num = 0
 
-        if self.context:
-            del self.context
-        self.context = NTContext(ins_filter)
+        # if self.context:
+        #     del self.context
+        # self.context = NTContext(ins_filter)
 
         tst_nocomplete = False
 
-        self._ExecSeqBind("ISA_BINDINGS", iform)
+        self.BFSExecSeqBind("ISA_BINDINGS", iform)
 
         for context in self.context:
             ins_hex = []
