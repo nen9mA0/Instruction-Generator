@@ -7,3 +7,13 @@ V1.0	最简单的版本，可以生成部分指令，但只添加了对NT的处�
 在写处理sequence的代码时发现一个问题，就是最常用的sequence ISA_BINDING对于每个iform_t只有INSTRUCTION这一个NT不同，但按照目前方式所有iform_t传入时都需要把INSTRUCTION前的NT重新执行一遍，每个大概有100+个状态。完全是浪费
 
 此外还有路径爆炸的问题。测试的一个两个8位寄存器操作数的iform_t context数目到了12000+个。考虑使用DFS解决
+
+
+
+#### 20201211
+
+BFS版本完成得差不多了，还有一些小细节（写在TODO
+
+但运行发现路径爆炸问题很严重，新建DFS算法相关
+
+将GeneratorStorage单独分出来，剩下的内容（NTContext ContextNode SeqContext Emulator和Generator类）按照同样接口重写，因为我发现解耦有点困难，不如重写清晰

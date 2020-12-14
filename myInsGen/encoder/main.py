@@ -3,7 +3,7 @@ import state_bits_reader
 import enc_patterns_reader
 import enc_ins_reader
 import register_reader
-import generator
+import dfs_generator
 
 from global_init import *
 
@@ -162,7 +162,7 @@ if __name__ == "__main__":
     #             print("\t\tconditon: %s" %str(cond))
     #         print("")
 
-    gen = generator.Generator()
+    gen = dfs_generator.Generator()
     # ins_filter = generator.Filter(gen)
 
     iforms_al = gen.GetOutputRegIform("XED_REG_AL")
