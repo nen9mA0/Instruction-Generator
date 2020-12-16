@@ -8,88 +8,329 @@ from pattern_class import *
 from actions import *
 from blot import *
 
+
+prev_seqNT = None           # The only global variable, used to bind an emit number with an seqNT
+
 class Node(object):
     def __init__(self, prev=None, next=None):
         self.prev = prev
         self.next = next
+        self.iter = None
+
+    def __iter__(self):
+        self.exec = False
+        return self
+
+    def __next__(self):
+        if self.exec:
+            raise StopIteration
+        else:
+            self.exec = True
+            return self
+
+    def ClearIter(self):
+        self.iter = None
+
 
 class ActionNode(Node):
     def __init__(self, obj, prev=None, next=None):
         super(ActionNode, self).__init__(prev, next)
+        self.act = obj
+        self.type = "act"
 
-    def __iter__(self):
-        self.i = 0
-
-    def __next__(self):
-        if self.i < self.rule_len:
-            ret = self.i
-            self.i += 1
+    def ExecNode(self, context):
+        global prev_seqNT
+        if self.act.type == "FB":
+            if not self.act.field_name == "ERROR":
+                context[self.act.field_name] = self.act.value
+                flag = True
+            else:                   # if action is "error", return false
+                flag = False
+        elif self.act.type == "emit":
+            context["emit"].append((prev_seqNT.name, self.act))
+            flag = True
+        elif self.act.type == "nothing":
+            flag = True             # nothing encode
         else:
-            raise StopIteration
+            a = 0
+        return (flag, context)
+
+    def __str__(self):
+        return str(self.act)
+
 
 class ConditionNode(Node):
     def __init__(self, obj, prev=None, next=None):
         super(ConditionNode, self).__init__(prev, next)
+        self.cond = obj
+        self.type = "cond"
+        if obj.equals:          # condition is equal
+            self.equal = True
+        else:                   # condition is not equal
+            self.equal = False
+
+    def TestAndAssignment(self, context, item, value):
+        if item in context:
+            if value != context[item]:
+                return False
+            else:
+                return True
+        else:
+            context[item] = value
+            return True
+        return False
+
+    def Test(self, context, item, value):
+        if item in context:
+            if value == context[item]:      # only has key and it not equal to value will return false
+                return False
+        return True                         # if dict has no key, return true
+
+    def ExecNode(self, context):
+        flag = False
+        if self.equal:
+            if self.TestAndAssignment(context, self.cond.field_name, self.cond.rvalue.value):
+                flag = True
+        else:
+            if self.Test(context, self.cond.field_name, self.cond.rvalue.value):
+                flag = True
+
+        return (flag, context)
+
+    def __str__(self):
+        return str(self.cond)
+
 
 class NTNode(Node):
-    def __init__(self, nt, prev=None, next=None):
+    def __init__(self, nt, gens, obj=None, prev=None, next=None, name=""):
         super(NTNode, self).__init__(prev, next)
+        self.name = name
         self.nt = nt
+        self.gens = gens
+        self.obj = obj                                      # save the binding action or condition, is none for seqnt or iform_t
+        self.init_context = None
+        if obj != None:
+            if isinstance(obj, action_t):
+                self.nt_binding = "act"
+            elif isinstance(obj, condition_t):
+                self.nt_binding = "cond"
+            else:
+                raise TypeError("NTNode: obj is neither act nor cond. Type is: %s" %type(obj))
         if isinstance(nt, nonterminal_t):
             self.rules = nt.rules
+            self.type = "nt"
         elif isinstance(nt, iform_t):
             self.rules = [nt.rule]
+            self.type = "iform"
+        if hasattr(self.nt, "otherwise"):
+            if len(self.nt.otherwise) > 1:
+                logger.error("otherwise length greater than 1")
+            self.otherwise = self.nt.otherwise[0]
+            self.otherwise_done = True
+        else:
+            self.otherwise = None
+            self.otherwise_done = False
         self.rule_len = len(self.rules)
-        self.next_statement = None
-        self.iter = None
+        self.is_seqnt = False
 
     def __iter__(self):
         self.rule_num = 0
+        self.nodelst = []
+        if self.otherwise:
+            self.otherwise_done = True
+        else:
+            self.otherwise_done = False
+        return self
 
     def __next__(self):
+        global prev_seqNT
+        if self.is_seqnt:
+            prev_seqNT = self
         if self.rule_num < self.rule_len:
+            self.UnlinkOldRule()
             rule = self.rules[self.rule_num]
-            if not self.next_statement:
-                for cond in rule.conditions.and_conditions:
-                    pass
+            self.rule_num += 1
+            self.BuildOneRule(rule)
+        elif self.otherwise_done:
+            self.otherwise_done = False
+            self.UnlinkOldRule()
+            self.BuildOtherwise(self.otherwise)
+        else:
+            raise StopIteration
+        return self
+
+    def UnlinkOldRule(self):
+        if len(self.nodelst) > 0:                       # unlink old linklist
+            head = self.nodelst[0]
+            tail = self.nodelst[-1]
+            head.prev.next = tail.next
+            tail.next.prev = head.prev
+            head.prev = None
+            tail.next = None
+            self.nodelst = []                           # reset nodelst
+
+    def BuildOneRule(self, rule):
+        head = None
+        tail = None
+        flag = False
+        for cond in rule.conditions.and_conditions:     # construct new route
+            if cond.equals == True:
+                if cond.rvalue.nt:
+                    nt_name = cond.rvalue.value
+                    if not nt_name in self.gens.ntlufs:
+                        raise KeyError("err: NTNode next: Can not find nt %s" %nt_name)
+                    nt = self.gens.ntlufs[nt_name]
+                    p = NTNode(nt, self.gens, cond)
+                else:
+                    p = ConditionNode(cond)
+                flag = True
+            else:
+                if cond.rvalue.nt:
+                    logger.error("NTNode next: Not Equal condition with nt %s in\n%s" %(cond, rule))
+                    flag = False
+                else:
+                    p = ConditionNode(cond)
+                    flag = True
+
+            if flag:                                    # if condition is valid
+                if not head:                            # linklist operation
+                    head = p
+                else:
+                    p.prev = tail
+                    tail.next = p
+                tail = p
+                self.nodelst.append(p)
+
+        for act in rule.actions:
+            if act.nt or act.ntluf:
+                nt_name = act.value
+                if act.nt:
+                    if not nt_name in self.gens.ntlufs:
+                        raise KeyError("err: NTNode next: Can not find ntluf %s" %nt_name)
+                    nt = self.gens.ntlufs[nt_name]
+                else:
+                    if not nt_name in self.gens.nts:
+                        raise KeyError("err: NTNode next: Can not find nt %s" %nt_name)
+                    nt = self.gens.nts[nt_name]
+                p = NTNode(nt, self.gens, act)
+            else:
+                p = ActionNode(act)
+
+            if not head:                            # linklist operation
+                head = p
+            else:
+                p.prev = tail
+                tail.next = p
+            tail = p
+            self.nodelst.append(p)
+        if head:
+            tail.next = self.next                       # insert the operation linklist into main linklist
+            tail.next.prev = tail
+            self.next = head
+            head.prev = self
+        else:
+            raise Exception("err: NTNode next: A rule has neither conditions nor actions (WTF?)")
+
+    def ExecNode(self, context):
+        if self.init_context != None:
+            del context
+            context = copy.deepcopy(self.init_context)
+        else:
+            self.init_context = context
+            context = copy.deepcopy(self.init_context)
+        return (True, context)
+
+    def ClearIter(self):
+        if len(self.nodelst) > 0:                       # unlink old linklist
+            head = self.nodelst[0]
+            tail = self.nodelst[-1]
+            head.prev.next = tail.next
+            tail.next.prev = head.prev
+            head.prev = None
+            tail.next = None
+        self.iter = None
+        del self.init_context
+        self.init_context = None
+
+    def BuildOtherwise(self, otherwise):
+        if otherwise.type == "return":                  # no action, directly connect current NT with next NT
+            pass                                        # because at the beginning both NT are connected, so we don't need to handle it
+        else:
+            a = 0
+            pass
+
+    def __str__(self):
+        mystr = self.type + ": "
+        if self.type == "iform":
+            mystr += self.nt.iclass
+        else:
+            mystr += self.nt.name
+        return mystr
+
+
+class HeadNode(Node):                     # used as a head or tail of a sequence
+    def __init__(self, prev=None, next=None):
+        super(HeadNode, self).__init__(prev, next)
+        self.type = "head"
+
+    def ExecNode(self, context):
+        return (True, context)
+
+    def SetHead(self, next):
+        self.prev = None
+        self.next = next
+
+    def SetTail(self, prev):
+        self.prev = prev
+        self.next = None
+
 
 class Emulator(object):
     def __init__(self, gens):
         self.gens = gens
         self.head = None
+        self.ins_lst = []
 
     def __iter__(self):
         self.node = self.head
         self.depth = 0
+        return self
 
     def __next__(self):
         node = self.node
-        if isinstance(node, NTNode):
-            if node.iter != None:
-                try:
-                    ret_num, ret_node = next(node.iter)
-                except StopIteration:
-                    pass
-            else:
+        if node.next != None:
+            if node.type == "nt" or node.type == "iform":
+                self.prev_nt = node        # for invalid path
+                self.prev_depth = self.depth
+            if node.iter == None:
                 node.iter = iter(node)
-        # if node.next != None:
-        #     ret_num = self.depth
-        #     ret_node = node
-        #     self.node = node.next
-        #     self.depth += 1
-        # else:
-        #     try:
-        #         ret_node = next(node)
-        #         ret_num = self.depth
-        #     except StopIteration:
-        #         ret_node = node.prev
-        #         self.depth -= 1
-        #         ret_num = self.depth
-        # return (ret_num, ret_node)
+            try:
+                ret_node = next(node.iter)
+                ret_num = self.depth
+                self.depth += 1
+                self.node = node.next
+            except StopIteration:
+                node.ClearIter()
+                ret_node = None
+                ret_num = -1
+                self.depth -= 1
+                self.node = node.prev       # backtracking
+        else:                               # this path has reached the end, must output
+            ret_node = None
+            ret_num = -2
+            self.depth -= 1
+            self.node = node.prev
+        if self.depth == 0:                 # when depth equal 0, node is headnode, so only the last backtracking will reach this point
+            raise StopIteration
+        # self.prev_node = node             # for debugging
+        return (ret_num, ret_node)
 
-    def BuildTreeFromNT(self, nt):
-        node = NTNode(nt)
-        return node
+    def InvalidPath(self):
+        if self.prev_nt != None:
+            self.node = self.prev_nt
+            self.depth = self.prev_depth
+        else:
+            raise ValueError("InvalidPath: prev_nt is None")
 
     def BuildSeqNode(self, seq, iform):
         nts = self.gens.nts
@@ -99,29 +340,61 @@ class Emulator(object):
             nt_name = nt_name[:-5]
             if not nt_name == "INSTRUCTIONS":
                 nt = nts[nt_name]
-                p = self.BuildTreeFromNT(nt)
+                p = NTNode(nt, self.gens, name=nt_name)
             else:
-                nt = iform
-                p = self.BuildTreeFromNT(nt)
+                p = NTNode(iform, self.gens, name="INSTRUCTIONS")
             if head == None:
-                head = p
+                head = HeadNode(next=p)
             else:
                 p.prev = p_prev
                 p_prev.next = p
             p_prev = p
+            p.is_seqnt = True
+        p = HeadNode(prev=p_prev)          # add an end point
+        p_prev.next = p
+        return head
 
-    def DFSExecSeqBind(self, seqname, iform):
+    def DFSExecSeqBind(self, seqname, emit_seqname, iform, init_context=None):
         if not seqname in self.gens.seqs:
             raise KeyError("_ExecSeq: Cannot find seqname: %s" %seqname)
 
+        if not emit_seqname in self.gens.seqs:
+            raise KeyError("_ExecSeq: Cannot find emit seqname: %s" %emit_seqname)
+
+        if init_context != None:
+            context = init_context
+        else:
+            context = {"emit":[],}
+
         seq = self.gens.seqs[seqname]
-        self.BuildSeqNode(seq, iform)
+        emit_seq = self.gens.seqs[emit_seqname]
+        self.head = self.BuildSeqNode(seq, iform)
 
         nodes = iter(self)
-        for node in nodes:
-            pass
-
+        prev_depth = 0
+        for depth, node in nodes:
+            if depth >= 0:
+                flag, context = node.ExecNode(context)
+                if not flag:            # if this path cannot satisfy condition, invalid it
+                    self.InvalidPath()
+            elif depth == -1:
+                pass
+            elif depth == -2:
+                self.EmitCode(context, emit_seq, print=True)
+                pass
         return 0
+
+    def EmitCode(self, obj, emitseq, print=False):
+        emit_lst = obj["emit"]
+        ins = []
+        for name in emitseq.nonterminals:
+            nt_name = name[:-5]
+            for emit_name, act in emit_lst:
+                if emit_name == nt_name:
+                    a = 0
+
+
+
 
 class Generator(object):
     def __init__(self):

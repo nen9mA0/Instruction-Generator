@@ -117,8 +117,8 @@ def GetRegOnly():
 
 # all_ins = "../../datafiles_test/all-enc-instructions.txt"
 
-save = True
-needreload = False
+save = False
+needreload = True
 
 if __name__ == "__main__":
     sd = save_data.SaveData(all_ins, pkl_dir, logger)
@@ -177,7 +177,7 @@ if __name__ == "__main__":
     cs = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_64)
 
     for i in iforms:
-        print(str(i))
+        # print(str(i))
         ins_lst = gen.GeneratorIform(i)
         if len(ins_lst) > 0:
             for ins in ins_lst:
