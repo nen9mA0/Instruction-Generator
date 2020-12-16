@@ -82,9 +82,9 @@ class ConditionNode(Node):
 
     def Test(self, context, item, value):
         if item in context:
-            if value == context[item]:      # only has key and it not equal to value will return false
-                return False
-        return True                         # if dict has no key, return true
+            if value != context[item]:      # only has key and it not equal to value will return True
+                return True
+        return False                         # if dict has no key, return False
 
     def ExecNode(self, context):
         flag = False
@@ -119,17 +119,20 @@ class NTNode(Node):
         if isinstance(nt, nonterminal_t):
             self.rules = nt.rules
             self.type = "nt"
+            if hasattr(self.nt, "otherwise"):
+                if len(self.nt.otherwise) > 1:
+                    logger.error("otherwise length greater than 1")
+                self.otherwise = self.nt.otherwise[0]
+                self.otherwise_done = True
+            else:
+                self.otherwise = None
+                self.otherwise_done = False
         elif isinstance(nt, iform_t):
             self.rules = [nt.rule]
             self.type = "iform"
-        if hasattr(self.nt, "otherwise"):
-            if len(self.nt.otherwise) > 1:
-                logger.error("otherwise length greater than 1")
-            self.otherwise = self.nt.otherwise[0]
-            self.otherwise_done = True
-        else:
             self.otherwise = None
             self.otherwise_done = False
+
         self.rule_len = len(self.rules)
         self.is_seqnt = False
 
@@ -354,7 +357,7 @@ class Emulator(object):
         p_prev.next = p
         return head
 
-    def DFSExecSeqBind(self, seqname, emit_seqname, iform, init_context=None):
+    def DFSExecSeqBind(self, seqname, emit_seqname, iform, important_NT=None, init_context=None):
         if not seqname in self.gens.seqs:
             raise KeyError("_ExecSeq: Cannot find seqname: %s" %seqname)
 
@@ -380,18 +383,60 @@ class Emulator(object):
             elif depth == -1:
                 pass
             elif depth == -2:
-                self.EmitCode(context, emit_seq, print=True)
+                self.EmitCode(context, emit_seq, print=True, important_NT=important_NT)
                 pass
         return 0
 
-    def EmitCode(self, obj, emitseq, print=False):
-        emit_lst = obj["emit"]
-        ins = []
+    # when important_NT specify, any output that without executing important_NT will be ignore
+    def EmitCode(self, context, emitseq, important_NT=None, print=False):
+        emit_lst = context["emit"]
+        ins_hex = []
+        tmp_num = 0         # fill bits from bottom
+        shift_num = 0
+
+        if important_NT:
+            important = True
+            important_flag = 0
+            important_mask = 2 ** len(important_NT) - 1
+        else:
+            important = False
+
         for name in emitseq.nonterminals:
             nt_name = name[:-5]
             for emit_name, act in emit_lst:
                 if emit_name == nt_name:
-                    a = 0
+                    if important and nt_name in important_NT:
+                        n = important_NT.index(nt_name)
+                        important_flag |= 1 << n
+                    if act.emit_type == "numeric":
+                        tmp_num = tmp_num << act.nbits
+                        tmp_num |= act.int_value
+                        shift_num += act.nbits
+                        if shift_num >= 8:
+                            mask = 0xff << (shift_num - 8)
+                            shift_num -= 8
+                            ins_hex.append(tmp_num & mask)
+                            tmp_num = tmp_num >> 8
+                    elif act.emit_type == "letters":
+                        key = act.field_name.upper()
+                        if key in context:
+                            tmp_num = tmp_num << act.nbits
+                            tmp_num |= int(context[key])
+                            shift_num += act.nbits
+                            if shift_num >= 8:
+                                mask = 0xff << (shift_num - 8)
+                                shift_num -= 8
+                                ins_hex.append(tmp_num & mask)
+                                tmp_num = tmp_num >> 8
+                        else:
+                            logger.error("err: GeneratorIform: Cannot emit letter type value %s" %act.value)
+                    else:
+                        logger.error("err: GeneratorIform: Unknown emit type: %s" %act.emit_type)
+        if important:
+            if important_flag == important_mask:
+                self.ins_lst.append(ins_hex)
+        else:
+            self.ins_lst.append(ins_hex)
 
 
 
@@ -438,57 +483,6 @@ class Generator(object):
         return ret_iforms
 
     def GeneratorIform(self, iform, ins_filter=None):        # a iform_t structure only contains one rule_t
-        #print(iform)
-        ins_lst = []
-        tmp_num = 0         # fill bits from bottom
-        shift_num = 0
-
-        # if self.context:
-        #     del self.context
-        # self.context = NTContext(ins_filter)
-
-        tst_nocomplete = False
-
-        self.emu.DFSExecSeqBind("ISA_BINDINGS", iform)
-
-        for context in self.context:
-            ins_hex = []
-            for act in iform.rule.actions:
-                if act.type == "emit":
-                    if act.emit_type == "numeric":
-                        tmp_num = tmp_num << act.nbits
-                        tmp_num |= act.int_value
-                        shift_num += act.nbits
-                        if shift_num >= 8:
-                            mask = 0xff << (shift_num - 8)
-                            shift_num -= 8
-                            ins_hex.append(tmp_num & mask)
-                            tmp_num = tmp_num >> 8
-                    elif act.emit_type == "letters":
-                        key = act.field_name.upper()
-                        if key in context:
-                            tmp_num = tmp_num << act.nbits
-                            tmp_num |= int(context[key])
-                            shift_num += act.nbits
-                            if shift_num >= 8:
-                                mask = 0xff << (shift_num - 8)
-                                shift_num -= 8
-                                ins_hex.append(tmp_num & mask)
-                                tmp_num = tmp_num >> 8
-                        else:
-                            logger.error("err: GeneratorIform: Cannot emit letter type value %s" %act.value)
-                    else:
-                        logger.error("err: GeneratorIform: Unknown emit type: %s" %act.emit_type)
-                elif act.type == "nt":
-                    if act.nt in self.gens.nts:
-                        pass
-                    else:
-                        logger.error("err: GeneratorIform: Unknown nt type: %s or ntluf type: %s" %(act.nt, act.ntluf))
-                elif act.type == "FB":
-                    pass
-                else:
-                    print(act.type)
-            if len(ins_hex) > 0:
-                ins_lst.append(bytes(ins_hex))
-
-        return ins_lst
+        # self.emu.DFSExecSeqBind("ISA_BINDINGS", "ISA_EMIT", iform,important_NT=["INSTRUCTIONS"])
+        self.emu.DFSExecSeqBind("ISA_BINDINGS", "ISA_EMIT", iform)
+        return self.emu.ins_lst
