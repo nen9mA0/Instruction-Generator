@@ -9,7 +9,9 @@ from actions import *
 from blot import *
 
 
-prev_seqNT = None           # The only global variable, used to bind an emit number with an seqNT
+# The only two global variable
+prev_NT = None          # Point to previous NT, used to get a return number of previous NT(eg. OUTREG)
+prev_seqNT = None       # Point to previous sequence NT, used to bind an emit number with an seqNT
 
 class Node(object):
     def __init__(self, prev=None, next=None):
@@ -38,11 +40,27 @@ class ActionNode(Node):
         self.act = obj
         self.type = "act"
 
-    def ExecNode(self, context):
+    def Assignment(self, context, item, value):
+        if item != "OUTREG":
+            context[item] = value
+        else:
+            global prev_NT                       # if item is OUTREG, binding the return value with NT.outreg
+            prev_NT.outreg = value
+
+    def ExecNode(self, context, depth=None):
         global prev_seqNT
+        if self.act.nt:
+            try:
+                global prev_NT
+                value = prev_NT.outreg
+            except:
+                raise KeyError("ActionNode ExecNode: prev_NT.outreg not exist")
+        else:
+            value = self.act.value
+
         if self.act.type == "FB":
             if not self.act.field_name == "ERROR":
-                context[self.act.field_name] = self.act.value
+                self.Assignment(context, self.act.field_name, value)
                 flag = True
             else:                   # if action is "error", return false
                 flag = False
@@ -70,15 +88,16 @@ class ConditionNode(Node):
             self.equal = False
 
     def TestAndAssignment(self, context, item, value):
-        if item in context:
-            if value != context[item]:
-                return False
+        if item != "OUTREG":
+            if item in context:
+                if value != context[item]:
+                    return False
             else:
-                return True
-        else:
-            context[item] = value
-            return True
-        return False
+                context[item] = value
+        else:                                       # if item is OUTREG, binding return value with NT
+            global prev_NT
+            prev_NT.outreg = value               # for condition of a NTNode, eg. reg0=REG_8()
+        return True
 
     def Test(self, context, item, value):
         if item in context:
@@ -86,13 +105,22 @@ class ConditionNode(Node):
                 return True
         return False                         # if dict has no key, return False
 
-    def ExecNode(self, context):
+    def ExecNode(self, context, depth=None):
         flag = False
+        if self.cond.rvalue.nt:                    # if is a condition of NTNode
+            try:
+                global prev_NT
+                value = prev_NT.outreg
+            except:
+                raise KeyError("ConditionNode ExecNode: prev_NT.outreg not exist")
+        else:                               # for normal situations
+            value = self.cond.rvalue.value
+
         if self.equal:
-            if self.TestAndAssignment(context, self.cond.field_name, self.cond.rvalue.value):
+            if self.TestAndAssignment(context, self.cond.field_name, value):
                 flag = True
         else:
-            if self.Test(context, self.cond.field_name, self.cond.rvalue.value):
+            if self.Test(context, self.cond.field_name, value):
                 flag = True
 
         return (flag, context)
@@ -102,7 +130,7 @@ class ConditionNode(Node):
 
 
 class NTNode(Node):
-    def __init__(self, nt, gens, obj=None, prev=None, next=None, name=""):
+    def __init__(self, nt, gens, obj=None, prev=None, next=None, name="", binding_seqNT=None):
         super(NTNode, self).__init__(prev, next)
         self.name = name
         self.nt = nt
@@ -135,6 +163,7 @@ class NTNode(Node):
 
         self.rule_len = len(self.rules)
         self.is_seqnt = False
+        self.binding_seqNT = binding_seqNT
 
     def __iter__(self):
         self.rule_num = 0
@@ -147,8 +176,11 @@ class NTNode(Node):
 
     def __next__(self):
         global prev_seqNT
-        if self.is_seqnt:
-            prev_seqNT = self
+        global prev_NT
+
+        prev_NT = self
+        prev_seqNT = self.binding_seqNT
+
         if self.rule_num < self.rule_len:
             self.UnlinkOldRule()
             rule = self.rules[self.rule_num]
@@ -183,26 +215,36 @@ class NTNode(Node):
                     if not nt_name in self.gens.ntlufs:
                         raise KeyError("err: NTNode next: Can not find nt %s" %nt_name)
                     nt = self.gens.ntlufs[nt_name]
-                    p = NTNode(nt, self.gens, cond)
+                    p1 = NTNode(nt, self.gens, cond, binding_seqNT=self.binding_seqNT)
+                    p2 = ConditionNode(cond)            # TODO: special operation for nt condition
                 else:
-                    p = ConditionNode(cond)
+                    p1 = ConditionNode(cond)
+                    p2 = None
                 flag = True
             else:
                 if cond.rvalue.nt:
                     logger.error("NTNode next: Not Equal condition with nt %s in\n%s" %(cond, rule))
                     flag = False
                 else:
-                    p = ConditionNode(cond)
+                    p1 = ConditionNode(cond)
+                    p2 = None
                     flag = True
 
             if flag:                                    # if condition is valid
                 if not head:                            # linklist operation
-                    head = p
+                    head = p1
                 else:
-                    p.prev = tail
-                    tail.next = p
-                tail = p
-                self.nodelst.append(p)
+                    p1.prev = tail
+                    tail.next = p1
+                if p2:
+                    p1.next = p2
+                    p2.prev = p1
+                    tail = p2
+                    self.nodelst.append(p1)
+                    self.nodelst.append(p2)
+                else:
+                    tail = p1
+                    self.nodelst.append(p1)
 
         for act in rule.actions:
             if act.nt or act.ntluf:
@@ -215,17 +257,27 @@ class NTNode(Node):
                     if not nt_name in self.gens.nts:
                         raise KeyError("err: NTNode next: Can not find nt %s" %nt_name)
                     nt = self.gens.nts[nt_name]
-                p = NTNode(nt, self.gens, act)
+                p1 = NTNode(nt, self.gens, act, binding_seqNT=self.binding_seqNT)
+                p2 = ActionNode(act)                # TODO: special operation for nt action
             else:
-                p = ActionNode(act)
+                p1 = ActionNode(act)
+                p2 = None
 
-            if not head:                            # linklist operation
-                head = p
+            if not head:                            # linklist operation, same as conditions
+                head = p1
             else:
-                p.prev = tail
-                tail.next = p
-            tail = p
-            self.nodelst.append(p)
+                p1.prev = tail
+                tail.next = p1
+            if p2:
+                p1.next = p2
+                p2.prev = p1
+                tail = p2
+                self.nodelst.append(p1)
+                self.nodelst.append(p2)
+            else:
+                tail = p1
+                self.nodelst.append(p1)
+
         if head:
             tail.next = self.next                       # insert the operation linklist into main linklist
             tail.next.prev = tail
@@ -234,13 +286,16 @@ class NTNode(Node):
         else:
             raise Exception("err: NTNode next: A rule has neither conditions nor actions (WTF?)")
 
-    def ExecNode(self, context):
+    def ExecNode(self, context, depth=None):
         if self.init_context != None:
             del context
             context = copy.deepcopy(self.init_context)
         else:
             self.init_context = context
             context = copy.deepcopy(self.init_context)
+
+        # if depth:
+        #     print("  "*depth + str(self))
         return (True, context)
 
     def ClearIter(self):
@@ -276,7 +331,7 @@ class HeadNode(Node):                     # used as a head or tail of a sequence
         super(HeadNode, self).__init__(prev, next)
         self.type = "head"
 
-    def ExecNode(self, context):
+    def ExecNode(self, context, depth=None):
         return (True, context)
 
     def SetHead(self, next):
@@ -287,12 +342,16 @@ class HeadNode(Node):                     # used as a head or tail of a sequence
         self.prev = prev
         self.next = None
 
+    def __str__(self):
+        return "HEAD===="
+
 
 class Emulator(object):
     def __init__(self, gens):
         self.gens = gens
         self.head = None
-        self.ins_lst = []
+        self.ins_set = set()
+        self.tst_ins_set_dict = {}
 
     def __iter__(self):
         self.node = self.head
@@ -346,6 +405,7 @@ class Emulator(object):
                 p = NTNode(nt, self.gens, name=nt_name)
             else:
                 p = NTNode(iform, self.gens, name="INSTRUCTIONS")
+            p.binding_seqNT = p             # for a seqNT, the binding_seqNT is itself
             if head == None:
                 head = HeadNode(next=p)
             else:
@@ -353,10 +413,11 @@ class Emulator(object):
                 p_prev.next = p
             p_prev = p
             p.is_seqnt = True
-        p = HeadNode(prev=p_prev)          # add an end point
+        p = HeadNode(prev=p_prev)           # add an end point
         p_prev.next = p
         return head
 
+    # when important_NT specify, any path that without emit in improtant_NT with be invalid
     def DFSExecSeqBind(self, seqname, emit_seqname, iform, important_NT=None, init_context=None):
         if not seqname in self.gens.seqs:
             raise KeyError("_ExecSeq: Cannot find seqname: %s" %seqname)
@@ -375,39 +436,47 @@ class Emulator(object):
 
         nodes = iter(self)
         prev_depth = 0
+        num = 0
         for depth, node in nodes:
             if depth >= 0:
-                flag, context = node.ExecNode(context)
+                flag, context = node.ExecNode(context, depth=depth)
                 if not flag:            # if this path cannot satisfy condition, invalid it
                     self.InvalidPath()
+                # print(node)
             elif depth == -1:
                 pass
             elif depth == -2:
-                self.EmitCode(context, emit_seq, print=True, important_NT=important_NT)
-                pass
+                self.EmitCode(context, emit_seq, print=True)
+                num += 1
+                # print(context)
+                # print("====output==== %d" %num)
+                # if num > 50:
+                #     a = 0
+                # pass
         return 0
 
     # when important_NT specify, any output that without executing important_NT will be ignore
-    def EmitCode(self, context, emitseq, important_NT=None, print=False):
+    # def EmitCode(self, context, emitseq, important_NT=None, print=False):
+    def EmitCode(self, context, emitseq, print=False):
         emit_lst = context["emit"]
         ins_hex = []
         tmp_num = 0         # fill bits from bottom
         shift_num = 0
 
-        if important_NT:
-            important = True
-            important_flag = 0
-            important_mask = 2 ** len(important_NT) - 1
-        else:
-            important = False
+        # if important_NT:
+        #     important = True
+        #     important_flag = 0
+        #     important_mask = 2 ** len(important_NT) - 1
+        # else:
+        #     important = False
 
         for name in emitseq.nonterminals:
             nt_name = name[:-5]
             for emit_name, act in emit_lst:
                 if emit_name == nt_name:
-                    if important and nt_name in important_NT:
-                        n = important_NT.index(nt_name)
-                        important_flag |= 1 << n
+                    # if important and nt_name in important_NT:
+                    #     n = important_NT.index(nt_name)
+                    #     important_flag |= 1 << n
                     if act.emit_type == "numeric":
                         tmp_num = tmp_num << act.nbits
                         tmp_num |= act.int_value
@@ -432,11 +501,16 @@ class Emulator(object):
                             logger.error("err: GeneratorIform: Cannot emit letter type value %s" %act.value)
                     else:
                         logger.error("err: GeneratorIform: Unknown emit type: %s" %act.emit_type)
-        if important:
-            if important_flag == important_mask:
-                self.ins_lst.append(ins_hex)
-        else:
-            self.ins_lst.append(ins_hex)
+        ins_str = bytes(ins_hex)
+        # self.ins_set.add(ins_str)
+        if not ins_str in self.tst_ins_set_dict:
+            self.tst_ins_set_dict[ins_str] = context
+
+        # if important:
+        #     if important_flag == important_mask:
+        #         self.ins_lst.append(ins_hex)
+        # else:
+        #     self.ins_lst.append(ins_hex)
 
 
 
@@ -485,4 +559,5 @@ class Generator(object):
     def GeneratorIform(self, iform, ins_filter=None):        # a iform_t structure only contains one rule_t
         # self.emu.DFSExecSeqBind("ISA_BINDINGS", "ISA_EMIT", iform,important_NT=["INSTRUCTIONS"])
         self.emu.DFSExecSeqBind("ISA_BINDINGS", "ISA_EMIT", iform)
-        return self.emu.ins_lst
+        #return self.emu.ins_set
+        return self.emu.tst_ins_set_dict

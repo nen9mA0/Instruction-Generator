@@ -174,15 +174,28 @@ if __name__ == "__main__":
     iforms = set_al & set_bl
     print(len(iforms))
 
-    cs = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_64)
+    cs = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
 
-    for i in iforms:
-        # print(str(i))
-        ins_lst = gen.GeneratorIform(i)
-        if len(ins_lst) > 0:
-            for ins in ins_lst:
-                print(ins.hex(), end="")
-                decode = cs.disasm(ins, 0)
-                for insn in decode:
-                    print("\t%s\t%s" % (insn.mnemonic, insn.op_str))
-    pass
+    set_iter = iter(iforms)
+    iform = next(set_iter)
+    print(str(iform))
+    ins_lst = gen.GeneratorIform(iform)
+    if len(ins_lst) > 0:
+        for ins in ins_lst:
+            print(ins.hex(), end="")
+            decode = cs.disasm(ins, 0)
+            for insn in decode:
+                print("\t%s\t%s" % (insn.mnemonic, insn.op_str))
+            print(ins_lst[ins])
+
+
+    # for i in iforms:
+    #     print(str(i))
+    #     ins_lst = gen.GeneratorIform(i)
+    #     if len(ins_lst) > 0:
+    #         for ins in ins_lst:
+    #             print(ins.hex(), end="")
+    #             decode = cs.disasm(ins, 0)
+    #             for insn in decode:
+    #                 print("\t%s\t%s" % (insn.mnemonic, insn.op_str))
+    # pass
