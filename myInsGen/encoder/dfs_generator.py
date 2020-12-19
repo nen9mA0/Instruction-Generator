@@ -1,6 +1,8 @@
 import copy
 from typing import TypeVar, Optional, Generic
 
+import ins_filter
+
 from global_init import *
 from generator_storage import *
 
@@ -248,15 +250,20 @@ class NTNode(Node):
 
         for act in rule.actions:
             if act.nt or act.ntluf:
-                nt_name = act.value
+                if act.value:
+                    nt_name = act.value
+                elif act.nt:
+                    nt_name = act.nt
+                elif act.ntluf:
+                    nt_name = act.ntluf
                 if act.nt:
-                    if not nt_name in self.gens.ntlufs:
-                        raise KeyError("err: NTNode next: Can not find ntluf %s" %nt_name)
-                    nt = self.gens.ntlufs[nt_name]
-                else:
                     if not nt_name in self.gens.nts:
                         raise KeyError("err: NTNode next: Can not find nt %s" %nt_name)
                     nt = self.gens.nts[nt_name]
+                else:
+                    if not nt_name in self.gens.ntlufs:
+                        raise KeyError("err: NTNode next: Can not find ntluf %s" %nt_name)
+                    nt = self.gens.ntlufs[nt_name]
                 p1 = NTNode(nt, self.gens, act, binding_seqNT=self.binding_seqNT)
                 p2 = ActionNode(act)                # TODO: special operation for nt action
             else:
@@ -351,7 +358,7 @@ class Emulator(object):
         self.gens = gens
         self.head = None
         self.ins_set = set()
-        self.tst_ins_set_dict = {}
+        # self.tst_ins_set_dict = {}
 
     def __iter__(self):
         self.node = self.head
@@ -389,10 +396,24 @@ class Emulator(object):
 
     def InvalidPath(self):
         if self.prev_nt != None:
+            current_node = self.node.prev                   # when InvalidPath be called, self.node has pointed to next node
+            nodelst = self.prev_nt.nodelst
+            if not current_node in nodelst:
+                prev_nt_last_node = nodelst[-1]
+                while current_node != prev_nt_last_node:    # Attention! when a condition is unsatisfied,
+                                                            # and this condition/action is outside previous NT,
+                                                            # we should reset all iterator of these cond/act.
+                                                            # Bug fix: 2020-12-19
+                    current_node.ClearIter()
+                    current_node = current_node.prev
             self.node = self.prev_nt
             self.depth = self.prev_depth
         else:
             raise ValueError("InvalidPath: prev_nt is None")
+
+    def ResetInslst(self):
+        self.ins_set = set()
+        self.tst_ins_set_dict = {}
 
     def BuildSeqNode(self, seq, iform):
         nts = self.gens.nts
@@ -418,7 +439,7 @@ class Emulator(object):
         return head
 
     # when important_NT specify, any path that without emit in improtant_NT with be invalid
-    def DFSExecSeqBind(self, seqname, emit_seqname, iform, important_NT=None, init_context=None):
+    def DFSExecSeqBind(self, seqname, emit_seqname, iform=None, important_NT=None, init_context=None):
         if not seqname in self.gens.seqs:
             raise KeyError("_ExecSeq: Cannot find seqname: %s" %seqname)
 
@@ -502,9 +523,9 @@ class Emulator(object):
                     else:
                         logger.error("err: GeneratorIform: Unknown emit type: %s" %act.emit_type)
         ins_str = bytes(ins_hex)
-        # self.ins_set.add(ins_str)
-        if not ins_str in self.tst_ins_set_dict:
-            self.tst_ins_set_dict[ins_str] = context
+        self.ins_set.add(ins_str)
+        # if not ins_str in self.tst_ins_set_dict:              # for testing output and its' context
+        #     self.tst_ins_set_dict[ins_str] = context
 
         # if important:
         #     if important_flag == important_mask:
@@ -558,6 +579,8 @@ class Generator(object):
 
     def GeneratorIform(self, iform, ins_filter=None):        # a iform_t structure only contains one rule_t
         # self.emu.DFSExecSeqBind("ISA_BINDINGS", "ISA_EMIT", iform,important_NT=["INSTRUCTIONS"])
-        self.emu.DFSExecSeqBind("ISA_BINDINGS", "ISA_EMIT", iform)
-        #return self.emu.ins_set
-        return self.emu.tst_ins_set_dict
+        self.emu.ResetInslst()
+        self.emu.DFSExecSeqBind("MODRM_BIND", "MODRM_EMIT")
+        # self.emu.DFSExecSeqBind("ISA_BINDINGS", "ISA_EMIT", iform, init_context=ins_filter.context)
+        return self.emu.ins_set
+        # return self.emu.tst_ins_set_dict

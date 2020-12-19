@@ -5,6 +5,8 @@ import enc_ins_reader
 import register_reader
 import dfs_generator
 
+import ins_filter
+
 from global_init import *
 
 import capstone
@@ -117,8 +119,8 @@ def GetRegOnly():
 
 # all_ins = "../../datafiles_test/all-enc-instructions.txt"
 
-save = False
-needreload = True
+save = True
+needreload = False
 
 if __name__ == "__main__":
     sd = save_data.SaveData(all_ins, pkl_dir, logger)
@@ -165,8 +167,8 @@ if __name__ == "__main__":
     gen = dfs_generator.Generator()
     # ins_filter = generator.Filter(gen)
 
-    iforms_al = gen.GetOutputRegIform("XED_REG_AL")
-    iforms_bl = gen.GetInputRegIform("XED_REG_BL")
+    iforms_al = gen.GetOutputRegIform("XED_REG_EAX")
+    iforms_bl = gen.GetInputRegIform("XED_REG_EBX")
 
     set_al = set(iforms_al)
     set_bl = set(iforms_bl)
@@ -176,26 +178,34 @@ if __name__ == "__main__":
 
     cs = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
 
-    set_iter = iter(iforms)
-    iform = next(set_iter)
-    print(str(iform))
-    ins_lst = gen.GeneratorIform(iform)
-    if len(ins_lst) > 0:
-        for ins in ins_lst:
-            print(ins.hex(), end="")
-            decode = cs.disasm(ins, 0)
-            for insn in decode:
-                print("\t%s\t%s" % (insn.mnemonic, insn.op_str))
-            print(ins_lst[ins])
+    # set_iter = iter(iforms)
+    # iform = next(set_iter)
+    # print(str(iform))
+    # my_ins_filter = ins_filter.InsFilter(iform=iform)
+    # ins_lst = gen.GeneratorIform(iform, ins_filter=my_ins_filter)
+    # if len(ins_lst) > 0:
+    #     for ins in ins_lst:
+    #         print(ins.hex(), end="")
+    #         decode = cs.disasm(ins, 0)
+    #         mystr = ""
+    #         for insn in decode:
+    #             mystr += "\t%s  %s\n" % (insn.mnemonic, insn.op_str)
+    #         print(mystr)
 
 
-    # for i in iforms:
-    #     print(str(i))
-    #     ins_lst = gen.GeneratorIform(i)
-    #     if len(ins_lst) > 0:
-    #         for ins in ins_lst:
-    #             print(ins.hex(), end="")
-    #             decode = cs.disasm(ins, 0)
-    #             for insn in decode:
-    #                 print("\t%s\t%s" % (insn.mnemonic, insn.op_str))
-    # pass
+    my_ins_filter = ins_filter.InsFilter()
+    my_ins_filter["REG0"] = "XED_REG_EAX"
+    my_ins_filter["REG1"] = "XED_REG_EBX"
+
+    for i in iforms:
+        print(str(i))
+        ins_lst = gen.GeneratorIform(i, ins_filter=my_ins_filter)
+        if len(ins_lst) > 0:
+            for ins in ins_lst:
+                print(ins.hex(), end="")
+                decode = cs.disasm(ins, 0)
+                mystr = ""
+                for insn in decode:
+                    mystr += "\t%s  %s" % (insn.mnemonic, insn.op_str)
+                print(mystr)
+    pass
