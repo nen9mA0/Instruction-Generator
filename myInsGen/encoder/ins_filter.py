@@ -1,8 +1,32 @@
 from global_init import *
-from generator_storage import *
+import generator_storage
+
+import dfs_generator
+
+
+class Generator(object):
+    def __init__(self, gens):
+        self.gens = gens
+        self.emu = dfs_generator.Emulator(self.gens)
+        self.context = None
+
+    def __getattr__(self, item):
+        return getattr(self.emu, item)
+
+    def GeneratorIform(self, iform, ins_filter=None):        # a iform_t structure only contains one rule_t
+        self.emu.ResetInslst()
+        self.emu.DFSExecSeqBind("ISA_BINDINGS", "ISA_EMIT", iform, init_context=ins_filter.context)
+        return self.emu.ins_set
+        # return self.emu.tst_ins_set_dict
+
+    def TestMODRM(self):
+        self.emu.ResetInslst()
+        self.emu.DFSExecSeqBind("MODRM_BIND", "MODRM_EMIT")
+        return self.emu.ins_set
+
 
 class InsFilter(object):
-    def __init__(self, init_context=None, iform=None):
+    def __init__(self, gens, init_context=None, iform=None):
         if init_context:
             self.context = init_context
         else:
@@ -15,8 +39,9 @@ class InsFilter(object):
             self.output_op = iform.output_op
         else:
             self.iform = None
-        self.input_index = 0
-        self.output_index = 0
+        self.gens = gens
+        self.reg_index = 0
+        self.reg_type = []
 
     def __getitem__(self, item):
         return self.context[item]
@@ -30,8 +55,118 @@ class InsFilter(object):
     def __len__(self):
         return len(self.context)
 
-    def AppendRegInput(self, reg):
-        reg_name = "REG" + self.input_index
+    def GetIfroms(self):
+        ret_set = None
+        del_item = []
+        for name in self.context:
+            tmp_lst = None
+            flag = False
+            if "REG" in name:
+                flag = True
+                index = int(name[-1])
+                reg_type = self.reg_type[index]
+                value = self.context[name]
+                if reg_type == "input":
+                    is_input = True
+                elif reg_type == "output":
+                    is_input = False
+                else:
+                    raise ValueError("reg_type not in input/output")
+
+                if value[-2:] == "()":      # if is ntlufs
+                    nt_name = value[:-2]
+                    if is_input:
+                        tmp_lst = self.GetNTIform(nt_name, is_input)
+                else:
+                    tmp_lst = self.GetRegIform(value, is_input)
+            elif "MOD" == name:
+                flag = True
+                value = self.context["MOD"]
+                try:
+                    int_value = int(value)
+                    pass                                # TODO: handler for normal conditions?
+                except ValueError:                      # only for MOD != 3
+                    del_item.append("MOD")              # is not a valid condition for emitting, so should be delete
+                    tmp_lst1 = self.gens.MODRM_lst
+                    tmp_lst2 = self.GetAllIform()
+                    modrm_set = set(tmp_lst1)
+                    all_set = set(tmp_lst2)
+                    tmp_set = all_set - modrm_set
+            else:
+                pass
+
+            if flag:
+                if tmp_lst:                     # some cases is a list, otherwise is a set
+                    tmp_set = set(tmp_lst)
+                if ret_set:
+                    ret_set = ret_set & tmp_set
+                else:
+                    ret_set = tmp_set
+
+        for i in del_item:
+            del self.context[i]
+        return ret_set
+
+
+    def SpecifyLock(self):
+        self.context["LOCK"] = "1"
+
+    def SpecifyMode(self, bits):
+        if bits == 16:
+            self.context["MODE"] = "0"
+        elif bits == 32:
+            self.context["MODE"] = "1"
+        elif bits == 64:
+            self.context["MODE"] = "2"
+
+    def GetAllIform(self):
+        return self.gens.all_iforms
+
+    def GetRegIform(self, reg, is_input=None):
+        if reg not in self.gens.reg_names:
+            logger.error("Register name Error")
+            raise ValueError
+
+        ret_iforms = []
+        if is_input == None or is_input == True:
+            if reg in self.gens.reg_nt_bind:
+                for nt_name in self.gens.reg_nt_bind[reg]:
+                    if nt_name in self.gens.nt_ins_bind[0]:
+                        for i in self.gens.nt_ins_bind[0][nt_name]:
+                            ret_iforms.append(i)
+            if reg in self.gens.reg_ins_bind[0]:
+                for i in self.gens.reg_ins_bind[0][reg]:
+                    ret_iforms.append(i)
+        if is_input == None or is_input == False:
+            if reg in self.gens.reg_nt_bind:
+                for nt_name in self.gens.reg_nt_bind[reg]:
+                    if nt_name in self.gens.nt_ins_bind[1]:
+                        for i in self.gens.nt_ins_bind[1][nt_name]:
+                            ret_iforms.append(i)
+            if reg in self.gens.reg_ins_bind[1]:
+                for i in self.gens.reg_ins_bind[1][reg]:
+                    ret_iforms.append(i)
+
+        return ret_iforms
+
+    def GetNTIform(self, nt_name, is_input=None):
+        if is_input == None or is_input == True:
+            if nt_name in self.gens.nt_ins_bind:
+                ret_iforms = self.gens.nt_ins_bind[0][nt_name]
+            else:
+                raise ValueError("nt %s not in nt_ins_bind" %nt_name)
+        if is_input == None or is_input == False:
+            if nt_name in self.gens.nt_ins_bind:
+                ret_iforms = self.gens.nt_ins_bind[1][nt_name]
+            else:
+                raise ValueError("nt %s not in nt_ins_bind" %nt_name)
+
+        return ret_iforms
+
+    def AppendReg(self, reg, reg_type):             # reg_type: "input"/"output"
+        if not reg_type in ("input", "output"):
+            raise ValueError("reg_type not in input/output: %s" %reg_type)
+        reg_name = "REG" + str(self.reg_index)
         if self.iform:
             flag = False
             for name, is_nt, value in self.input_op:
@@ -48,32 +183,6 @@ class InsFilter(object):
 
         if flag:
             self.context[reg_name] = reg
-            self.input_index += 1
+            self.reg_index += 1
+            self.reg_type.append(reg_type)
         return flag
-
-    def AppendRegOutput(self, reg):
-        reg_name = "REG" + self.output_index
-        if self.iform:
-            flag = False
-            for name, is_nt, value in self.output_op:
-                if reg_name == name:
-                    if not is_nt:
-                        if reg == value:
-                            flag = True
-                            break
-                    else:
-                        flag = True
-                        break
-        else:
-            flag = True
-
-        if flag:
-            self.context[reg_name] = reg
-            self.output_index += 1
-        return flag
-
-    def SpecifyReg(self, reg):
-        self.context["OUTREG"] = reg
-
-    def SpecifyLock(self):
-        self.context["LOCK"] = "1"

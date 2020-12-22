@@ -151,7 +151,8 @@ class NTNode(Node):
             self.type = "nt"
             if hasattr(self.nt, "otherwise"):
                 if len(self.nt.otherwise) > 1:
-                    logger.error("otherwise length greater than 1")
+                    # logger.error("otherwise length greater than 1")
+                    pass
                 self.otherwise = self.nt.otherwise[0]
                 self.otherwise_done = True
             else:
@@ -265,7 +266,7 @@ class NTNode(Node):
                         raise KeyError("err: NTNode next: Can not find ntluf %s" %nt_name)
                     nt = self.gens.ntlufs[nt_name]
                 p1 = NTNode(nt, self.gens, act, binding_seqNT=self.binding_seqNT)
-                p2 = ActionNode(act)                # TODO: special operation for nt action
+                # p2 = ActionNode(act)                # TODO: special operation for nt action
             else:
                 p1 = ActionNode(act)
                 p2 = None
@@ -438,8 +439,7 @@ class Emulator(object):
         p_prev.next = p
         return head
 
-    # when important_NT specify, any path that without emit in improtant_NT with be invalid
-    def DFSExecSeqBind(self, seqname, emit_seqname, iform=None, important_NT=None, init_context=None):
+    def DFSExecSeqBind(self, seqname, emit_seqname, iform=None, init_context=None):
         if not seqname in self.gens.seqs:
             raise KeyError("_ExecSeq: Cannot find seqname: %s" %seqname)
 
@@ -511,7 +511,7 @@ class Emulator(object):
                         key = act.field_name.upper()
                         if key in context:
                             tmp_num = tmp_num << act.nbits
-                            tmp_num |= int(context[key])
+                            tmp_num |= int(context[key])    # TODO: Emit Immediate
                             shift_num += act.nbits
                             if shift_num >= 8:
                                 mask = 0xff << (shift_num - 8)
@@ -534,53 +534,3 @@ class Emulator(object):
         #     self.ins_lst.append(ins_hex)
 
 
-
-
-class Generator(object):
-    def __init__(self):
-        self.gens = GeneratorStorage()
-        self.emu = Emulator(self.gens)
-        self.context = None
-
-    def __getattr__(self, item):
-        return getattr(self.emu, item)
-
-    def GetOutputRegIform(self, reg):
-        if reg not in self.gens.reg_names:
-            logger.error("Register name Error")
-            raise ValueError
-
-        ret_iforms = []
-        if reg in self.gens.reg_nt_bind:
-            for nt_name in self.gens.reg_nt_bind[reg]:
-                if nt_name in self.gens.nt_ins_bind[1]:
-                    for i in self.gens.nt_ins_bind[1][nt_name]:
-                        ret_iforms.append(i)
-        if reg in self.gens.reg_ins_bind[1]:
-            for i in self.gens.reg_ins_bind[1][reg]:
-                ret_iforms.append(i)
-        return ret_iforms
-
-    def GetInputRegIform(self, reg):
-        if reg not in self.gens.reg_names:
-            logger.error("Register name Error")
-            raise ValueError
-
-        ret_iforms = []
-        if reg in self.gens.reg_nt_bind:
-            for nt_name in self.gens.reg_nt_bind[reg]:
-                if nt_name in self.gens.nt_ins_bind[0]:
-                    for i in self.gens.nt_ins_bind[0][nt_name]:
-                        ret_iforms.append(i)
-        if reg in self.gens.reg_ins_bind[0]:
-            for i in self.gens.reg_ins_bind[0][reg]:
-                ret_iforms.append(i)
-        return ret_iforms
-
-    def GeneratorIform(self, iform, ins_filter=None):        # a iform_t structure only contains one rule_t
-        # self.emu.DFSExecSeqBind("ISA_BINDINGS", "ISA_EMIT", iform,important_NT=["INSTRUCTIONS"])
-        self.emu.ResetInslst()
-        self.emu.DFSExecSeqBind("MODRM_BIND", "MODRM_EMIT")
-        # self.emu.DFSExecSeqBind("ISA_BINDINGS", "ISA_EMIT", iform, init_context=ins_filter.context)
-        return self.emu.ins_set
-        # return self.emu.tst_ins_set_dict

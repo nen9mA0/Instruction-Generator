@@ -4,6 +4,7 @@ import enc_patterns_reader
 import enc_ins_reader
 import register_reader
 import dfs_generator
+import generator_storage
 
 import ins_filter
 
@@ -164,17 +165,7 @@ if __name__ == "__main__":
     #             print("\t\tconditon: %s" %str(cond))
     #         print("")
 
-    gen = dfs_generator.Generator()
     # ins_filter = generator.Filter(gen)
-
-    iforms_al = gen.GetOutputRegIform("XED_REG_EAX")
-    iforms_bl = gen.GetInputRegIform("XED_REG_EBX")
-
-    set_al = set(iforms_al)
-    set_bl = set(iforms_bl)
-
-    iforms = set_al & set_bl
-    print(len(iforms))
 
     cs = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
 
@@ -192,10 +183,26 @@ if __name__ == "__main__":
     #             mystr += "\t%s  %s\n" % (insn.mnemonic, insn.op_str)
     #         print(mystr)
 
+    needreload = True
+    sd = save_data.SaveData(all_ins[:-4]+"_gens", pkl_dir, logger)
+    if sd.haspkl and not needreload:
+        gens = generator_storage.GeneratorStorage(load=True)
+        sd.Load(generator_storage.GensLoad, gens)
+    else:
+        gens = generator_storage.GeneratorStorage()
+    if save:
+        sd.Save(generator_storage.GensSave, gens)
 
-    my_ins_filter = ins_filter.InsFilter()
-    my_ins_filter["REG0"] = "XED_REG_EAX"
-    my_ins_filter["REG1"] = "XED_REG_EBX"
+    my_ins_filter = ins_filter.InsFilter(gens)
+    my_ins_filter.AppendReg("XED_REG_BL", "input")
+    my_ins_filter.AppendReg("XED_REG_AL", "output")
+    my_ins_filter["MOD"] = "!=3"
+    my_ins_filter.SpecifyMode(32)
+    iforms = my_ins_filter.GetIfroms()
+
+    gen = ins_filter.Generator(gens)
+    # my_ins_filter["REG0"] = "XED_REG_EAX"
+    # my_ins_filter["REG1"] = "XED_REG_EBX"
 
     for i in iforms:
         print(str(i))

@@ -1,7 +1,24 @@
 from global_init import *
+import pickle
+
+def GensSave(f, obj):
+    pickle.dump(obj.reg_nt_bind, f)
+    pickle.dump(obj.nt_reg_bind, f)
+    pickle.dump(obj.nt_ins_bind, f)
+    pickle.dump(obj.reg_ins_bind, f)
+    pickle.dump(obj.all_iforms, f)
+    pickle.dump(obj.MODRM_lst, f)
+
+def GensLoad(f, obj):
+    obj.reg_nt_bind = pickle.load(f)
+    obj.nt_reg_bind = pickle.load(f)
+    obj.nt_ins_bind = pickle.load(f)
+    obj.reg_ins_bind = pickle.load(f)
+    obj.all_iforms = pickle.load(f)
+    obj.MODRM_lst = pickle.load(f)
 
 class GeneratorStorage(object):
-    def __init__(self):
+    def __init__(self, load=False):
         self.nts = gs.nts
         self.ntlufs = gs.ntlufs
         self.seqs = gs.seqs
@@ -11,9 +28,14 @@ class GeneratorStorage(object):
         self.nt_reg_bind = {}
         self.nt_ins_bind = ({}, {})         # 0 for input  1 for output
         self.reg_ins_bind = ({}, {})        # for the iforms that directly specify the register
+        self.all_iforms = []
+        self.MODRM_lst = []
 
-        self.MakeRegNTlufLst()
-        self.MakeInsNTLst()
+        if not load:
+            self.MakeRegNTlufLst()
+            self.MakeInsNTLst()
+            self.MakeAllIforms()
+            self.MakeMODRMLst()
 
     # make binding of register name --> nonterminal which has action `OUTREG=reg_name`
     # A register may mentioned by several nonterminal, also a nonterminal may mention different registers
@@ -73,3 +95,16 @@ class GeneratorStorage(object):
                     else:
                         pass
                         # logger.error("MakeInsNTLst: cannot handle output operand %s %s" %(var, nt))
+
+    def MakeMODRMLst(self):
+        for iclass in gs.iarray:
+            for iform in gs.iarray[iclass]:
+                rule = iform.rule
+                for act in rule.actions:
+                    if act.nt == "MODRM":
+                        self.MODRM_lst.append(iform)
+                        break
+
+    def MakeAllIforms(self):
+        for ins in self.iarray:
+            self.all_iforms.extend(self.iarray[ins])

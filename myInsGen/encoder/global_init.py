@@ -24,7 +24,7 @@ class GlobalStruct(object):
     def StoreContext(self, seqname, contextlst):
         self.seq_context[seqname] = contextlst
 
-    def GetContext(self):
+    def GetContext(self,seqname):
         return self.seq_context[seqname]
 
 
@@ -57,8 +57,8 @@ pkl_dir = "pklfiles"
 
 all_reg = "all-datafiles/basic_test/basic-test-registers.txt"
 all_state_file = "all-datafiles/basic_test/basic-test-state.txt"
-all_enc_pattern = "all-datafiles/basic_test/basic-test-enc-patterns.txt"
-# all_enc_pattern = "../../datafiles_test/test-enc-pattern.txt"
+# all_enc_pattern = "all-datafiles/basic_test/basic-test-enc-patterns.txt"
+all_enc_pattern = "../../datafiles_test/test-enc-pattern.txt"
 all_enc_dec_pattern = "all-datafiles/basic_test/basic-test-enc-dec-patterns.txt"
 all_field = "all-datafiles/basic_test/basic-test-fields.txt"
 # all_ins = "all-datafiles/all-enc-instructions.txt"
