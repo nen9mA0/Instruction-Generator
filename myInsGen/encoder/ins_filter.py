@@ -13,9 +13,9 @@ class Generator(object):
     def __getattr__(self, item):
         return getattr(self.emu, item)
 
-    def GeneratorIform(self, iform, ins_filter=None):        # a iform_t structure only contains one rule_t
+    def GeneratorIform(self, iform, ins_filter=None, onetime=False):        # a iform_t structure only contains one rule_t
         self.emu.ResetInslst()
-        self.emu.DFSExecSeqBind("ISA_BINDINGS", "ISA_EMIT", iform, init_context=ins_filter.context)
+        self.emu.DFSExecSeqBind("ISA_BINDINGS", "ISA_EMIT", iform, init_context=ins_filter.context, onetime=onetime)
         return self.emu.ins_set
         # return self.emu.tst_ins_set_dict
 
@@ -71,12 +71,12 @@ class InsFilter(object):
                 elif reg_type == "output":
                     is_input = False
                 else:
-                    raise ValueError("reg_type not in input/output")
+                    is_input = None
 
                 if value[-2:] == "()":      # if is ntlufs
                     nt_name = value[:-2]
-                    if is_input:
-                        tmp_lst = self.GetNTIform(nt_name, is_input)
+                    tmp_lst = self.GetNTIform(nt_name, is_input)
+                    del_item.append(name)
                 else:
                     tmp_lst = self.GetRegIform(value, is_input)
             elif "MOD" == name:
@@ -150,26 +150,42 @@ class InsFilter(object):
         return ret_iforms
 
     def GetNTIform(self, nt_name, is_input=None):
+        ret_iforms = []
+        flag = True
+        nt_name_lst = [nt_name]
+        if nt_name in self.gens.sub_NT:
+            nt_name_lst.extend(self.gens.sub_NT[nt_name])
         if is_input == None or is_input == True:
-            if nt_name in self.gens.nt_ins_bind:
-                ret_iforms = self.gens.nt_ins_bind[0][nt_name]
-            else:
-                raise ValueError("nt %s not in nt_ins_bind" %nt_name)
+            for tmp_nt_name in nt_name_lst:
+                if tmp_nt_name in self.gens.nt_ins_bind[0]:
+                    flag = False
+                    ret_iforms.extend(self.gens.nt_ins_bind[0][tmp_nt_name])
         if is_input == None or is_input == False:
-            if nt_name in self.gens.nt_ins_bind:
-                ret_iforms = self.gens.nt_ins_bind[1][nt_name]
-            else:
-                raise ValueError("nt %s not in nt_ins_bind" %nt_name)
+            for tmp_nt_name in nt_name_lst:
+                if tmp_nt_name in self.gens.nt_ins_bind[1]:
+                    flag = False
+                    ret_iforms.extend(self.gens.nt_ins_bind[1][tmp_nt_name])
+        if flag:
+            raise ValueError("nt %s not in nt_ins_bind" %nt_name)
 
         return ret_iforms
 
-    def AppendReg(self, reg, reg_type):             # reg_type: "input"/"output"
-        if not reg_type in ("input", "output"):
+    def AppendReg(self, reg, reg_type=""):             # reg_type: "input"/"output"
+        if reg_type != "" and not reg_type in ("input", "output"):
             raise ValueError("reg_type not in input/output: %s" %reg_type)
         reg_name = "REG" + str(self.reg_index)
+
         if self.iform:
+            if reg_type == "input":
+                operands = self.input_op
+            elif reg_type == "output":
+                operands = self.output_op
+            else:
+                operands = []
+                operands.extend(self.input_op)
+                operands.extend(self.output_op)
             flag = False
-            for name, is_nt, value in self.input_op:
+            for name, is_nt, value in operands:
                 if reg_name == name:
                     if not is_nt:
                         if reg == value:

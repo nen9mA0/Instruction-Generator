@@ -183,36 +183,47 @@ if __name__ == "__main__":
     #             mystr += "\t%s  %s\n" % (insn.mnemonic, insn.op_str)
     #         print(mystr)
 
-    needreload = True
+    # needreload = True     # for test
     sd = save_data.SaveData(all_ins[:-4]+"_gens", pkl_dir, logger)
     if sd.haspkl and not needreload:
         gens = generator_storage.GeneratorStorage(load=True)
         sd.Load(generator_storage.GensLoad, gens)
     else:
         gens = generator_storage.GeneratorStorage()
-    if save:
+    if save and needreload:
         sd.Save(generator_storage.GensSave, gens)
 
     my_ins_filter = ins_filter.InsFilter(gens)
-    my_ins_filter.AppendReg("XED_REG_BL", "input")
-    my_ins_filter.AppendReg("XED_REG_AL", "output")
+    # my_ins_filter.AppendReg("XED_REG_BL", "input")
+    # my_ins_filter.AppendReg("XED_REG_AL", "output")
+    # my_ins_filter.AppendReg("GPRv_R()", "")
+    # my_ins_filter.AppendReg("GPRv_B()", "")
     my_ins_filter["MOD"] = "!=3"
-    my_ins_filter.SpecifyMode(32)
+    my_ins_filter.SpecifyMode(16)
     iforms = my_ins_filter.GetIfroms()
 
+    # my_ins_filter["REG0"] = "XED_REG_AX"       # here we just specify input and output reg
+    # my_ins_filter["REG1"] = "XED_REG_BX"
+
     gen = ins_filter.Generator(gens)
-    # my_ins_filter["REG0"] = "XED_REG_EAX"
-    # my_ins_filter["REG1"] = "XED_REG_EBX"
+
+    print(len(iforms))
 
     for i in iforms:
-        print(str(i))
-        ins_lst = gen.GeneratorIform(i, ins_filter=my_ins_filter)
+        tmp_str = str(i).split()
+        print("%s %s"%(tmp_str[0], tmp_str[1]))
+        ins_lst = gen.GeneratorIform(i, ins_filter=my_ins_filter, onetime=True)
         if len(ins_lst) > 0:
             for ins in ins_lst:
                 print(ins.hex(), end="")
                 decode = cs.disasm(ins, 0)
                 mystr = ""
+                i = 0
                 for insn in decode:
-                    mystr += "\t%s  %s" % (insn.mnemonic, insn.op_str)
+                    if i == 0:
+                        mystr += "\t%s  %s" % (insn.mnemonic, insn.op_str)
+                        i += 1
                 print(mystr)
+        else:
+            logger.error(str(i))
     pass

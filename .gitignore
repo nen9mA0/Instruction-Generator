@@ -2,9 +2,12 @@
 
 !myInsGen/encoder/
 myInsGen/encoder/log
+myInsGen/encoder/output
 myInsGen/encoder/.VSCodeCounter/
 myInsGen/encoder/.vscode
 myInsGen/encoder/all-datafiles
+myInsGen/encoder/note
+myInsGen/encoder/Verify
 
 *.pyc
 *.pkl

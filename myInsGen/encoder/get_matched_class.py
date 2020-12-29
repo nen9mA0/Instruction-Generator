@@ -274,10 +274,10 @@ def GetExtensionMatchedICLASS(lines, ext_regex="", add_file=False):
             continue
     return exts
 
-all_ins = "../../all-datafiles/all-enc-instructions.txt"
+all_ins = "all-datafiles/all_test/all-enc-instructions.txt"
 # all_ins = "../../datafiles_test/all-enc-instructions.txt"
 # match_ins = "../../datafiles_test/x87_instructions.txt"
-match_ins_dir = "all-datafiles"
+match_ins_dir = "all-datafiles/extension/base"
 
 # X87 SSE3 BASE VTX LONGMODE MMX SSE2 SSE MONITOR RDTSCP CLFSH PAUSE
 # SSSE3 SSE4 XSAVE MOVBE SMX AES PCLMULQDQ 3DNOW
@@ -287,14 +287,24 @@ match_ins_dir = "all-datafiles"
 # RDPID PT MOVDIR WAITPKG CLDEMOTE SGX_ENCLV AVX AVXAES F16C FMA AVX2GATHER
 # AVX2 BMI2 BMI1 VMFUNC INVPCID LZCNT RTM ADOX_ADCX PKU CLWB AVX512EVEX
 # PREFETCHWT1 AVX512VEX WBNOINVD PCONFIG GFNI VAES VPCLMULQDQ ENQCMD TSX_LDTRK SERIALIZE
-ext = ""
+ext = "BASE"
 
 if __name__ == "__main__":
     lines = open(all_ins).readlines()
     exts = GetExtensionMatchedICLASS(lines, ext, True)      # cannot run together with GetCategoryMatchedICLASS because lines is changed
     # categorys = GetCategoryMatchedICLASS(lines, "", True)
 
-    for ext in exts:
+    if ext == "":
+        for ext in exts:
+            match_ins_filename = ext.lower() + "_instructions.txt"
+            match_ins_filename = os.path.join(match_ins_dir, match_ins_filename)
+            with open(match_ins_filename, "w") as f:
+                lst = exts[ext]
+                for line in lst:
+                    f.write(line + "\n")
+        for i in exts:
+            print(i)
+    else:
         match_ins_filename = ext.lower() + "_instructions.txt"
         match_ins_filename = os.path.join(match_ins_dir, match_ins_filename)
         with open(match_ins_filename, "w") as f:
@@ -302,8 +312,6 @@ if __name__ == "__main__":
             for line in lst:
                 f.write(line + "\n")
 
-    for i in exts:
-        print(i)
 
     # for i in categorys:
     #     print(i)

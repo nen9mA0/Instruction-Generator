@@ -72,7 +72,14 @@ class ActionNode(Node):
         elif self.act.type == "nothing":
             flag = True             # nothing encode
         else:
-            a = 0
+            if self.act.not_equal:  # TODO: Add for not equal actions
+                flag = True
+                field_name = self.act.field_name.upper()
+                if field_name in context:
+                    if context[field_name] == self.act.int_value:
+                        del context[field_name]
+            else:
+                a = 0
         return (flag, context)
 
     def __str__(self):
@@ -184,15 +191,15 @@ class NTNode(Node):
         prev_NT = self
         prev_seqNT = self.binding_seqNT
 
-        if self.rule_num < self.rule_len:
+        if self.otherwise_done:
+            self.otherwise_done = False
+            self.UnlinkOldRule()
+            self.BuildOtherwise(self.otherwise)
+        elif self.rule_num < self.rule_len:
             self.UnlinkOldRule()
             rule = self.rules[self.rule_num]
             self.rule_num += 1
             self.BuildOneRule(rule)
-        elif self.otherwise_done:
-            self.otherwise_done = False
-            self.UnlinkOldRule()
-            self.BuildOtherwise(self.otherwise)
         else:
             raise StopIteration
         return self
@@ -439,7 +446,7 @@ class Emulator(object):
         p_prev.next = p
         return head
 
-    def DFSExecSeqBind(self, seqname, emit_seqname, iform=None, init_context=None):
+    def DFSExecSeqBind(self, seqname, emit_seqname, iform=None, init_context=None, onetime=False):
         if not seqname in self.gens.seqs:
             raise KeyError("_ExecSeq: Cannot find seqname: %s" %seqname)
 
@@ -451,6 +458,7 @@ class Emulator(object):
         else:
             context = {"emit":[],}
 
+        self.iform = iform
         seq = self.gens.seqs[seqname]
         emit_seq = self.gens.seqs[emit_seqname]
         self.head = self.BuildSeqNode(seq, iform)
@@ -469,6 +477,8 @@ class Emulator(object):
             elif depth == -2:
                 self.EmitCode(context, emit_seq, print=True)
                 num += 1
+                if onetime:
+                    break
                 # print(context)
                 # print("====output==== %d" %num)
                 # if num > 50:
@@ -500,9 +510,10 @@ class Emulator(object):
                     #     important_flag |= 1 << n
                     if act.emit_type == "numeric":
                         tmp_num = tmp_num << act.nbits
-                        tmp_num |= act.int_value
+                        act_value_mask = (1 << act.nbits) - 1
+                        tmp_num |= (act.int_value & act_value_mask)
                         shift_num += act.nbits
-                        if shift_num >= 8:
+                        while shift_num >= 8:
                             mask = 0xff << (shift_num - 8)
                             shift_num -= 8
                             ins_hex.append(tmp_num & mask)
@@ -510,16 +521,33 @@ class Emulator(object):
                     elif act.emit_type == "letters":
                         key = act.field_name.upper()
                         if key in context:
+                            context_value = context[key]
+                            if context_value == "*":
+                                context_value = "0"
+                            int_value = int(context_value)
                             tmp_num = tmp_num << act.nbits
-                            tmp_num |= int(context[key])    # TODO: Emit Immediate
+                            act_value_mask = (1 << act.nbits) - 1
+                            tmp_num |= (int_value & act_value_mask)    # TODO: Emit Immediate
                             shift_num += act.nbits
-                            if shift_num >= 8:
+                            while shift_num >= 8:
                                 mask = 0xff << (shift_num - 8)
                                 shift_num -= 8
                                 ins_hex.append(tmp_num & mask)
                                 tmp_num = tmp_num >> 8
                         else:
-                            logger.error("err: GeneratorIform: Cannot emit letter type value %s" %act.value)
+                            # if act.nbits == 3:                          # TODO: now this case is just for emit rrr or nnn
+                            int_value = 0                                   # TODO: now this case assume the value is simply a 0
+                            tmp_num = tmp_num << act.nbits
+                            act_value_mask = (1 << act.nbits) - 1
+                            tmp_num |= (int_value & act_value_mask)
+                            shift_num += act.nbits
+                            while shift_num >= 8:
+                                mask = 0xff << (shift_num - 8)
+                                shift_num -= 8
+                                ins_hex.append(tmp_num & mask)
+                                tmp_num = tmp_num >> 8
+                            logger.info("Assume %s  Emit 0" %str(act))
+                            # logger.error("err: GeneratorIform: Cannot emit letter type value %s" %act.value)
                     else:
                         logger.error("err: GeneratorIform: Unknown emit type: %s" %act.emit_type)
         ins_str = bytes(ins_hex)
@@ -532,5 +560,3 @@ class Emulator(object):
         #         self.ins_lst.append(ins_hex)
         # else:
         #     self.ins_lst.append(ins_hex)
-
-

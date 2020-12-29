@@ -8,6 +8,7 @@ def GensSave(f, obj):
     pickle.dump(obj.reg_ins_bind, f)
     pickle.dump(obj.all_iforms, f)
     pickle.dump(obj.MODRM_lst, f)
+    pickle.dump(obj.sub_NT, f)
 
 def GensLoad(f, obj):
     obj.reg_nt_bind = pickle.load(f)
@@ -16,6 +17,7 @@ def GensLoad(f, obj):
     obj.reg_ins_bind = pickle.load(f)
     obj.all_iforms = pickle.load(f)
     obj.MODRM_lst = pickle.load(f)
+    obj.sub_NT = pickle.load(f)
 
 class GeneratorStorage(object):
     def __init__(self, load=False):
@@ -30,12 +32,14 @@ class GeneratorStorage(object):
         self.reg_ins_bind = ({}, {})        # for the iforms that directly specify the register
         self.all_iforms = []
         self.MODRM_lst = []
+        self.sub_NT = {}                    # record the NT that calls other NTs
 
         if not load:
             self.MakeRegNTlufLst()
             self.MakeInsNTLst()
             self.MakeAllIforms()
             self.MakeMODRMLst()
+            self.MakeSubNTLst()
 
     # make binding of register name --> nonterminal which has action `OUTREG=reg_name`
     # A register may mentioned by several nonterminal, also a nonterminal may mention different registers
@@ -108,3 +112,14 @@ class GeneratorStorage(object):
     def MakeAllIforms(self):
         for ins in self.iarray:
             self.all_iforms.extend(self.iarray[ins])
+
+    def MakeSubNTLst(self):
+        for nt_name in self.ntlufs:
+            nt = self.ntlufs[nt_name]
+            for rule in nt.rules:
+                for act in rule.actions:
+                    if act.type == "ntluf":
+                        if nt_name in self.sub_NT:
+                            self.sub_NT[nt_name].append(act.ntluf)
+                        else:
+                            self.sub_NT[nt_name] = [act.ntluf]
