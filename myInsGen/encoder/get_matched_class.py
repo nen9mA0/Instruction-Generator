@@ -277,7 +277,7 @@ def GetExtensionMatchedICLASS(lines, ext_regex="", add_file=False):
 all_ins = "all-datafiles/all_test/all-enc-instructions.txt"
 # all_ins = "../../datafiles_test/all-enc-instructions.txt"
 # match_ins = "../../datafiles_test/x87_instructions.txt"
-match_ins_dir = "all-datafiles/extension/base"
+match_ins_dir = "all-datafiles/extension/x87"
 
 # X87 SSE3 BASE VTX LONGMODE MMX SSE2 SSE MONITOR RDTSCP CLFSH PAUSE
 # SSSE3 SSE4 XSAVE MOVBE SMX AES PCLMULQDQ 3DNOW
@@ -287,7 +287,7 @@ match_ins_dir = "all-datafiles/extension/base"
 # RDPID PT MOVDIR WAITPKG CLDEMOTE SGX_ENCLV AVX AVXAES F16C FMA AVX2GATHER
 # AVX2 BMI2 BMI1 VMFUNC INVPCID LZCNT RTM ADOX_ADCX PKU CLWB AVX512EVEX
 # PREFETCHWT1 AVX512VEX WBNOINVD PCONFIG GFNI VAES VPCLMULQDQ ENQCMD TSX_LDTRK SERIALIZE
-ext = "BASE"
+ext = "X87"
 
 if __name__ == "__main__":
     lines = open(all_ins).readlines()

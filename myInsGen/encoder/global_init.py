@@ -58,10 +58,10 @@ pkl_dir = "pklfiles"
 # ===== all =====
 all_reg =               "all-datafiles/all_test/all-registers.txt"
 all_state_file =        "all-datafiles/all_test/all-state.txt"
-# all_enc_pattern =       "all-datafiles/all_test/all-enc-patterns.txt"
+all_enc_pattern =       "all-datafiles/all_test/all-enc-patterns.txt"
 all_enc_dec_pattern =   "all-datafiles/all_test/all-enc-dec-patterns.txt"
 all_field =             "all-datafiles/all_test/all-fields.txt"
-# all_ins =             "all-datafiles/all_test/all-enc-instructions.txt"
+all_ins =             "all-datafiles/all_test/all-enc-instructions.txt"
 
 # ===== basic test =====
 # all_reg =               "all-datafiles/basic_test/basic-test-registers.txt"
@@ -72,11 +72,11 @@ all_field =             "all-datafiles/all_test/all-fields.txt"
 # all_ins =               "all-datafiles/basic_test/basic-test-enc-instructions.txt"
 
 # ===== just for test =====
-all_enc_pattern =       "../../datafiles_test/test-enc-pattern.txt"         # didn't has REX about
+# all_enc_pattern =       "../../datafiles_test/test-enc-pattern.txt"         # didn't has REX about
 # all_ins =             "../../datafiles_test/test-enc-instructions.txt"
 # all_ins =             "all-datafiles/base_instructions.txt"
-all_ins =               "all-datafiles/extension/base/base_instructions.txt"
-
+# all_ins =               "all-datafiles/extension/base/base_instructions.txt"
+# all_ins = "all-datafiles/extension/x87/x87_instructions.txt"
 
 # logger = Logger.logger_t("log/out.txt")
 logger = Logger.logger_t()

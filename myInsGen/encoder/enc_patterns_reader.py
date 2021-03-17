@@ -125,7 +125,7 @@ def parse_decode_lines(lines):
 
         p =  ntluf_pattern.match(line)
         if p:
-            nt_name =  p.group('ntname')
+            nt_name = p.group('ntname')
             ret_type = p.group('rettype')
             # create a new nonterminal to use
             nt = nonterminal_t(nt_name, ret_type)
@@ -135,7 +135,6 @@ def parse_decode_lines(lines):
         p = nt_pattern.match(line)
         if p:
             nt_name =  p.group('ntname')
-            
             # create a new nonterminal to use
             nt = nonterminal_t(nt_name)
             nts[nt_name] = nt

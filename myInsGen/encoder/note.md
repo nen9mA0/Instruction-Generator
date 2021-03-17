@@ -17,3 +17,12 @@ BFS版本完成得差不多了，还有一些小细节（写在TODO
 但运行发现路径爆炸问题很严重，新建DFS算法相关
 
 将GeneratorStorage单独分出来，剩下的内容（NTContext ContextNode SeqContext Emulator和Generator类）按照同样接口重写，因为我发现解耦有点困难，不如重写清晰
+
+#### 20210308
+
+时隔三个月来看这代码好难受 （
+
+DFS三个月前就能用了，现在试图加速运行速度
+
+考虑将每个nonterminal做成查找表的形式，类似于FPGA的LUT
+

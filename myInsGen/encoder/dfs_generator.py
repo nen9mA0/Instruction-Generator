@@ -67,10 +67,15 @@ class ActionNode(Node):
             else:                   # if action is "error", return false
                 flag = False
         elif self.act.type == "emit":
-            context["emit"].append((prev_seqNT.name, self.act))
+            if prev_seqNT:
+                context["emit"].append((prev_seqNT.name, self.act))
+            else:
+                context["emit"].append(("", self.act))
             flag = True
         elif self.act.type == "nothing":
             flag = True             # nothing encode
+        elif self.act.type == "return":
+            flag = True
         else:
             if self.act.not_equal:  # TODO: Add for not equal actions
                 flag = True
@@ -79,7 +84,7 @@ class ActionNode(Node):
                     if context[field_name] == self.act.int_value:
                         del context[field_name]
             else:
-                a = 0
+                raise ValueError("Cannot Handle Action Type: %s" %self.act.type)
         return (flag, context)
 
     def __str__(self):
@@ -108,11 +113,21 @@ class ConditionNode(Node):
             prev_NT.outreg = value               # for condition of a NTNode, eg. reg0=REG_8()
         return True
 
-    def Test(self, context, item, value):
+    def Test(self, context, item, value):   # Duplicate: used to handel not equal
         if item in context:
             if value != context[item]:      # only has key and it not equal to value will return True
                 return True
         return False                         # if dict has no key, return False
+
+    def TestNeq(self, context, item, value):    # now use this to handle not equal conditions
+        if item in context:                     # only when context has key and equal to value will return False
+            if value != context[item]:
+                return True
+            else:
+                return False
+        else:
+            return True
+
 
     def ExecNode(self, context, depth=None):
         flag = False
@@ -129,7 +144,7 @@ class ConditionNode(Node):
             if self.TestAndAssignment(context, self.cond.field_name, value):
                 flag = True
         else:
-            if self.Test(context, self.cond.field_name, value):
+            if self.TestNeq(context, self.cond.field_name, value):
                 flag = True
 
         return (flag, context)
@@ -157,19 +172,16 @@ class NTNode(Node):
             self.rules = nt.rules
             self.type = "nt"
             if hasattr(self.nt, "otherwise"):
-                if len(self.nt.otherwise) > 1:
-                    # logger.error("otherwise length greater than 1")
-                    pass
-                self.otherwise = self.nt.otherwise[0]
-                self.otherwise_done = True
+                self.otherwise = self.nt.otherwise
+                self.otherwise_done = False
             else:
                 self.otherwise = None
-                self.otherwise_done = False
+                self.otherwise_done = True
         elif isinstance(nt, iform_t):
             self.rules = [nt.rule]
             self.type = "iform"
             self.otherwise = None
-            self.otherwise_done = False
+            self.otherwise_done = True
 
         self.rule_len = len(self.rules)
         self.is_seqnt = False
@@ -179,9 +191,9 @@ class NTNode(Node):
         self.rule_num = 0
         self.nodelst = []
         if self.otherwise:
-            self.otherwise_done = True
-        else:
             self.otherwise_done = False
+        else:
+            self.otherwise_done = True
         return self
 
     def __next__(self):
@@ -191,11 +203,12 @@ class NTNode(Node):
         prev_NT = self
         prev_seqNT = self.binding_seqNT
 
-        if self.otherwise_done:
-            self.otherwise_done = False
+        if not self.otherwise_done:
+            self.otherwise_done = True
             self.UnlinkOldRule()
             self.BuildOtherwise(self.otherwise)
-        elif self.rule_num < self.rule_len:
+            return self
+        if self.rule_num < self.rule_len:
             self.UnlinkOldRule()
             rule = self.rules[self.rule_num]
             self.rule_num += 1
@@ -325,12 +338,42 @@ class NTNode(Node):
         del self.init_context
         self.init_context = None
 
-    def BuildOtherwise(self, otherwise):
-        if otherwise.type == "return":                  # no action, directly connect current NT with next NT
-            pass                                        # because at the beginning both NT are connected, so we don't need to handle it
+    def BuildOtherwise(self, otherwise_lst):
+        head = None
+        tail = None
+        flag = False
+        for act in otherwise_lst:
+            if act.nt or act.ntluf:
+                raise ValueError("I used to think that nt will never appear here")
+            else:
+                p1 = ActionNode(act)
+
+            if not head:                            # linklist operation, same as conditions
+                head = p1
+            else:
+                p1.prev = tail
+                tail.next = p1
+            tail = p1
+            self.nodelst.append(p1)
+
+        if head:
+            tail.next = self.next                       # insert the operation linklist into main linklist
+            tail.next.prev = tail
+            self.next = head
+            head.prev = self
         else:
-            a = 0
-            pass
+            raise ValueError("WTF?")
+
+        # for otherwise in otherwise_lst:
+        #     if otherwise.type == "return":                      # no action, directly connect current NT with next NT
+        #         return True                                     # because at the beginning both NT are connected, so we don't need to handle it
+        #     elif otherwise.type == "FB":
+        #         if otherwise.field_name == "ERROR":             # TODO: Otherwise may has many other operations, such as error or an action
+        #             return False                                # 20210316: TODO fixed, but may has other conditions
+        #         else:
+        #             raise ValueError("BuildOtherwise FB is not ERROR")
+        #     else:
+        #         raise ValueError("BuildOtherwise Unknown Operation")
 
     def __str__(self):
         mystr = self.type + ": "
@@ -366,11 +409,14 @@ class Emulator(object):
         self.gens = gens
         self.head = None
         self.ins_set = set()
+        self.weak_ins_set = set()
+        self.route = []
         # self.tst_ins_set_dict = {}
 
     def __iter__(self):
         self.node = self.head
         self.depth = 0
+        self.prev_ret_num = 0
         return self
 
     def __next__(self):
@@ -378,7 +424,7 @@ class Emulator(object):
         if node.next != None:
             if node.type == "nt" or node.type == "iform":
                 self.prev_nt = node        # for invalid path
-                self.prev_depth = self.depth
+                self.prev_nt_depth = self.depth
             if node.iter == None:
                 node.iter = iter(node)
             try:
@@ -386,6 +432,7 @@ class Emulator(object):
                 ret_num = self.depth
                 self.depth += 1
                 self.node = node.next
+                self.route.append(node)
             except StopIteration:
                 node.ClearIter()
                 ret_node = None
@@ -400,6 +447,9 @@ class Emulator(object):
         if self.depth == 0:                 # when depth equal 0, node is headnode, so only the last backtracking will reach this point
             raise StopIteration
         # self.prev_node = node             # for debugging
+        if self.prev_ret_num == -1 or self.prev_ret_num == -2:
+            self.route.pop()
+        self.prev_ret_num = ret_num
         return (ret_num, ret_node)
 
     def InvalidPath(self):
@@ -415,7 +465,9 @@ class Emulator(object):
                     current_node.ClearIter()
                     current_node = current_node.prev
             self.node = self.prev_nt
-            self.depth = self.prev_depth
+            self.depth = self.prev_nt_depth
+            while len(self.route) > self.depth:
+                self.route.pop()
         else:
             raise ValueError("InvalidPath: prev_nt is None")
 
@@ -423,7 +475,7 @@ class Emulator(object):
         self.ins_set = set()
         self.tst_ins_set_dict = {}
 
-    def BuildSeqNode(self, seq, iform):
+    def BuildSeqNode(self, seq, iform=None):
         nts = self.gens.nts
         p_prev = None
         head = None
@@ -446,7 +498,85 @@ class Emulator(object):
         p_prev.next = p
         return head
 
-    def DFSExecSeqBind(self, seqname, emit_seqname, iform=None, init_context=None, onetime=False):
+    def BuildLUT(self, cond_context, act_context):
+        lut = []
+        return lut
+
+    def GetRoute(self):
+        mystr = ""
+        for i in self.route:
+            mystr += "%s\t" %str(i)
+        return mystr
+
+    def DFSNTContext(self, nt_name_lst, binding_seq=None):
+        nts = self.gens.nts
+        ntlufs = self.gens.ntlufs
+
+        first_nt = None
+        prev_nt = None
+        for nt_name in nt_name_lst:
+            nt_name = nt_name[:-5]
+            if not (nt_name in nts or nt_name in ntlufs):
+                raise KeyError("Cannot find NT/NTluf: %s" %nt_name)
+            else:
+                if nt_name in nts:
+                    nt = nts[nt_name]
+                else:
+                    nt = ntlufs[nt_name]
+            p = NTNode(nt, self.gens, name=nt_name, binding_seqNT=binding_seq)
+            if first_nt == None:
+                first_nt = p
+            else:
+                prev_nt.next = p
+                p.prev = prev_nt
+
+            prev_nt = p
+
+        head = HeadNode(next=first_nt)
+        tail = HeadNode(prev=prev_nt)
+        first_nt.prev = head
+        prev_nt.next = tail
+
+        self.head = head
+
+        context = {"emit":[]}                   # used to save end context for one cond_context
+        cond_context = {}                       # used to save all conds
+        all_context = []
+
+        nodes = iter(self)
+        prev_depth = 0
+        num = 0
+        for depth, node in nodes:
+            if depth >= 0:
+                if node.type == "cond":         # now context is all conditions, create a new context for actions
+                    flag, cond_context = node.ExecNode(cond_context, depth=depth)
+                    if node.equal == False:     # add special handler for not equal conditions
+                        if not "neq" in cond_context:
+                            cond_context["neq"] = {}
+                        cond_context["neq"][node.cond.field_name] = node.cond.rvalue.value
+                flag, context = node.ExecNode(context, depth=depth)
+                if not flag:            # if this path cannot satisfy condition, invalid it
+                    self.InvalidPath()
+                # print(node)
+            elif depth == -1:
+                pass
+            elif depth == -2:
+                all_context.append((cond_context, context))
+                context = {"emit":[]}
+                cond_context = {}
+                # print(self.GetRoute())
+                num += 1
+        return all_context
+
+    def DFSSeqContext(self, seqname):
+        if not seqname in self.gens.seqs:
+            raise KeyError("_ExecSeq: Cannot find seqname: %s" %seqname)
+        seq = self.gens.seqs[seqname]
+        all_context = self.DFSNTContext(seq.nonterminals, seq)
+        return all_context
+
+
+    def DFSExecSeqBind(self, seqname, emit_seqname, iform=None, init_context=None, weak_context=None, onetime=False):
         if not seqname in self.gens.seqs:
             raise KeyError("_ExecSeq: Cannot find seqname: %s" %seqname)
 
@@ -475,8 +605,12 @@ class Emulator(object):
             elif depth == -1:
                 pass
             elif depth == -2:
-                self.EmitCode(context, emit_seq, print=True)
+                ins_str = self.EmitCode(context, emit_seq)
+                self.ins_set.add(ins_str)
                 num += 1
+                # if weak_context:
+                #     if 
+                # else:
                 if onetime:
                     break
                 # print(context)
@@ -488,7 +622,7 @@ class Emulator(object):
 
     # when important_NT specify, any output that without executing important_NT will be ignore
     # def EmitCode(self, context, emitseq, important_NT=None, print=False):
-    def EmitCode(self, context, emitseq, print=False):
+    def EmitCode(self, context, emitseq):
         emit_lst = context["emit"]
         ins_hex = []
         tmp_num = 0         # fill bits from bottom
@@ -551,7 +685,7 @@ class Emulator(object):
                     else:
                         logger.error("err: GeneratorIform: Unknown emit type: %s" %act.emit_type)
         ins_str = bytes(ins_hex)
-        self.ins_set.add(ins_str)
+        return ins_str
         # if not ins_str in self.tst_ins_set_dict:              # for testing output and its' context
         #     self.tst_ins_set_dict[ins_str] = context
 

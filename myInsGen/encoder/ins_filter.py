@@ -15,7 +15,7 @@ class Generator(object):
 
     def GeneratorIform(self, iform, ins_filter=None, onetime=False):        # a iform_t structure only contains one rule_t
         self.emu.ResetInslst()
-        self.emu.DFSExecSeqBind("ISA_BINDINGS", "ISA_EMIT", iform, init_context=ins_filter.context, onetime=onetime)
+        self.emu.DFSExecSeqBind("ISA_BINDINGS", "ISA_EMIT", iform, init_context=ins_filter.context, weak_context=ins_filter.weak_context, onetime=onetime)
         return self.emu.ins_set
         # return self.emu.tst_ins_set_dict
 
@@ -42,6 +42,9 @@ class InsFilter(object):
         self.gens = gens
         self.reg_index = 0
         self.reg_type = []
+        self.weak_context = {}      # weak context only control the output after EmitCode.
+                                    # If an instruction satisfy the conditions in weak_context,
+                                    # they'll be pushed into an unique list
 
     def __getitem__(self, item):
         return self.context[item]
@@ -54,6 +57,14 @@ class InsFilter(object):
 
     def __len__(self):
         return len(self.context)
+
+    def TestWeakContext(self, context):
+        flag = True
+        for item in self.weak_context:
+            if item in context:
+                if context[item] != self.weak_context[item]:
+                    flag = False
+        return flag
 
     def GetIfroms(self):
         ret_set = None

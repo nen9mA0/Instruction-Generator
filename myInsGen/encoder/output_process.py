@@ -3,7 +3,7 @@ import re
 
 output_dir = "output"
 # files_process = ["out_eax_ebx.txt", "out_ax_bx.txt", "out_al_bl.txt"]
-files_process = ["out_ax_bx.txt"]
+files_process = ["x87_out.txt"]
 
 ins_num_pattern = re.compile("^\d+$")
 iclass_pattern = re.compile("^ICLASS.*$")
@@ -41,6 +41,7 @@ def DeleteIClass(lines):
 
 def GetUniqueIns(lines):
     ins_set = set()
+    ins_lst = []
     for line in lines:
         line = line.strip()
         ins = ins_pattern.match(line)
@@ -48,17 +49,22 @@ def GetUniqueIns(lines):
             tmp_ins = ins.group("ins")
             if len(tmp_ins) > 0:
                 ins_set.add(tmp_ins)
-    return ins_set
+                ins_lst.append(tmp_ins)
+    return ins_set, ins_lst
 
 
 if __name__ == "__main__":
     lines, ins_num = GetAllIns(files_process)
     lines = DeleteIClass(lines)
-    ins_set = GetUniqueIns(lines)
-    ins_lst = []
-    for ins in ins_set:
-        ins_lst.append(ins)
+    ins_set, ins_lst = GetUniqueIns(lines)
 
-    ins_lst.sort()
-    for ins in ins_lst:
+    tmp_lst = list(ins_set)
+    tmp_lst.sort()
+    print(len(tmp_lst))
+    for ins in tmp_lst:
         print(ins)
+
+    for ins in tmp_lst:
+        ins_lst.remove(ins)
+    print("================")
+    print(ins_lst)

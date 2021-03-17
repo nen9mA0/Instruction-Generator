@@ -118,10 +118,15 @@ def GetRegOnly():
 
 
 
-# all_ins = "../../datafiles_test/all-enc-instructions.txt"
-
-save = True
+# all_ins = "all-datafiles/just_for_test/just4test.txt"
+save = False
 needreload = False
+
+# save = True
+# needreload = False
+
+# save = False
+# needreload = True
 
 if __name__ == "__main__":
     sd = save_data.SaveData(all_ins, pkl_dir, logger)
@@ -183,7 +188,7 @@ if __name__ == "__main__":
     #             mystr += "\t%s  %s\n" % (insn.mnemonic, insn.op_str)
     #         print(mystr)
 
-    # needreload = True     # for test
+    needreload = True     # for test
     sd = save_data.SaveData(all_ins[:-4]+"_gens", pkl_dir, logger)
     if sd.haspkl and not needreload:
         gens = generator_storage.GeneratorStorage(load=True)
@@ -199,13 +204,17 @@ if __name__ == "__main__":
     # my_ins_filter.AppendReg("GPRv_R()", "")
     # my_ins_filter.AppendReg("GPRv_B()", "")
     my_ins_filter["MOD"] = "!=3"
-    my_ins_filter.SpecifyMode(16)
+    my_ins_filter.SpecifyMode(32)
     iforms = my_ins_filter.GetIfroms()
 
     # my_ins_filter["REG0"] = "XED_REG_AX"       # here we just specify input and output reg
     # my_ins_filter["REG1"] = "XED_REG_BX"
 
     gen = ins_filter.Generator(gens)
+
+    # gen.DFSNTContext(["VEX_REXR_ENC"])
+    gen.DFSSeqContext("MODRM_BIND")
+    # gen.DFSNTs(["SIB_REQUIRED_ENCODE", "SIBSCALE_ENCODE", "SIBINDEX_ENCODE", "SIBBASE_ENCODE", "MODRM_RM_ENCODE"])
 
     print(len(iforms))
 
