@@ -5,8 +5,9 @@ import enc_ins_reader
 import register_reader
 import dfs_generator
 import generator_storage
-
 import ins_filter
+import HashTable
+
 
 from global_init import *
 
@@ -114,13 +115,23 @@ def GetRegOnly():
                     break
     return iform_dct
 
-# def GetRegNTBinding(ntluf, dct):
+def CreateNTHashTable(gen, gens, htm, nt_list):
+    for nt_name in nt_list:
+        all_context = gen.DFSNTContext([nt_name])
+        if "_BIND" in nt_name or "_EMIT" in nt_name:
+            nt_name = nt_name[:-5]
+        hashtable = HashTable.HashTable(nt_name)
+        hashtable.LoadContext(all_context)
+        gens.htm.AddHashTable(hashtable)
+    return gens
 
+def CreateSeqHashTable(gen, gens, htm, seq_list):
+    pass
+
+# def GetRegNTBinding(ntluf, dct)
 
 
 # all_ins = "all-datafiles/just_for_test/just4test.txt"
-save = False
-needreload = False
 
 # save = True
 # needreload = False
@@ -129,6 +140,10 @@ needreload = False
 # needreload = True
 
 if __name__ == "__main__":
+# =========== Load GlobalStruct ================
+    save = False
+    needreload = False                  # control if we need to reload pattern files or save them again
+
     sd = save_data.SaveData(all_ins, pkl_dir, logger)
     if sd.haspkl and not needreload:
         sd.Load(GsLoad, gs)
@@ -144,6 +159,7 @@ if __name__ == "__main__":
 
         if save:
             sd.Save(GsSave, gs)
+# ==============================================
 
     print("parse end")
 
@@ -188,7 +204,9 @@ if __name__ == "__main__":
     #             mystr += "\t%s  %s\n" % (insn.mnemonic, insn.op_str)
     #         print(mystr)
 
+# =============== Load Generator Storage ===================
     needreload = True     # for test
+    save = False
     sd = save_data.SaveData(all_ins[:-4]+"_gens", pkl_dir, logger)
     if sd.haspkl and not needreload:
         gens = generator_storage.GeneratorStorage(load=True)
@@ -197,7 +215,7 @@ if __name__ == "__main__":
         gens = generator_storage.GeneratorStorage()
     if save and needreload:
         sd.Save(generator_storage.GensSave, gens)
-
+# ==========================================================
     my_ins_filter = ins_filter.InsFilter(gens)
     # my_ins_filter.AppendReg("XED_REG_BL", "input")
     # my_ins_filter.AppendReg("XED_REG_AL", "output")
@@ -212,9 +230,39 @@ if __name__ == "__main__":
 
     gen = ins_filter.Generator(gens)
 
+
+# =============== Load NT Hash Table =======================
+    needreload = False
+    save = False
+
+    sd = save_data.SaveData(all_ins[:-4]+"_htm", pkl_dir, logger)
+    htm = HashTable.HashTableManager()
+    gens.AddHashTableManager(htm)
+    if sd.haspkl and not needreload:
+        sd.Load(HashTable.HTMLoad, htm)
+    else:
+        CreateNTHashTable(gen, gens, htm, gens.ntlufs)
+        CreateNTHashTable(gen, gens, htm, gens.nts)
+        # CreateNTHashTable(gen, gens, htm, ["XMM_SE"])
+    if save and needreload:
+        sd.Save(HashTable.HTMSave, htm)
+
+    # gen.GetNTsHashTable(gen.gens.nts)
+
+# ==========================================================
+
+
     # gen.DFSNTContext(["VEX_REXR_ENC"])
-    gen.DFSSeqContext("MODRM_BIND")
-    # gen.DFSNTs(["SIB_REQUIRED_ENCODE", "SIBSCALE_ENCODE", "SIBINDEX_ENCODE", "SIBBASE_ENCODE", "MODRM_RM_ENCODE"])
+    # gen.DFSSeqContext("MODRM_BIND")
+    # all_context = gen.DFSNTContext(["SIB_REQUIRED_ENCODE", "SIBSCALE_ENCODE", "SIBINDEX_ENCODE", "SIBBASE_ENCODE", "MODRM_RM_ENCODE"])
+
+    all_context = gen.DFSNTContext(["FIXUP_EOSZ_ENC_BIND", "FIXUP_EASZ_ENC_BIND", "ASZ_NONTERM_BIND"])
+
+    for cond_context, act_context in all_context:
+        mystr = str(cond_context) + "\t\t" + str(act_context)
+        print(mystr)
+    # for route in all_route:           # all_route: just 4 debug
+    #     print(route)
 
     print(len(iforms))
 

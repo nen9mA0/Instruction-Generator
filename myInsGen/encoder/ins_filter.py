@@ -1,5 +1,6 @@
 from global_init import *
 import generator_storage
+import HashTable
 
 import dfs_generator
 
@@ -9,9 +10,18 @@ class Generator(object):
         self.gens = gens
         self.emu = dfs_generator.Emulator(self.gens)
         self.context = None
+        # self.htm = HashTable.HashTableManager()
 
     def __getattr__(self, item):
         return getattr(self.emu, item)
+
+    # def GetNTsHashTable(self, nts):
+    #     for nt_name in nts:
+    #         all_context = self.emu.DFSNTContext([nts[nt_name]])
+    #         hashtable = HashTable.HashTable(nt_name)
+    #         hashtable.LoadContext(all_context)
+    #         hashtable.ReHash(all_context)
+    #         self.htm.AddHashTable(hashtable)
 
     def GeneratorIform(self, iform, ins_filter=None, onetime=False):        # a iform_t structure only contains one rule_t
         self.emu.ResetInslst()

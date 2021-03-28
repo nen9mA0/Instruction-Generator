@@ -1,12 +1,13 @@
 from global_init import *
+import HashTable
 import pickle
+
 
 def GensSave(f, obj):
     pickle.dump(obj.reg_nt_bind, f)
     pickle.dump(obj.nt_reg_bind, f)
     pickle.dump(obj.nt_ins_bind, f)
     pickle.dump(obj.reg_ins_bind, f)
-    pickle.dump(obj.all_iforms, f)
     pickle.dump(obj.MODRM_lst, f)
     pickle.dump(obj.sub_NT, f)
 
@@ -15,7 +16,6 @@ def GensLoad(f, obj):
     obj.nt_reg_bind = pickle.load(f)
     obj.nt_ins_bind = pickle.load(f)
     obj.reg_ins_bind = pickle.load(f)
-    obj.all_iforms = pickle.load(f)
     obj.MODRM_lst = pickle.load(f)
     obj.sub_NT = pickle.load(f)
 
@@ -33,13 +33,19 @@ class GeneratorStorage(object):
         self.all_iforms = []
         self.MODRM_lst = []
         self.sub_NT = {}                    # record the NT that calls other NTs
+        self.htm = None
+
+        self.MakeInsNTLst()
 
         if not load:
             self.MakeRegNTlufLst()
-            self.MakeInsNTLst()
             self.MakeAllIforms()
             self.MakeMODRMLst()
             self.MakeSubNTLst()
+
+    def AddHashTableManager(self, htm):
+        self.htm = htm
+        return htm
 
     # make binding of register name --> nonterminal which has action `OUTREG=reg_name`
     # A register may mentioned by several nonterminal, also a nonterminal may mention different registers

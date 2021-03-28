@@ -2,6 +2,7 @@ import copy
 from typing import TypeVar, Optional, Generic
 
 import ins_filter
+import HashTable
 
 from global_init import *
 from generator_storage import *
@@ -48,6 +49,7 @@ class ActionNode(Node):
         else:
             global prev_NT                       # if item is OUTREG, binding the return value with NT.outreg
             prev_NT.outreg = value
+            context[item] = value               # fixed 20210326: we also put OUTREG into context
 
     def ExecNode(self, context, depth=None):
         global prev_seqNT
@@ -111,9 +113,10 @@ class ConditionNode(Node):
         else:                                       # if item is OUTREG, binding return value with NT
             global prev_NT
             prev_NT.outreg = value               # for condition of a NTNode, eg. reg0=REG_8()
+            context[item] = value                   # fixed 20210326: we also put OUTREG into context
         return True
 
-    def Test(self, context, item, value):   # Duplicate: used to handel not equal
+    def Test(self, context, item, value):   # Duplicate: used to handle not equal
         if item in context:
             if value != context[item]:      # only has key and it not equal to value will return True
                 return True
@@ -127,7 +130,6 @@ class ConditionNode(Node):
                 return False
         else:
             return True
-
 
     def ExecNode(self, context, depth=None):
         flag = False
@@ -232,13 +234,15 @@ class NTNode(Node):
         tail = None
         flag = False
         for cond in rule.conditions.and_conditions:     # construct new route
+            # if str(cond) == "BASE0=ArBP()":              # just 4 debug
+            #     a = 0
             if cond.equals == True:
                 if cond.rvalue.nt:
                     nt_name = cond.rvalue.value
                     if not nt_name in self.gens.ntlufs:
                         raise KeyError("err: NTNode next: Can not find nt %s" %nt_name)
                     nt = self.gens.ntlufs[nt_name]
-                    p1 = NTNode(nt, self.gens, cond, binding_seqNT=self.binding_seqNT)
+                    p1 = CreateNTNode(nt, self.gens, cond, name=nt_name, binding_seqNT=self.binding_seqNT)
                     p2 = ConditionNode(cond)            # TODO: special operation for nt condition
                 else:
                     p1 = ConditionNode(cond)
@@ -270,6 +274,7 @@ class NTNode(Node):
                     self.nodelst.append(p1)
 
         for act in rule.actions:
+            is_seq = False
             if act.nt or act.ntluf:
                 if act.value:
                     nt_name = act.value
@@ -278,14 +283,40 @@ class NTNode(Node):
                 elif act.ntluf:
                     nt_name = act.ntluf
                 if act.nt:
-                    if not nt_name in self.gens.nts:
+                    flag = False
+                    if nt_name in self.gens.nts:
+                        flag = True
+                        nt = self.gens.nts[nt_name]
+                    if nt_name+"_BIND" in self.gens.seqs:           # TODO: 20210320 fix, an action nt may be a sequence
+                        flag = True
+                        is_seq = True
+                        seq = self.gens.seqs[nt_name+"_BIND"]
+                    if not flag:
                         raise KeyError("err: NTNode next: Can not find nt %s" %nt_name)
-                    nt = self.gens.nts[nt_name]
                 else:
                     if not nt_name in self.gens.ntlufs:
                         raise KeyError("err: NTNode next: Can not find ntluf %s" %nt_name)
                     nt = self.gens.ntlufs[nt_name]
-                p1 = NTNode(nt, self.gens, act, binding_seqNT=self.binding_seqNT)
+                if not is_seq:
+                    p1 = CreateNTNode(nt, self.gens, act, name=nt_name, binding_seqNT=self.binding_seqNT)
+                    p2 = None
+                else:                                       # nt is a sequence
+                    p1 = None                               # use as p_head
+                    p2 = None                               # use as p_prev
+                    nodelst_tmp = []
+                    for nt_name in seq.nonterminals:        # build seq nt is the same as the method in BuildSeqNode
+                        nt_name = nt_name[:-5]
+                        nt = self.gens.nts[nt_name]
+                        p = CreateNTNode(nt, self.gens, name=nt_name)
+                        p.binding_seqNT = p             # for a seqNT, the binding_seqNT is itself
+                        p.is_seqnt = True
+                        if p1 == None:
+                            p1 = p
+                        else:
+                            p2.next = p
+                            p.prev = p2
+                        p2 = p
+                        nodelst_tmp.append(p)
                 # p2 = ActionNode(act)                # TODO: special operation for nt action
             else:
                 p1 = ActionNode(act)
@@ -296,15 +327,19 @@ class NTNode(Node):
             else:
                 p1.prev = tail
                 tail.next = p1
-            if p2:
-                p1.next = p2
-                p2.prev = p1
+            if not is_seq:
+                if p2:
+                    p1.next = p2
+                    p2.prev = p1
+                    tail = p2
+                    self.nodelst.append(p1)
+                    self.nodelst.append(p2)
+                else:
+                    tail = p1
+                    self.nodelst.append(p1)
+            else:                                   # if is a sequence
                 tail = p2
-                self.nodelst.append(p1)
-                self.nodelst.append(p2)
-            else:
-                tail = p1
-                self.nodelst.append(p1)
+                self.nodelst.extend(nodelst_tmp)
 
         if head:
             tail.next = self.next                       # insert the operation linklist into main linklist
@@ -384,6 +419,60 @@ class NTNode(Node):
         return mystr
 
 
+# Every NTHashTableNode can only bind with one context.
+# If you want to emulate other context, you should rebuild a NTHashTableNode, 
+# which is just like NTNode only binding with one init_context
+class NTHashTableNode(Node):
+    def __init__(self, nt, hashtable, prev=None, next=None, binding_seqNT=None):
+        super(NTHashTableNode, self).__init__(prev, next)
+        self.type = "hashnode"
+        self.name = nt.name
+        self.hashtable = hashtable
+        self.binding_seqNT = binding_seqNT
+
+    def __iter__(self):
+        self.context_set = None
+        self.context_iter = None
+        self.init_context = None
+        self.act_context = None
+        return self
+
+    def __next__(self):
+        global prev_NT
+        global prev_seqNT
+
+        prev_NT = self
+        prev_seqNT = self.binding_seqNT
+
+        if self.init_context:
+            self.act_context = next(self.context_iter)[1]
+        return self
+
+    def ExecNode(self, context, depth=None):
+        if self.init_context:
+            del context
+            context = copy.deepcopy(self.init_context)
+        else:                               # init here
+            self.init_context = context
+            self.context_set = self.hashtable.GetActContext(context)
+            self.context_iter = iter(self.context_set)
+            context = copy.deepcopy(self.init_context)      # use a new context to do following things
+            try:
+                self.act_context = next(self.context_iter)[1]
+            except StopIteration:
+                return (False, context)
+
+        has_outreg, outreg = self.hashtable.RefreshContext(context, self.act_context)
+        if has_outreg:
+            global prev_NT
+            prev_NT.outreg = outreg
+        return (True, context)
+
+    def __str__(self):
+        mystr = "%s: %s" %(self.type, self.name)
+        return mystr
+
+
 class HeadNode(Node):                     # used as a head or tail of a sequence
     def __init__(self, prev=None, next=None):
         super(HeadNode, self).__init__(prev, next)
@@ -402,6 +491,16 @@ class HeadNode(Node):                     # used as a head or tail of a sequence
 
     def __str__(self):
         return "HEAD===="
+
+def CreateNTNode(nt, gens, obj=None, prev=None, next=None, name="", binding_seqNT=None):
+    nt_name = nt.name
+    htm = gens.htm
+    if nt_name in htm:
+        hashtable = htm[nt_name]
+        node = NTHashTableNode(nt, hashtable, prev, next, binding_seqNT)
+    else:
+        node = NTNode(nt, gens, obj, prev, next, name, binding_seqNT)
+    return node
 
 
 class Emulator(object):
@@ -483,9 +582,9 @@ class Emulator(object):
             nt_name = nt_name[:-5]
             if not nt_name == "INSTRUCTIONS":
                 nt = nts[nt_name]
-                p = NTNode(nt, self.gens, name=nt_name)
+                p = CreateNTNode(nt, self.gens, name=nt_name)
             else:
-                p = NTNode(iform, self.gens, name="INSTRUCTIONS")
+                p = CreateNTNode(iform, self.gens, name="INSTRUCTIONS")
             p.binding_seqNT = p             # for a seqNT, the binding_seqNT is itself
             if head == None:
                 head = HeadNode(next=p)
@@ -497,10 +596,6 @@ class Emulator(object):
         p = HeadNode(prev=p_prev)           # add an end point
         p_prev.next = p
         return head
-
-    def BuildLUT(self, cond_context, act_context):
-        lut = []
-        return lut
 
     def GetRoute(self):
         mystr = ""
@@ -515,15 +610,21 @@ class Emulator(object):
         first_nt = None
         prev_nt = None
         for nt_name in nt_name_lst:
-            nt_name = nt_name[:-5]
-            if not (nt_name in nts or nt_name in ntlufs):
-                raise KeyError("Cannot find NT/NTluf: %s" %nt_name)
-            else:
-                if nt_name in nts:
-                    nt = nts[nt_name]
+            if isinstance(nt_name, str):
+                # if nt_name == "SIBBASE_ENCODE":             # just 4 debug
+                #     a = 0
+                if "_BIND" in nt_name or "_EMIT" in nt_name:
+                    nt_name = nt_name[:-5]
+                if not (nt_name in nts or nt_name in ntlufs):
+                    raise KeyError("Cannot find NT/NTluf: %s" %nt_name)
                 else:
-                    nt = ntlufs[nt_name]
-            p = NTNode(nt, self.gens, name=nt_name, binding_seqNT=binding_seq)
+                    if nt_name in nts:
+                        nt = nts[nt_name]
+                    else:
+                        nt = ntlufs[nt_name]
+            else:
+                nt = nt_name
+            p = CreateNTNode(nt, self.gens, name=nt_name, binding_seqNT=binding_seq)
             if first_nt == None:
                 first_nt = p
             else:
@@ -541,32 +642,62 @@ class Emulator(object):
 
         context = {"emit":[]}                   # used to save end context for one cond_context
         cond_context = {}                       # used to save all conds
+        cond_context_dict = {}                  # used to save nt's binding cond_context
+        backtrack = False
+                                                # fix bug 20210323: if one route have multi NTs, and these NT's conditions
+                                                # contains the same item, previous condition will be covered.
+                                                # For example, NT1 has condition EASZ=0, then NT2 has condition EASZ=2,
+                                                # the condition EASZ=0 will be covered.
         all_context = []
+        # all_route = []                # all_route: just 4 debug
+        prev_cond = False
 
         nodes = iter(self)
         prev_depth = 0
         num = 0
         for depth, node in nodes:
+            # if node and (node.type == "nt" or node.type == "hashnode"):    # just 4 debug
+            #     if node.name == "DISP_WIDTH_32":
+            #         a = 0
             if depth >= 0:
                 if node.type == "cond":         # now context is all conditions, create a new context for actions
-                    flag, cond_context = node.ExecNode(cond_context, depth=depth)
-                    if node.equal == False:     # add special handler for not equal conditions
-                        if not "neq" in cond_context:
-                            cond_context["neq"] = {}
-                        cond_context["neq"][node.cond.field_name] = node.cond.rvalue.value
-                flag, context = node.ExecNode(context, depth=depth)
+                    prev_cond = True
+                    unuse_flag, cond_context = node.ExecNode(cond_context, depth=depth)
+                    if unuse_flag:              # first we must verify if the path is available
+                        if node.equal == False:     # add special handler for not equal conditions
+                            name = node.cond.field_name
+                            value = "!" + node.cond.rvalue.value        # neq conditions has a "!" prefix
+                            if not name in cond_context:
+                                cond_context[name] = value
+                            else:
+                                if cond_context[name] != value:
+                                    raise ValueError("Neq context %s reassignment from %s to %s" %(name, cond_context[name], value))
+                elif node.type == "nt" or node.type == "hashnode":
+                    if backtrack:
+                        cond_context = copy.deepcopy(cond_context_dict[node.name])
+                    else:
+                        if len(node.name) == 0: # just 4  debug
+                            a = 0
+                        cond_context_dict[node.name] = copy.deepcopy(cond_context)
+                flag, context = node.ExecNode(context, depth=depth) # real context is executed here
+                backtrack = False
                 if not flag:            # if this path cannot satisfy condition, invalid it
                     self.InvalidPath()
+                    backtrack = True
                 # print(node)
             elif depth == -1:
-                pass
+                backtrack = True
             elif depth == -2:
-                all_context.append((cond_context, context))
-                context = {"emit":[]}
-                cond_context = {}
+                # if num == 11:         # just 4 debug
+                #     a = 0
+                all_context.append(HashTable.HashTableItem( (cond_context, context) ))
+                # all_route.append(copy.deepcopy([str(i) for i in self.route]))     # all_route: just 4 debug
                 # print(self.GetRoute())
                 num += 1
+        self.head = None
+        self.route.clear()
         return all_context
+
 
     def DFSSeqContext(self, seqname):
         if not seqname in self.gens.seqs:
@@ -574,7 +705,6 @@ class Emulator(object):
         seq = self.gens.seqs[seqname]
         all_context = self.DFSNTContext(seq.nonterminals, seq)
         return all_context
-
 
     def DFSExecSeqBind(self, seqname, emit_seqname, iform=None, init_context=None, weak_context=None, onetime=False):
         if not seqname in self.gens.seqs:
