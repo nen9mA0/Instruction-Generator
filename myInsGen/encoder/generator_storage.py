@@ -35,11 +35,11 @@ class GeneratorStorage(object):
         self.sub_NT = {}                    # record the NT that calls other NTs
         self.htm = None
 
-        self.MakeInsNTLst()
+        self.MakeAllIforms()
 
         if not load:
             self.MakeRegNTlufLst()
-            self.MakeAllIforms()
+            self.MakeInsNTLst()
             self.MakeMODRMLst()
             self.MakeSubNTLst()
 

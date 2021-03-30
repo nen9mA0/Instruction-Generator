@@ -18,6 +18,8 @@ prev_seqNT = None       # Point to previous sequence NT, used to bind an emit nu
 
 class Node(object):
     def __init__(self, prev=None, next=None):
+        self.touchflag = False          # just used to determine whether the node is a new generated node
+                                        # used by nt_emitnum in Emulator
         self.prev = prev
         self.next = next
         self.iter = None
@@ -32,6 +34,12 @@ class Node(object):
         else:
             self.exec = True
             return self
+
+    def GetIterLen(self):
+        return 1
+
+    def GetIterNum(self):
+        return 1
 
     def ClearIter(self):
         self.iter = None
@@ -186,6 +194,8 @@ class NTNode(Node):
             self.otherwise_done = True
 
         self.rule_len = len(self.rules)
+        if self.otherwise:
+            self.rule_len += 1
         self.is_seqnt = False
         self.binding_seqNT = binding_seqNT
 
@@ -209,6 +219,7 @@ class NTNode(Node):
             self.otherwise_done = True
             self.UnlinkOldRule()
             self.BuildOtherwise(self.otherwise)
+            self.rule_num += 1
             return self
         if self.rule_num < self.rule_len:
             self.UnlinkOldRule()
@@ -218,6 +229,15 @@ class NTNode(Node):
         else:
             raise StopIteration
         return self
+
+    def GetIterLen(self):
+        ret = self.rule_len
+        if self.otherwise:
+            ret += 1
+        return ret
+
+    def GetIterNum(self):
+        return self.rule_num-1
 
     def UnlinkOldRule(self):
         if len(self.nodelst) > 0:                       # unlink old linklist
@@ -429,12 +449,14 @@ class NTHashTableNode(Node):
         self.name = nt.name
         self.hashtable = hashtable
         self.binding_seqNT = binding_seqNT
+        self.nodelst = [self]
 
     def __iter__(self):
         self.context_set = None
         self.context_iter = None
         self.init_context = None
         self.act_context = None
+        self.num = 0
         return self
 
     def __next__(self):
@@ -446,7 +468,18 @@ class NTHashTableNode(Node):
 
         if self.init_context:
             self.act_context = next(self.context_iter)[1]
+            self.num += 1
         return self
+
+    def GetIterLen(self):
+        if self.context_set:
+            ret = len(self.context_set)
+        else:
+            ret = 0
+        return ret
+
+    def GetIterNum(self):
+        return self.num-1
 
     def ExecNode(self, context, depth=None):
         if self.init_context:
@@ -459,6 +492,7 @@ class NTHashTableNode(Node):
             context = copy.deepcopy(self.init_context)      # use a new context to do following things
             try:
                 self.act_context = next(self.context_iter)[1]
+                self.num += 1
             except StopIteration:
                 return (False, context)
 
@@ -493,11 +527,14 @@ class HeadNode(Node):                     # used as a head or tail of a sequence
         return "HEAD===="
 
 def CreateNTNode(nt, gens, obj=None, prev=None, next=None, name="", binding_seqNT=None):
-    nt_name = nt.name
-    htm = gens.htm
-    if nt_name in htm:
-        hashtable = htm[nt_name]
-        node = NTHashTableNode(nt, hashtable, prev, next, binding_seqNT)
+    if isinstance(nt, nonterminal_t):
+        nt_name = nt.name
+        htm = gens.htm
+        if nt_name in htm:
+            hashtable = htm[nt_name]
+            node = NTHashTableNode(nt, hashtable, prev, next, binding_seqNT)
+        else:
+            node = NTNode(nt, gens, obj, prev, next, name, binding_seqNT)
     else:
         node = NTNode(nt, gens, obj, prev, next, name, binding_seqNT)
     return node
@@ -509,7 +546,15 @@ class Emulator(object):
         self.head = None
         self.ins_set = set()
         self.weak_ins_set = set()
+        self.nt_iternum = {}        # used to specify the iter number of some NTs
+
+        self.nt_emitnum_limit = {}
+        self.nt_emitnum = {}        # different from nt_iternum, is also used to limit number of iteration
+                                    # but only when the current route reach the end and emit code, 
+                                    # the value of emitnum will increase by 1
+
         self.route = []
+        self.route_num = []
         # self.tst_ins_set_dict = {}
 
     def __iter__(self):
@@ -520,14 +565,24 @@ class Emulator(object):
 
     def __next__(self):
         node = self.node
+        is_nt = False
         if node.next != None:
-            if node.type == "nt" or node.type == "iform":
+            if node.type == "nt" or node.type == "iform" or node.type == "hashnode":
                 self.prev_nt = node        # for invalid path
                 self.prev_nt_depth = self.depth
+                is_nt = True
             if node.iter == None:
                 node.iter = iter(node)
             try:
                 ret_node = next(node.iter)
+                if is_nt:
+                    if ret_node.name in self.nt_iternum:
+                        if ret_node.GetIterNum() >= self.nt_iternum[ret_node.name]:
+                            raise StopIteration
+                    if ret_node.name in self.nt_emitnum_limit:
+                        if ret_node.name in self.nt_emitnum:
+                            if self.nt_emitnum[ret_node.name] >= self.nt_emitnum_limit[ret_node.name]:
+                                raise StopIteration
                 ret_num = self.depth
                 self.depth += 1
                 self.node = node.next
@@ -548,6 +603,7 @@ class Emulator(object):
         # self.prev_node = node             # for debugging
         if self.prev_ret_num == -1 or self.prev_ret_num == -2:
             self.route.pop()
+            self.route_num.pop()
         self.prev_ret_num = ret_num
         return (ret_num, ret_node)
 
@@ -567,12 +623,27 @@ class Emulator(object):
             self.depth = self.prev_nt_depth
             while len(self.route) > self.depth:
                 self.route.pop()
+                self.route_num.pop()
         else:
             raise ValueError("InvalidPath: prev_nt is None")
 
     def ResetInslst(self):
         self.ins_set = set()
         self.tst_ins_set_dict = {}
+
+    def RefreshNTEmitNum(self):
+        head = self.head
+        node = head.next
+        while node.type != "head":      # if we haven't readched the end
+            if node.type == "nt" or node.type == "iform" or node.type == "hashnode":
+                if node.name in self.nt_emitnum:
+                    if node.touchflag:          # not a new node generated by new route
+                        self.nt_emitnum[node.name] += 1
+                    else:
+                        self.nt_emitnum[node.name] = 1
+                else:
+                    self.nt_emitnum[node.name] = 1
+        return self.nt_emitnum
 
     def BuildSeqNode(self, seq, iform=None):
         nts = self.gens.nts
@@ -640,6 +711,7 @@ class Emulator(object):
 
         self.head = head
 
+        self.nt_emitnum = {}
         context = {"emit":[]}                   # used to save end context for one cond_context
         cond_context = {}                       # used to save all conds
         cond_context_dict = {}                  # used to save nt's binding cond_context
@@ -680,6 +752,7 @@ class Emulator(object):
                             a = 0
                         cond_context_dict[node.name] = copy.deepcopy(cond_context)
                 flag, context = node.ExecNode(context, depth=depth) # real context is executed here
+                self.route_num.append((node.GetIterLen(), node.GetIterNum()))
                 backtrack = False
                 if not flag:            # if this path cannot satisfy condition, invalid it
                     self.InvalidPath()
@@ -691,11 +764,13 @@ class Emulator(object):
                 # if num == 11:         # just 4 debug
                 #     a = 0
                 all_context.append(HashTable.HashTableItem( (cond_context, context) ))
+                self.RefreshNTEmitNum()
                 # all_route.append(copy.deepcopy([str(i) for i in self.route]))     # all_route: just 4 debug
                 # print(self.GetRoute())
                 num += 1
         self.head = None
         self.route.clear()
+        self.route_num.clear()
         return all_context
 
 
@@ -706,7 +781,7 @@ class Emulator(object):
         all_context = self.DFSNTContext(seq.nonterminals, seq)
         return all_context
 
-    def DFSExecSeqBind(self, seqname, emit_seqname, iform=None, init_context=None, weak_context=None, onetime=False):
+    def DFSExecSeqBind(self, seqname, emit_seqname, iform=None, init_context=None, weak_context=None, output_num=1):
         if not seqname in self.gens.seqs:
             raise KeyError("_ExecSeq: Cannot find seqname: %s" %seqname)
 
@@ -723,12 +798,14 @@ class Emulator(object):
         emit_seq = self.gens.seqs[emit_seqname]
         self.head = self.BuildSeqNode(seq, iform)
 
+        self.nt_emitnum = {}
         nodes = iter(self)
         prev_depth = 0
         num = 0
         for depth, node in nodes:
             if depth >= 0:
                 flag, context = node.ExecNode(context, depth=depth)
+                self.route_num.append((node.GetIterLen(), node.GetIterNum()))
                 if not flag:            # if this path cannot satisfy condition, invalid it
                     self.InvalidPath()
                 # print(node)
@@ -738,16 +815,13 @@ class Emulator(object):
                 ins_str = self.EmitCode(context, emit_seq)
                 self.ins_set.add(ins_str)
                 num += 1
-                # if weak_context:
-                #     if 
-                # else:
-                if onetime:
+                self.RefreshNTEmitNum()
+                if num >= output_num:
                     break
-                # print(context)
-                # print("====output==== %d" %num)
-                # if num > 50:
-                #     a = 0
-                # pass
+
+        self.head = None
+        self.route.clear()
+        self.route_num.clear()
         return 0
 
     # when important_NT specify, any output that without executing important_NT will be ignore

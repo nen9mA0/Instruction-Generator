@@ -51,6 +51,9 @@ udelete_full_pattern = \
 
 iclass_pattern = re.compile(r'^ICLASS\s*[:]\s*(?P<iclass>[A-Za-z0-9_]+)')
 uname_pattern = re.compile(r'^UNAME\s*[:]\s*(?P<uname>[A-Za-z0-9_]+)')
+cpl_pattern = re.compile(r"^CPL\s*[:]\s*(?P<cpl>[0-9]+)")
+category_pattern = re.compile(r'^CATEGORY\s*[:]\s*(?P<category>[A-Za-z0-9_]+)')
+extension_pattern = re.compile(r'^EXTENSION\s*[:]\s*(?P<extension>[A-Za-z0-9_]+)')
 ipattern_pattern = re.compile(r'^PATTERN\s*[:]\s*(?P<ipattern>.+)')
 operand_pattern = re.compile(r'^OPERANDS\s*[:]\s*(?P<operands>.+)')
 no_operand_pattern = re.compile(r'^OPERANDS\s*[:]\s*$')

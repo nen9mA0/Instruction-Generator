@@ -15,17 +15,14 @@ class Generator(object):
     def __getattr__(self, item):
         return getattr(self.emu, item)
 
-    # def GetNTsHashTable(self, nts):
-    #     for nt_name in nts:
-    #         all_context = self.emu.DFSNTContext([nts[nt_name]])
-    #         hashtable = HashTable.HashTable(nt_name)
-    #         hashtable.LoadContext(all_context)
-    #         hashtable.ReHash(all_context)
-    #         self.htm.AddHashTable(hashtable)
+    def SetNTIterNum(self, iternum_dict):
+        for nt in iternum_dict:
+            self.emu.nt_iternum[nt] = iternum_dict[nt]
+        return self.emu.nt_iternum
 
-    def GeneratorIform(self, iform, ins_filter=None, onetime=False):        # a iform_t structure only contains one rule_t
+    def GeneratorIform(self, iform, ins_filter=None, output_num=1):        # a iform_t structure only contains one rule_t
         self.emu.ResetInslst()
-        self.emu.DFSExecSeqBind("ISA_BINDINGS", "ISA_EMIT", iform, init_context=ins_filter.context, weak_context=ins_filter.weak_context, onetime=onetime)
+        self.emu.DFSExecSeqBind("ISA_BINDINGS", "ISA_EMIT", iform, init_context=ins_filter.context, weak_context=ins_filter.weak_context, output_num=output_num)
         return self.emu.ins_set
         # return self.emu.tst_ins_set_dict
 
@@ -103,19 +100,21 @@ class InsFilter(object):
             elif "MOD" == name:
                 flag = True
                 value = self.context["MOD"]
-                try:
-                    int_value = int(value)
-                    pass                                # TODO: handler for normal conditions?
-                except ValueError:                      # only for MOD != 3
-                    del_item.append("MOD")              # is not a valid condition for emitting, so should be delete
+                if value == "3":                    # if MOD = 3, the instruction only has register or imm as operands
                     tmp_lst1 = self.gens.MODRM_lst
                     tmp_lst2 = self.GetAllIform()
                     modrm_set = set(tmp_lst1)
                     all_set = set(tmp_lst2)
                     tmp_set = all_set - modrm_set
+                else:
+                    tmp_lst = self.gens.MODRM_lst
+                    # del_item.append("MOD")              # is not a valid condition for emitting, so should be delete
+            elif "extension" == name:
+                flag = True
+                tmp_lst = self.GetExtensionIform(self.context[name])
+                del_item.append("extension")
             else:
                 pass
-
             if flag:
                 if tmp_lst:                     # some cases is a list, otherwise is a set
                     tmp_set = set(tmp_lst)
@@ -139,6 +138,14 @@ class InsFilter(object):
             self.context["MODE"] = "1"
         elif bits == 64:
             self.context["MODE"] = "2"
+
+    def GetExtensionIform(self, extension):
+        tmp_lst = []
+        all_iform = self.GetAllIform()
+        for iform in all_iform:
+            if iform.extension == extension:
+                tmp_lst.append(iform)
+        return tmp_lst
 
     def GetAllIform(self):
         return self.gens.all_iforms

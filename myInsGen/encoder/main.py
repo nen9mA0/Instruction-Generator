@@ -217,11 +217,11 @@ if __name__ == "__main__":
         sd.Save(generator_storage.GensSave, gens)
 # ==========================================================
     my_ins_filter = ins_filter.InsFilter(gens)
-    # my_ins_filter.AppendReg("XED_REG_BL", "input")
     # my_ins_filter.AppendReg("XED_REG_AL", "output")
-    # my_ins_filter.AppendReg("GPRv_R()", "")
-    # my_ins_filter.AppendReg("GPRv_B()", "")
-    my_ins_filter["MOD"] = "!=3"
+    my_ins_filter.AppendReg("GPRv_R()", "")
+    my_ins_filter.AppendReg("GPRv_B()", "")
+    my_ins_filter["MOD"] = "3"
+    my_ins_filter["extension"] = "BASE"
     my_ins_filter.SpecifyMode(32)
     iforms = my_ins_filter.GetIfroms()
 
@@ -230,6 +230,17 @@ if __name__ == "__main__":
 
     gen = ins_filter.Generator(gens)
 
+# ============== Set NT iter num ================
+    nt_iternum = {}
+    nt_iternum["FIXUP_EOSZ_ENC"] = 1
+    nt_iternum["FIXUP_EASZ_ENC"] = 1
+    nt_iternum["ASZ_NONTERM"] = 1
+    nt_iternum["VEXED_REX"] = 1
+    nt_iternum["OSZ_NONTERM_ENC"] = 1
+    nt_iternum["GPRv_B"] = 2
+    nt_iternum["GPRv_R"] = 2
+    # nt_iternum["PREFIX_ENC"] = 1
+    gen.SetNTIterNum(nt_iternum)
 
 # =============== Load NT Hash Table =======================
     needreload = False
@@ -256,11 +267,6 @@ if __name__ == "__main__":
     # gen.DFSSeqContext("MODRM_BIND")
     # all_context = gen.DFSNTContext(["SIB_REQUIRED_ENCODE", "SIBSCALE_ENCODE", "SIBINDEX_ENCODE", "SIBBASE_ENCODE", "MODRM_RM_ENCODE"])
 
-    all_context = gen.DFSNTContext(["FIXUP_EOSZ_ENC_BIND", "FIXUP_EASZ_ENC_BIND", "ASZ_NONTERM_BIND"])
-
-    for cond_context, act_context in all_context:
-        mystr = str(cond_context) + "\t\t" + str(act_context)
-        print(mystr)
     # for route in all_route:           # all_route: just 4 debug
     #     print(route)
 
@@ -269,7 +275,7 @@ if __name__ == "__main__":
     for i in iforms:
         tmp_str = str(i).split()
         print("%s %s"%(tmp_str[0], tmp_str[1]))
-        ins_lst = gen.GeneratorIform(i, ins_filter=my_ins_filter, onetime=True)
+        ins_lst = gen.GeneratorIform(i, ins_filter=my_ins_filter, output_num=10000)
         if len(ins_lst) > 0:
             for ins in ins_lst:
                 print(ins.hex(), end="")
@@ -282,5 +288,5 @@ if __name__ == "__main__":
                         i += 1
                 print(mystr)
         else:
-            logger.error(str(i))
+            logger.warning(str(i))
     pass

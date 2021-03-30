@@ -107,7 +107,8 @@ class HashTable(object):
                         else:
                             ret = set(context_lst)
                     else:
-                        raise ValueError("Key %s not in keyname" %key)
+                        pass
+                        # raise ValueError("Key %s not in keyname" %key)
 
                     if key in self.neqkey:
                         neq_value = value[1:]

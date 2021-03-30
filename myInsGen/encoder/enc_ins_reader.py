@@ -240,7 +240,7 @@ def parse_one_decode_rule( iclass, operand_str, pattern_str):
     #msgerr("OPERANDS %s" % ' '.join( [str(x) for x in operands]))
     return (operands, patterns, modal_patterns)
 
-def finalize_decode_conversion(iclass, operands, ipattern, uname=None):
+def finalize_decode_conversion(iclass, operands, ipattern, category, extension, uname=None, cpl=None):
     if ipattern  == None:
         die("No ipattern for iclass %s and operands: %s" % 
             (str(iclass), operands ))
@@ -251,7 +251,9 @@ def finalize_decode_conversion(iclass, operands, ipattern, uname=None):
     (conditions, actions, modal_patterns) = \
                     parse_one_decode_rule(iclass, operands, ipattern)
     # FIXME do something with the operand/conditions and patterns/actions
-    iform = iform_t(iclass, conditions, actions, modal_patterns, uname)
+    if cpl:
+        cpl = int(cpl)
+    iform = iform_t(iclass, conditions, actions, modal_patterns, category, extension, uname, cpl)
 
     if uname == 'NOP0F1F':
         # We have many fat NOPS, 0F1F is the preferred one so we
@@ -336,6 +338,9 @@ def read_decoder_instruction_file(lines):
             started = True
             iclass = None
             uname = None
+            category = None
+            extension = None
+            cpl = None
             continue
         
         if right_curly_pattern.match(line):
@@ -344,12 +349,30 @@ def read_decoder_instruction_file(lines):
             started = False
             iclass = None
             uname = None
+            category = None
+            extension = None
+            cpl = None
             continue
         ic = iclass_pattern.match(line)
         if ic:
             iclass = ic.group('iclass')
             continue
-        
+
+        cp = cpl_pattern.match(line)
+        if cp:
+            cpl = cp.group('cpl')
+            continue
+
+        ca = category_pattern.match(line)
+        if ca:
+            category = ca.group('category')
+            continue
+
+        ex = extension_pattern.match(line)
+        if ex:
+            extension = ex.group('extension')
+            continue
+
         un = uname_pattern.match(line)
         if un:
             uname = un.group('uname')
@@ -361,13 +384,13 @@ def read_decoder_instruction_file(lines):
             continue
         
         if no_operand_pattern.match(line):
-            finalize_decode_conversion(iclass,'', ipattern, uname)
+            finalize_decode_conversion(iclass,'', ipattern, category, extension, uname, cpl)
             continue
 
         op = operand_pattern.match(line)
         if op:
             operands = op.group('operands')
-            finalize_decode_conversion(iclass, operands, ipattern, uname)
+            finalize_decode_conversion(iclass, operands, ipattern, category, extension, uname, cpl)
             continue
     return
 
