@@ -20,6 +20,11 @@ class Generator(object):
             self.emu.nt_iternum[nt] = iternum_dict[nt]
         return self.emu.nt_iternum
 
+    def SetNTEmitNum(self, emitnum_dict):
+        for nt in emitnum_dict:
+            self.emu.nt_emitnum_limit[nt] = emitnum_dict[nt]
+        return self.emu.nt_emitnum_limit
+
     def GeneratorIform(self, iform, ins_filter=None, output_num=1):        # a iform_t structure only contains one rule_t
         self.emu.ResetInslst()
         self.emu.DFSExecSeqBind("ISA_BINDINGS", "ISA_EMIT", iform, init_context=ins_filter.context, weak_context=ins_filter.weak_context, output_num=output_num)

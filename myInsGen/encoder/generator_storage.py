@@ -9,7 +9,10 @@ def GensSave(f, obj):
     pickle.dump(obj.nt_ins_bind, f)
     pickle.dump(obj.reg_ins_bind, f)
     pickle.dump(obj.MODRM_lst, f)
+    pickle.dump(obj.IMM_lst, f)
+    pickle.dump(obj.branch_ins, f)
     pickle.dump(obj.sub_NT, f)
+    pickle.dump(obj.sub_NT_reverse, f)
 
 def GensLoad(f, obj):
     obj.reg_nt_bind = pickle.load(f)
@@ -17,7 +20,10 @@ def GensLoad(f, obj):
     obj.nt_ins_bind = pickle.load(f)
     obj.reg_ins_bind = pickle.load(f)
     obj.MODRM_lst = pickle.load(f)
+    obj.IMM_lst = pickle.load(f)
+    obj.branch_ins = pickle.load(f)
     obj.sub_NT = pickle.load(f)
+    obj.sub_NT_reverse = pickle.load(f)
 
 class GeneratorStorage(object):
     def __init__(self, load=False):
@@ -31,17 +37,20 @@ class GeneratorStorage(object):
         self.nt_ins_bind = ({}, {})         # 0 for input  1 for output
         self.reg_ins_bind = ({}, {})        # for the iforms that directly specify the register
         self.all_iforms = []
-        self.MODRM_lst = []
+        self.MODRM_lst = ([], [])
+        self.IMM_lst = ([], [])
+        self.branch_ins = []
         self.sub_NT = {}                    # record the NT that calls other NTs
+        self.sub_NT_reverse = {}
         self.htm = None
 
         self.MakeAllIforms()
 
         if not load:
+            self.MakeSubNTLst()
             self.MakeRegNTlufLst()
             self.MakeInsNTLst()
-            self.MakeMODRMLst()
-            self.MakeSubNTLst()
+            # self.MakeMODRMLst()           # duplicated
 
     def AddHashTableManager(self, htm):
         self.htm = htm
@@ -77,6 +86,8 @@ class GeneratorStorage(object):
     def MakeInsNTLst(self):
         for iclass in gs.iarray:
             for iform in gs.iarray[iclass]:
+                mem_flag = True             # if a iform have 2 mem or imm input operand, it will be appended only one time
+                imm_flag = True
                 for (var, nt, value) in iform.input_op:
                     if nt:
                         if value in self.nt_ins_bind[0]:
@@ -88,9 +99,24 @@ class GeneratorStorage(object):
                             self.reg_ins_bind[0][value].append(iform)
                         else:
                             self.reg_ins_bind[0][value] = [iform]
-                    else:
+                    elif "MEM" in var:
+                        if mem_flag:
+                            mem_flag = False
+                            self.MODRM_lst[0].append(iform)
+                    elif "IMM" in var:
+                        if imm_flag:
+                            imm_flag = False
+                            self.IMM_lst[0].append(iform)
+                    elif "RELBR" in var:
+                        self.branch_ins.append(iform)
+                    else:                   # else: PTR: jmp_far call_far
+                                            #       AGEN: lea bndmk bndcl bndcu bndcn
+                                            #       SCALE: xlat
+                        a = 0
                         pass
                         # logger.error("MakeInsNTLst: cannot handle input operand %s %s" %(var, value))
+                mem_flag = True
+                imm_flag = True
                 for (var, nt, value) in iform.output_op:
                     if nt:
                         if value in self.nt_ins_bind[1]:
@@ -102,11 +128,19 @@ class GeneratorStorage(object):
                             self.reg_ins_bind[1][value].append(iform)
                         else:
                             self.reg_ins_bind[1][value] = [iform]
+                    elif "MEM" in var:
+                        if mem_flag:
+                            mem_flag = False
+                            self.MODRM_lst[1].append(iform)
+                    elif "IMM" in var:
+                        if imm_flag:
+                            imm_flag = False
+                            self.IMM_lst[1].append(iform)
                     else:
                         pass
                         # logger.error("MakeInsNTLst: cannot handle output operand %s %s" %(var, nt))
 
-    def MakeMODRMLst(self):
+    def MakeMODRMLst(self):         # This method is duplicated and the MODRM_lst is now built by MakeInsNTLst
         for iclass in gs.iarray:
             for iform in gs.iarray[iclass]:
                 rule = iform.rule
@@ -129,3 +163,10 @@ class GeneratorStorage(object):
                             self.sub_NT[nt_name].append(act.ntluf)
                         else:
                             self.sub_NT[nt_name] = [act.ntluf]
+        for nt_name in self.sub_NT:
+            for sub_nt_name in self.sub_NT[nt_name]:
+                if sub_nt_name in self.sub_NT_reverse:
+                    if not nt_name in self.sub_NT_reverse[sub_nt_name]:
+                        self.sub_NT_reverse[sub_nt_name].append(nt_name)
+                else:
+                    self.sub_NT_reverse[sub_nt_name] = [nt_name]

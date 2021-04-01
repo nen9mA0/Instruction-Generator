@@ -117,6 +117,8 @@ def GetRegOnly():
 
 def CreateNTHashTable(gen, gens, htm, nt_list):
     for nt_name in nt_list:
+        if nt_name == "XOP_TYPE_ENC":
+            a = 0
         all_context = gen.DFSNTContext([nt_name])
         if "_BIND" in nt_name or "_EMIT" in nt_name:
             nt_name = nt_name[:-5]
@@ -216,32 +218,7 @@ if __name__ == "__main__":
     if save and needreload:
         sd.Save(generator_storage.GensSave, gens)
 # ==========================================================
-    my_ins_filter = ins_filter.InsFilter(gens)
-    # my_ins_filter.AppendReg("XED_REG_AL", "output")
-    my_ins_filter.AppendReg("GPRv_R()", "")
-    my_ins_filter.AppendReg("GPRv_B()", "")
-    my_ins_filter["MOD"] = "3"
-    my_ins_filter["extension"] = "BASE"
-    my_ins_filter.SpecifyMode(32)
-    iforms = my_ins_filter.GetIfroms()
-
-    # my_ins_filter["REG0"] = "XED_REG_AX"       # here we just specify input and output reg
-    # my_ins_filter["REG1"] = "XED_REG_BX"
-
     gen = ins_filter.Generator(gens)
-
-# ============== Set NT iter num ================
-    nt_iternum = {}
-    nt_iternum["FIXUP_EOSZ_ENC"] = 1
-    nt_iternum["FIXUP_EASZ_ENC"] = 1
-    nt_iternum["ASZ_NONTERM"] = 1
-    nt_iternum["VEXED_REX"] = 1
-    nt_iternum["OSZ_NONTERM_ENC"] = 1
-    nt_iternum["GPRv_B"] = 2
-    nt_iternum["GPRv_R"] = 2
-    # nt_iternum["PREFIX_ENC"] = 1
-    gen.SetNTIterNum(nt_iternum)
-
 # =============== Load NT Hash Table =======================
     needreload = False
     save = False
@@ -262,6 +239,18 @@ if __name__ == "__main__":
 
 # ==========================================================
 
+    my_ins_filter = ins_filter.InsFilter(gens)
+    # my_ins_filter.AppendReg("XED_REG_AL", "output")
+    my_ins_filter.AppendReg("GPRv_B()", "")
+    my_ins_filter.AppendReg("XED_REG_EAX", "")
+    # my_ins_filter.AppendReg("GPRv_B()", "")
+    my_ins_filter["MOD"] = "3"
+    my_ins_filter["extension"] = "BASE"
+    my_ins_filter.SpecifyMode(32)
+    iforms = my_ins_filter.GetIfroms()
+
+    # my_ins_filter["REG0"] = "XED_REG_AX"       # here we just specify input and output reg
+    # my_ins_filter["REG1"] = "XED_REG_BX"
 
     # gen.DFSNTContext(["VEX_REXR_ENC"])
     # gen.DFSSeqContext("MODRM_BIND")
@@ -269,6 +258,20 @@ if __name__ == "__main__":
 
     # for route in all_route:           # all_route: just 4 debug
     #     print(route)
+
+
+# ============== Set NT iter num ================
+    nt_emitnum = {}
+    nt_emitnum["FIXUP_EOSZ_ENC"] = 2
+    nt_emitnum["FIXUP_EASZ_ENC"] = 1
+    nt_emitnum["ASZ_NONTERM"] = 1
+    nt_emitnum["VEXED_REX"] = 1
+    nt_emitnum["OSZ_NONTERM_ENC"] = 1
+    nt_emitnum["GPRv_B"] = 2
+    nt_emitnum["GPRv_R"] = 2
+    # nt_emitnum["PREFIX_ENC"] = 1
+    gen.SetNTEmitNum(nt_emitnum)
+# ============== ============
 
     print(len(iforms))
 

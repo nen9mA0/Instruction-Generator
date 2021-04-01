@@ -7,12 +7,22 @@ def HTMLoad(f, obj):
     obj.nt_names = pickle.load(f)
 
 
+hash_num = 0
+
 class HashTableItem(object):            # this class is a wrapper of structure ({},{}), and just because dictionary is unhashable
     def __init__(self, context_tuple):
         self.context = context_tuple
+        global hash_num
+        self.id = hash_num
+        hash_num += 1
 
-    def __hash__(self):                 # hash is address of HashTableItem
-        return id(self)
+    # def __hash__(self):                 # hash is address of HashTableItem
+    #     return id(self)
+    def __hash__(self):
+        return self.id
+
+    def __eq__(self, rhs):
+        return self.id == rhs.id
 
     def __getitem__(self, index):       # self.context is a tuple
         return self.context[index]
@@ -129,7 +139,9 @@ class HashTable(object):
             ret = set(context_lst)
         if self.otherwise:
             ret = ret | set(self.otherwise)
-        return ret
+        ret_lst = list(ret)
+        ret_lst.sort(key=lambda obj: obj.x)
+        return ret_lst
 
     def RefreshContext(self, context, act_context):
         has_outreg = False
