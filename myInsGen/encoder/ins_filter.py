@@ -15,6 +15,9 @@ class Generator(object):
     def __getattr__(self, item):
         return getattr(self.emu, item)
 
+    def SetDefaultEmitNum(self, num_str):
+        self.emu.default_emit_num = num_str
+
     def SetNTIterNum(self, iternum_dict):
         for nt in iternum_dict:
             self.emu.nt_iternum[nt] = iternum_dict[nt]
@@ -27,13 +30,13 @@ class Generator(object):
 
     def GeneratorIform(self, iform, ins_filter=None, output_num=1):        # a iform_t structure only contains one rule_t
         self.emu.ResetInslst()
-        self.emu.DFSExecSeqBind("ISA_BINDINGS", "ISA_EMIT", iform, init_context=ins_filter.context, weak_context=ins_filter.weak_context, output_num=output_num)
+        self.emu.DFSExecSeqBind("ISA_BINDINGS", iform, init_context=ins_filter.context, weak_context=ins_filter.weak_context, output_num=output_num)
         return self.emu.ins_set
         # return self.emu.tst_ins_set_dict
 
     def TestMODRM(self):
         self.emu.ResetInslst()
-        self.emu.DFSExecSeqBind("MODRM_BIND", "MODRM_EMIT")
+        self.emu.DFSExecSeqBind("MODRM_BIND")
         return self.emu.ins_set
 
 
@@ -78,8 +81,54 @@ class InsFilter(object):
                     flag = False
         return flag
 
+    def SetISABinding(self, extension_name):
+        binding_seq = None
+        for seq in gs.repeat_seqs["ISA_BINDINGS"]:
+            if extension_name == "AVX512VEX":
+                if "vex" in seq.binding_dir:
+                    binding_seq = seq
+                    break
+            elif extension_name == "AVX512EVEX":
+                if "evex" in seq.binding_dir:
+                    binding_seq = seq
+                    break
+            else:
+                if not "vex" in seq.binding_dir and not "evex" in seq.binding_dir:
+                    binding_seq = seq
+                    break
+        self.gens.seqs["ISA_BINDINGS"] = binding_seq
+        for seq in gs.repeat_seqs["ISA_EMIT"]:
+            if seq.binding_dir == self.gens.seqs["ISA_BINDINGS"].binding_dir:
+                self.gens.seqs["ISA_EMIT"] = seq
+                break
+
+    def SetVexedRexBinding(self, extension_name):
+        binding_seq = None
+        binding_hashtable = None
+        index = 0
+        for seq in gs.repeat_nts["VEXED_REX"]:
+            if extension_name == "AVX512VEX":
+                if "vex" in seq.binding_dir:
+                    binding_seq = seq
+                    binding_hashtable = self.gens.htm.repeat_nts["VEXED_REX"][index]
+                    break
+            elif extension_name == "AVX512EVEX":
+                if "evex" in seq.binding_dir:
+                    binding_seq = seq
+                    binding_hashtable = self.gens.htm.repeat_nts["VEXED_REX"][index]
+                    break
+            else:
+                if not "vex" in seq.binding_dir and not "evex" in seq.binding_dir:
+                    binding_seq = seq
+                    binding_hashtable = self.gens.htm.repeat_nts["VEXED_REX"][index]
+                    break
+            index += 1
+        self.gens.nts["VEXED_REX"] = binding_seq
+        self.gens.htm.nt_names["VEXED_REX"] = binding_hashtable
+
     def GetIfroms(self):
         ret_set = None
+        isa_binding_set = False
         del_item = []
         for name in self.context:
             tmp_lst = None
@@ -106,17 +155,22 @@ class InsFilter(object):
                 flag = True
                 value = self.context["MOD"]
                 if value == "3":                    # if MOD = 3, the instruction only has register or imm as operands
-                    tmp_lst1 = self.gens.MODRM_lst
+                    tmp_lst1 = self.gens.MODRM_lst[0]
+                    tmp_lst1.extend(self.gens.MODRM_lst[1])
                     tmp_lst2 = self.GetAllIform()
                     modrm_set = set(tmp_lst1)
                     all_set = set(tmp_lst2)
                     tmp_set = all_set - modrm_set
                 else:
-                    tmp_lst = self.gens.MODRM_lst
+                    tmp_lst = self.gens.MODRM_lst[0]
+                    tmp_lst.extend(self.gens.MODRM_lst[1])
                     # del_item.append("MOD")              # is not a valid condition for emitting, so should be delete
             elif "extension" == name:
                 flag = True
+                isa_binding_set = True
                 tmp_lst = self.GetExtensionIform(self.context[name])
+                self.SetISABinding(self.context[name])
+                self.SetVexedRexBinding(self.context[name])
                 del_item.append("extension")
             else:
                 pass
@@ -130,6 +184,10 @@ class InsFilter(object):
 
         for i in del_item:
             del self.context[i]
+        if not isa_binding_set:
+            raise ValueError("Must at least specify one extension")
+        else:
+            self.gens.MakeSeqNTBind()           # MakeSeqNTBind when ISA seq has been binded
         return ret_set
 
 

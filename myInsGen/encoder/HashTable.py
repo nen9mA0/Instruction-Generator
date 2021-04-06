@@ -2,9 +2,13 @@ from global_init import *
 
 def HTMSave(f, obj):
     pickle.dump(obj.nt_names, f)
+    pickle.dump(obj.repeat_nts, f)
+    pickle.dump(obj.repeat_ntlufs, f)
 
 def HTMLoad(f, obj):
     obj.nt_names = pickle.load(f)
+    obj.repeat_nts = pickle.load(f)
+    obj.repeat_ntlufs = pickle.load(f)
 
 
 hash_num = 0
@@ -82,7 +86,7 @@ class HashTable(object):
                     raise ValueError("Multi otherwise in NT %s: %s" %(self.name, context))
         return self.keyname
 
-    def GetActContext(self, context):
+    def GetActContext(self, context, otherwise_first=True):
         ret = None
         for key in context:
             if not key == "emit":
@@ -140,7 +144,11 @@ class HashTable(object):
         if self.otherwise:
             ret = ret | set(self.otherwise)
         ret_lst = list(ret)
-        ret_lst.sort(key=lambda obj: obj.x)
+        ret_lst.sort(key=lambda obj: obj.id)        # by default(all NTNode's otherwise_first field are True), the id of otherwise will always smaller than others
+        if self.otherwise and not otherwise_first:  # if otherwise_first is False, we exchange otherwise(in ret_lst[0] if it has otherwise) with the last element
+            tmp = ret_lst[0]
+            ret_lst[0] = ret_lst[-1]
+            ret_lst[-1] = tmp
         return ret_lst
 
     def RefreshContext(self, context, act_context):
@@ -160,14 +168,20 @@ class HashTable(object):
 class HashTableManager(object):
     def __init__(self):
         self.nt_names = {}
+        self.repeat_nts = {}
+        self.repeat_ntlufs = {}
         self.seq_names = {}
 
     def AddHashTable(self, hashtable):
         name = hashtable.name
+        if name in self.nt_names:
+            raise ValueError("One NT has multi hashtable(repeat NT must been handled by repeat_nts)")
         self.nt_names[name] = hashtable
 
     def AddSeqHashTable(self, hashtable):
         name = hashtable.name
+        if name in self.seq_names:
+            raise ValueError("One NT has multi hashtable(repeat NT must been handled by repeat_nts)")
         self.seq_names[name] = hashtable
 
     def __getitem__(self, name):

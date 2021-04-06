@@ -18,9 +18,18 @@ def parse_encode_lines(lines, state_bits):
     nts = {} # nonterminals_t's
     ntlufs = {} # nonterminals_t's
     seqs = {} # sequencer_t's 
+
+    repeat_nts = {}         # some nt/ntluf/seq has multi definition, so we use three dict to record this
+    repeat_ntlufs = {}
+    repeat_seqs = {}
     i = 0
     while len(lines) > 0:
         line = lines.pop(0)
+
+        fn = file_pattern.match(line)
+        if fn:
+            filename = fn.group('file')
+
         line = comment_pattern.sub("",line)
         line = leading_whitespace_pattern.sub("",line)
         if line == '':
@@ -34,8 +43,16 @@ def parse_encode_lines(lines, state_bits):
 
         sequence = sequence_pattern.match(line)
         if sequence:
-            seq = sequencer_t(sequence.group('seqname'))
-            seqs[seq.name] = seq
+            seq = sequencer_t(sequence.group('seqname'), filename)
+            if seq.name in seqs:
+                if seqs[seq.name]:          # if is not none, shows that this seq only has been defined one time
+                    tmp = seqs[seq.name]
+                    repeat_seqs[seq.name] = [tmp, seq]
+                    seqs[seq.name] = None
+                else:
+                    repeat_seqs[seq.name].append(seq)
+            else:
+                seqs[seq.name] = seq
             #msg("SEQ MATCH %s" % seq.name)
             nt = None
             continue
@@ -45,18 +62,31 @@ def parse_encode_lines(lines, state_bits):
             nt_name =  p.group('ntname')
             ret_type = p.group('rettype')
             # create a new nonterminal to use
-            nt = nonterminal_t(nt_name, ret_type)
-            ntlufs[nt_name] = nt
+            nt = nonterminal_t(nt_name, filename, ret_type)
+            if nt_name in ntlufs:
+                if ntlufs[nt_name]:          # if is not none, shows that this seq only has been defined one time
+                    tmp = ntlufs[nt_name]
+                    repeat_ntlufs[nt_name] = [tmp, nt]
+                    ntlufs[nt_name] = None
+                else:
+                    repeat_ntlufs[nt_name].append(nt)
+            else:
+                ntlufs[nt_name] = nt
             seq = None
             continue
 
         m = nt_pattern.match(line)
         if m:
             nt_name =  m.group('ntname')
+            nt = nonterminal_t(nt_name, filename)
             if nt_name in nts:
-                nt = nts[nt_name]
+                if nts[nt_name]:          # if is not none, shows that this seq only has been defined one time
+                    tmp = nts[nt_name]
+                    repeat_nts[nt_name] = [tmp, nt]
+                    nts[nt_name] = None
+                else:
+                    repeat_nts[nt_name].append(nt)
             else:
-                nt = nonterminal_t(nt_name)
                 nts[nt_name] = nt
             seq = None
             continue
@@ -91,7 +121,7 @@ def parse_encode_lines(lines, state_bits):
         else:
             for nt in line.split():
                 seq.add(nt)
-    return (seqs,nts,ntlufs)
+    return (seqs, nts, ntlufs, repeat_seqs, repeat_nts, repeat_ntlufs)
 
 def parse_decode_lines(lines):
     """ Read the flat decoder files (not the ISA file).
@@ -112,9 +142,15 @@ def parse_decode_lines(lines):
     """
     nts = {}
     ntlufs = {}
+    repeat_nts = {}         # some nt/ntluf/seq has multi definition, so we use three dict to record this
+    repeat_ntlufs = {}
 
     while len(lines) > 0:
         line = lines.pop(0)
+
+        fn = file_pattern.match(line)
+        if fn:
+            filename = fn.group('file')
         #msge("LINEOUT:" + line)
         line = comment_pattern.sub("",line)
         line = leading_whitespace_pattern.sub("",line)
@@ -128,16 +164,32 @@ def parse_decode_lines(lines):
             nt_name = p.group('ntname')
             ret_type = p.group('rettype')
             # create a new nonterminal to use
-            nt = nonterminal_t(nt_name, ret_type)
-            ntlufs[nt_name] = nt
+            nt = nonterminal_t(nt_name, filename, ret_type)
+            if nt_name in ntlufs:
+                if ntlufs[nt_name]:          # if is not none, shows that this seq only has been defined one time
+                    tmp = ntlufs[nt_name]
+                    repeat_ntlufs[nt_name] = [tmp, nt]
+                    ntlufs[nt_name] = None
+                else:
+                    repeat_ntlufs[nt_name].append(nt)
+            else:
+                ntlufs[nt_name] = nt
             continue
         
         p = nt_pattern.match(line)
         if p:
             nt_name =  p.group('ntname')
             # create a new nonterminal to use
-            nt = nonterminal_t(nt_name)
-            nts[nt_name] = nt
+            nt = nonterminal_t(nt_name, filename)
+            if nt_name in nts:
+                if nts[nt_name]:          # if is not none, shows that this seq only has been defined one time
+                    tmp = nts[nt_name]
+                    repeat_nts[nt_name] = [tmp, nt]
+                    nts[nt_name] = None
+                else:
+                    repeat_nts[nt_name].append(nt)
+            else:
+                nts[nt_name] = nt
             continue
         
         p = decode_rule_pattern.match(line)
@@ -153,7 +205,7 @@ def parse_decode_lines(lines):
         
         die("Unhandled line: %s" % line)
         
-    return  (nts, ntlufs)
+    return  (nts, ntlufs, repeat_nts, repeat_ntlufs)
 
 def parse_decode_rule(conds, actions, line, nt_name):
     # conds   -- rhs, from an encode perspective (decode operands)
@@ -264,9 +316,11 @@ def ReadEncPattern(filename, state_bits):
 def ReadEncDecPattern(filename, state_bits):
     lines = open(filename, "r").readlines()
     lines = expand_state_bits(lines, state_bits)
-    (nts, ntlufs) = parse_decode_lines(lines)
+    (nts, ntlufs, repeat_nts, repeat_ntlufs) = parse_decode_lines(lines)
     gs.nts.update(nts)
     gs.ntlufs.update(ntlufs)
+    gs.repeat_nts.update(repeat_nts)
+    gs.repeat_ntlufs.update(repeat_ntlufs)
 
 if __name__ == "__main__":
     operand = fields_reader.ReadFields(all_field)

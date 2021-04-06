@@ -2,6 +2,7 @@ import sys
 import re
 
 from global_init import *
+from patterns import *
 
 make_numeric_decimal_pattern = re.compile(r'^[-]?[0-9]+$')
 make_numeric_hex_pattern = re.compile(r'^0[xX][0-9A-Fa-f]+$')
@@ -159,6 +160,31 @@ def process_continuations(lines):
     del lines
     return olines
 
+def process_continuations_without_file(lines):
+    continuation_pattern = re.compile(r'\\$')
+    olines = []
+    while len(lines) != 0:
+        line = lines[0]
+        fp = file_pattern.match(line)
+        if fp:
+            pass
+        else:
+            line = no_comments(line)
+        line = line.strip()
+        lines.pop(0)
+        if line == '':
+            continue
+        if continuation_pattern.search(line):
+            # combine this line with the next line if the next line exists
+            line = continuation_pattern.sub('', line)
+            if len(lines) >= 1:
+                combined_lines = [line + lines[0]]
+                lines.pop(0)
+                lines = combined_lines + lines
+                continue
+        olines.append(line)
+    del lines
+    return olines
 
 def die(s):
     stderr(s)

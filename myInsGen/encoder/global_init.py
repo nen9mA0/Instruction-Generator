@@ -14,6 +14,9 @@ class GlobalStruct(object):
         self.seqs = {}
         self.nts = {}
         self.ntlufs = {}
+        self.repeat_seqs = {}
+        self.repeat_nts = {}
+        self.repeat_ntlufs = {}
         self.deleted_unames = {}
         self.deleted_instructions = {}
         self.iarray = {}
@@ -37,6 +40,9 @@ def GsSave(f, obj):
     pickle.dump(obj.seqs, f)
     pickle.dump(obj.nts, f)
     pickle.dump(obj.ntlufs, f)
+    pickle.dump(obj.repeat_seqs, f)
+    pickle.dump(obj.repeat_nts, f)
+    pickle.dump(obj.repeat_ntlufs, f)
     pickle.dump(obj.deleted_unames, f)
     pickle.dump(obj.deleted_instructions, f)
     pickle.dump(obj.iarray, f)
@@ -49,6 +55,9 @@ def GsLoad(f, obj):
     obj.seqs = pickle.load(f)
     obj.nts = pickle.load(f)
     obj.ntlufs = pickle.load(f)
+    obj.repeat_seqs = pickle.load(f)
+    obj.repeat_nts = pickle.load(f)
+    obj.repeat_ntlufs = pickle.load(f)
     obj.deleted_unames = pickle.load(f)
     obj.deleted_instructions = pickle.load(f)
     obj.iarray = pickle.load(f)

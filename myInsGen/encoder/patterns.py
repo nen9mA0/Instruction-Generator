@@ -33,6 +33,7 @@ ntluf_pattern  =  re.compile(r'^(?P<rettype>[A-Za-z0-9_]+)\s+(?P<ntname>[A-Za-z_
 # for the decode rule, the rhs might be empty
 decode_rule_pattern = re.compile(r'(?P<action>.+)[|](?P<cond>.*)')
 
+file_pattern = re.compile(r'###FILE:\s*(?P<file>[A-Za-z0-9-_./]+)')
 comment_pattern = re.compile(r'#.*$')
 leading_whitespace_pattern = re.compile(r'^\s+')
 full_line_comment_pattern = re.compile(r'^\s*#')

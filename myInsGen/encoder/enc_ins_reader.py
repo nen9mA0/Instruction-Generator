@@ -240,7 +240,7 @@ def parse_one_decode_rule( iclass, operand_str, pattern_str):
     #msgerr("OPERANDS %s" % ' '.join( [str(x) for x in operands]))
     return (operands, patterns, modal_patterns)
 
-def finalize_decode_conversion(iclass, operands, ipattern, category, extension, uname=None, cpl=None):
+def finalize_decode_conversion(iclass, operands, ipattern, category, extension, binding_dir, uname=None, cpl=None):
     if ipattern  == None:
         die("No ipattern for iclass %s and operands: %s" % 
             (str(iclass), operands ))
@@ -253,7 +253,7 @@ def finalize_decode_conversion(iclass, operands, ipattern, category, extension, 
     # FIXME do something with the operand/conditions and patterns/actions
     if cpl:
         cpl = int(cpl)
-    iform = iform_t(iclass, conditions, actions, modal_patterns, category, extension, uname, cpl)
+    iform = iform_t(iclass, conditions, actions, modal_patterns, category, extension, binding_dir, uname, cpl)
 
     if uname == 'NOP0F1F':
         # We have many fat NOPS, 0F1F is the preferred one so we
@@ -290,7 +290,7 @@ def read_decoder_instruction_file(lines):
     than buffering up the whole file. Also, just storing the parts
     I need. """
     continuation_pattern = re.compile(r'\\$')
-    lines = process_continuations(lines)
+    lines = process_continuations_without_file(lines)      # we must preserve FILE, so define a new function
     nts = {}
     nt = None
     iclass = None
@@ -300,6 +300,11 @@ def read_decoder_instruction_file(lines):
     started = False
     while len(lines) > 0:
         line = lines.pop(0)
+
+        fn = file_pattern.match(line)
+        if fn:
+            filename = fn.group('file')
+
         line = comment_pattern.sub("",line)
         #line = leading_whitespace_pattern.sub("",line)
         line=line.strip()
@@ -328,7 +333,7 @@ def read_decoder_instruction_file(lines):
             if nt_name in nts:
                 nt = nts[nt_name]
             else:
-                nt = nonterminal_t(nt_name)
+                nt = nonterminal_t(nt_name, "")
                 nts[nt_name] = nt
             continue
 
@@ -384,13 +389,13 @@ def read_decoder_instruction_file(lines):
             continue
         
         if no_operand_pattern.match(line):
-            finalize_decode_conversion(iclass,'', ipattern, category, extension, uname, cpl)
+            finalize_decode_conversion(iclass,'', ipattern, category, extension, filename, uname, cpl)
             continue
 
         op = operand_pattern.match(line)
         if op:
             operands = op.group('operands')
-            finalize_decode_conversion(iclass, operands, ipattern, category, extension, uname, cpl)
+            finalize_decode_conversion(iclass, operands, ipattern, category, extension, filename, uname, cpl)
             continue
     return
 

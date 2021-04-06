@@ -8,6 +8,7 @@ def GensSave(f, obj):
     pickle.dump(obj.nt_reg_bind, f)
     pickle.dump(obj.nt_ins_bind, f)
     pickle.dump(obj.reg_ins_bind, f)
+    pickle.dump(obj.all_iforms, f)
     pickle.dump(obj.MODRM_lst, f)
     pickle.dump(obj.IMM_lst, f)
     pickle.dump(obj.branch_ins, f)
@@ -19,6 +20,7 @@ def GensLoad(f, obj):
     obj.nt_reg_bind = pickle.load(f)
     obj.nt_ins_bind = pickle.load(f)
     obj.reg_ins_bind = pickle.load(f)
+    obj.all_iforms = pickle.load(f)
     obj.MODRM_lst = pickle.load(f)
     obj.IMM_lst = pickle.load(f)
     obj.branch_ins = pickle.load(f)
@@ -36,6 +38,7 @@ class GeneratorStorage(object):
         self.nt_reg_bind = {}
         self.nt_ins_bind = ({}, {})         # 0 for input  1 for output
         self.reg_ins_bind = ({}, {})        # for the iforms that directly specify the register
+        self.seq_nt_bind = {}
         self.all_iforms = []
         self.MODRM_lst = ([], [])
         self.IMM_lst = ([], [])
@@ -44,9 +47,8 @@ class GeneratorStorage(object):
         self.sub_NT_reverse = {}
         self.htm = None
 
-        self.MakeAllIforms()
-
         if not load:
+            self.MakeAllIforms()
             self.MakeSubNTLst()
             self.MakeRegNTlufLst()
             self.MakeInsNTLst()
@@ -78,6 +80,17 @@ class GeneratorStorage(object):
                             else:
                                 self.nt_reg_bind[ntluf_name] = set()
                                 self.nt_reg_bind[ntluf_name].add(reg_name)
+
+                            if ntluf_name in self.sub_NT_reverse:
+                                nt_lst = self.sub_NT_reverse[ntluf_name]
+                                nt_set = set(nt_lst)
+                                self.reg_nt_bind[reg_name] = self.reg_nt_bind[reg_name] | nt_set
+                                for nt_name in nt_lst:
+                                    if nt_name in self.nt_reg_bind:
+                                        self.nt_reg_bind[nt_name].add(reg_name)
+                                    else:
+                                        self.nt_reg_bind[nt_name] = set()
+                                        self.nt_reg_bind[nt_name].add(reg_name)
 
     # Create binding between instruction and nonterminal or register
     # Here we distinguish input operand from output operand
@@ -170,3 +183,8 @@ class GeneratorStorage(object):
                         self.sub_NT_reverse[sub_nt_name].append(nt_name)
                 else:
                     self.sub_NT_reverse[sub_nt_name] = [nt_name]
+
+    def MakeSeqNTBind(self):
+        for seq in self.seqs:
+            for nt_name in self.seqs[seq].nonterminals:
+                self.seq_nt_bind[nt_name] = seq

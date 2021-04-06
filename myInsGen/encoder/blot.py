@@ -163,7 +163,7 @@ class iform_t(object):
         hash_mask_low = 0x7fff
         hash_mask_high = mask ^ hash_mask_low
 
-    def __init__(self, iclass, enc_conditions, enc_actions, modal_patterns, category, extension, uname=None, cpl=None):
+    def __init__(self, iclass, enc_conditions, enc_actions, modal_patterns, category, extension, binding_dir, uname=None, cpl=None):
         self.iclass = iclass
         self.uname = uname
         self.enc_conditions = enc_conditions # [ operand_t ]
@@ -183,6 +183,7 @@ class iform_t(object):
         self.cpl = cpl
         self.category = category
         self.extension = extension
+        self.binding_dir = binding_dir
 
         self.input_op = []
         self.output_op = []

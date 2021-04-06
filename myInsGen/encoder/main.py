@@ -115,15 +115,26 @@ def GetRegOnly():
                     break
     return iform_dct
 
-def CreateNTHashTable(gen, gens, htm, nt_list):
-    for nt_name in nt_list:
-        if nt_name == "XOP_TYPE_ENC":
-            a = 0
-        all_context = gen.DFSNTContext([nt_name])
+def GetNTsHashTable(gen, nt_list):
+    hashtable_lst = []
+    for nt in nt_list:
+        if isinstance(nt, str):
+            nt_name = nt
+        else:
+            nt_name = nt.name
+        all_context = gen.DFSNTContext([nt], nt)
+        if len(all_context) == 0:
+            continue
         if "_BIND" in nt_name or "_EMIT" in nt_name:
             nt_name = nt_name[:-5]
         hashtable = HashTable.HashTable(nt_name)
         hashtable.LoadContext(all_context)
+        hashtable_lst.append(hashtable)
+    return hashtable_lst
+
+def CreateNTHashTable(gen, gens, nt_list):
+    hashtable_lst = GetNTsHashTable(gen, nt_list)
+    for hashtable in hashtable_lst:
         gens.htm.AddHashTable(hashtable)
     return gens
 
@@ -155,7 +166,8 @@ if __name__ == "__main__":
         operand = fields_reader.ReadFields(all_field)
         gs.storage_fields = operand.operand_fields
         gs.state_bits = state_bits_reader.ReadState(all_state_file)
-        (gs.seqs,gs.nts,gs.ntlufs) = enc_patterns_reader.ReadEncPattern(all_enc_pattern, gs.state_bits)
+        (gs.seqs, gs.nts, gs.ntlufs, gs.repeat_seqs, gs.repeat_nts, gs.repeat_ntlufs) = \
+                            enc_patterns_reader.ReadEncPattern(all_enc_pattern, gs.state_bits)
         enc_patterns_reader.ReadEncDecPattern(all_enc_dec_pattern, gs.state_bits)
         enc_ins_reader.ReadIns(all_ins)
 
@@ -229,23 +241,26 @@ if __name__ == "__main__":
     if sd.haspkl and not needreload:
         sd.Load(HashTable.HTMLoad, htm)
     else:
-        CreateNTHashTable(gen, gens, htm, gens.ntlufs)
-        CreateNTHashTable(gen, gens, htm, gens.nts)
+        CreateNTHashTable(gen, gens, gs.ntlufs)
+        CreateNTHashTable(gen, gens, gs.nts)
+        for nt_name in gs.repeat_nts:
+            htm.repeat_nts[nt_name] = GetNTsHashTable(gen, gs.repeat_nts[nt_name])
+        for nt_name in gs.repeat_ntlufs:
+            htm.repeat_ntlufs[nt_name] = GetNTsHashTable(gen, gs.repeat_ntlufs[nt_name])
         # CreateNTHashTable(gen, gens, htm, ["XMM_SE"])
     if save and needreload:
         sd.Save(HashTable.HTMSave, htm)
 
-    # gen.GetNTsHashTable(gen.gens.nts)
 
 # ==========================================================
 
     my_ins_filter = ins_filter.InsFilter(gens)
     # my_ins_filter.AppendReg("XED_REG_AL", "output")
-    my_ins_filter.AppendReg("GPRv_B()", "")
-    my_ins_filter.AppendReg("XED_REG_EAX", "")
     # my_ins_filter.AppendReg("GPRv_B()", "")
-    my_ins_filter["MOD"] = "3"
-    my_ins_filter["extension"] = "BASE"
+    # my_ins_filter.AppendReg("XED_REG_EAX", "")
+    # my_ins_filter.AppendReg("GPRv_B()", "")
+    my_ins_filter["MOD"] = "!3"
+    my_ins_filter["extension"] = "BASE"         # TODO: Attension: there are some special operation for AVX512VEX and AVX512EVEX
     my_ins_filter.SpecifyMode(32)
     iforms = my_ins_filter.GetIfroms()
 
@@ -263,22 +278,42 @@ if __name__ == "__main__":
 # ============== Set NT iter num ================
     nt_emitnum = {}
     nt_emitnum["FIXUP_EOSZ_ENC"] = 2
-    nt_emitnum["FIXUP_EASZ_ENC"] = 1
-    nt_emitnum["ASZ_NONTERM"] = 1
-    nt_emitnum["VEXED_REX"] = 1
+    nt_emitnum["FIXUP_EASZ_ENC"] = 2
+    nt_emitnum["ASZ_NONTERM"] = 2
     nt_emitnum["OSZ_NONTERM_ENC"] = 1
-    nt_emitnum["GPRv_B"] = 2
-    nt_emitnum["GPRv_R"] = 2
+    nt_emitnum["PREFIX_ENC"] = 1
+    nt_emitnum["REX_PREFIX_ENC"] = 1
+
+    nt_emitnum["SIB_REQUIRED_ENCODE"] = 1
+    nt_emitnum["SIBSCALE_ENCODE"] = 1
+    nt_emitnum["SIBINDEX_ENCODE"] = 1
+    nt_emitnum["SIBBASE_ENCODE"] = 1
+    nt_emitnum["MODRM_RM_ENCODE"] = 1
+    nt_emitnum["MODRM_MOD_ENCODE"] = 1
+    nt_emitnum["SEGMENT_DEFAULT_ENCODE"] = 1
+    nt_emitnum["SEGMENT_ENCODE"] = 1
+    nt_emitnum["SIB_NT"] = 1
+    nt_emitnum["DISP_NT"] = 1
     # nt_emitnum["PREFIX_ENC"] = 1
     gen.SetNTEmitNum(nt_emitnum)
 # ============== ============
+
+# ============== Set NT otherwise_first ================
+# **See Note**
+# Specify if this NT will execute otherwise **at last** (by default, otherwise will be executed first)
+# **Attension** : otherwise_first setting here only work to NTHashNode
+    nt_otherwise_last = {}
+    nt_otherwise_last["PREFIX_ENC"]
+# ============== ============
+
+    gen.SetDefaultEmitNum("1")
 
     print(len(iforms))
 
     for i in iforms:
         tmp_str = str(i).split()
         print("%s %s"%(tmp_str[0], tmp_str[1]))
-        ins_lst = gen.GeneratorIform(i, ins_filter=my_ins_filter, output_num=10000)
+        ins_lst = gen.GeneratorIform(i, ins_filter=my_ins_filter, output_num=2)
         if len(ins_lst) > 0:
             for ins in ins_lst:
                 print(ins.hex(), end="")

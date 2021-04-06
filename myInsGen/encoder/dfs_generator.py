@@ -14,7 +14,7 @@ from blot import *
 
 # The only two global variable
 prev_NT = None          # Point to previous NT, used to get a return number of previous NT(eg. OUTREG)
-prev_seqNT = None       # Point to previous sequence NT, used to bind an emit number with an seqNT
+prev_emitNT = None       # Point to previous sequence NT, used to bind an emit number with an seqNT
 
 class Node(object):
     def __init__(self, prev=None, next=None):
@@ -60,7 +60,7 @@ class ActionNode(Node):
             context[item] = value               # fixed 20210326: we also put OUTREG into context
 
     def ExecNode(self, context, depth=None):
-        global prev_seqNT
+        global prev_emitNT
         if self.act.nt:
             try:
                 global prev_NT
@@ -77,8 +77,11 @@ class ActionNode(Node):
             else:                   # if action is "error", return false
                 flag = False
         elif self.act.type == "emit":
-            if prev_seqNT:
-                context["emit"].append((prev_seqNT.name, self.act))
+            if prev_emitNT:
+                if isinstance(prev_emitNT, str):
+                    context["emit"].append((prev_emitNT, self.act))
+                else:
+                    context["emit"].append((prev_emitNT.name, self.act))
             else:
                 context["emit"].append(("", self.act))
             flag = True
@@ -164,13 +167,14 @@ class ConditionNode(Node):
 
 
 class NTNode(Node):
-    def __init__(self, nt, gens, obj=None, prev=None, next=None, name="", binding_seqNT=None):
+    def __init__(self, nt, gens, obj=None, prev=None, next=None, name="", binding_emitNT=None):
         super(NTNode, self).__init__(prev, next)
         self.name = name
         self.nt = nt
         self.gens = gens
         self.obj = obj                                      # save the binding action or condition, is none for seqnt or iform_t
         self.init_context = None
+        self.otherwise_first = True                         # if is true, otherwise will be execute first
         if obj != None:
             if isinstance(obj, action_t):
                 self.nt_binding = "act"
@@ -195,10 +199,12 @@ class NTNode(Node):
 
         self.rule_len = len(self.rules)
         self.is_seqnt = False
-        self.binding_seqNT = binding_seqNT
+        self.binding_seq = None
+        self.binding_emitNT = binding_emitNT
 
     def __iter__(self):
         self.rule_num = 0
+        self.last_emit_num = None
         self.nodelst = []
         if self.otherwise:
             self.otherwise_done = False
@@ -207,22 +213,23 @@ class NTNode(Node):
         return self
 
     def __next__(self):
-        global prev_seqNT
+        global prev_emitNT
         global prev_NT
 
         prev_NT = self
-        prev_seqNT = self.binding_seqNT
+        prev_emitNT = self.binding_emitNT
 
-        if not self.otherwise_done:
-            self.otherwise_done = True
-            self.UnlinkOldRule()
-            self.BuildOtherwise(self.otherwise)
-            return self
-        if self.rule_num < self.rule_len:
+        exec_otherwise = not self.otherwise_done and self.otherwise_first
+
+        if not exec_otherwise and self.rule_num < self.rule_len:
             self.UnlinkOldRule()
             rule = self.rules[self.rule_num]
             self.rule_num += 1
             self.BuildOneRule(rule)
+        elif not self.otherwise_done:
+            self.otherwise_done = True
+            self.UnlinkOldRule()
+            self.BuildOtherwise(self.otherwise)
         else:
             raise StopIteration
         return self
@@ -262,7 +269,7 @@ class NTNode(Node):
                     if not nt_name in self.gens.ntlufs:
                         raise KeyError("err: NTNode next: Can not find nt %s" %nt_name)
                     nt = self.gens.ntlufs[nt_name]
-                    p1 = CreateNTNode(nt, self.gens, cond, name=nt_name, binding_seqNT=self.binding_seqNT)
+                    p1 = CreateNTNode(nt, self.gens, cond, name=nt_name, binding_emitNT=self.binding_emitNT)
                     p2 = ConditionNode(cond)            # TODO: special operation for nt condition
                 else:
                     p1 = ConditionNode(cond)
@@ -318,7 +325,7 @@ class NTNode(Node):
                         raise KeyError("err: NTNode next: Can not find ntluf %s" %nt_name)
                     nt = self.gens.ntlufs[nt_name]
                 if not is_seq:
-                    p1 = CreateNTNode(nt, self.gens, act, name=nt_name, binding_seqNT=self.binding_seqNT)
+                    p1 = CreateNTNode(nt, self.gens, act, name=nt_name, binding_emitNT=self.binding_emitNT)
                     p2 = None
                 else:                                       # nt is a sequence
                     p1 = None                               # use as p_head
@@ -328,8 +335,9 @@ class NTNode(Node):
                         nt_name = nt_name[:-5]
                         nt = self.gens.nts[nt_name]
                         p = CreateNTNode(nt, self.gens, name=nt_name)
-                        p.binding_seqNT = p             # for a seqNT, the binding_seqNT is itself
+                        p.binding_emitNT = p             # for a seqNT, the binding_emitNT is itself
                         p.is_seqnt = True
+                        p.binding_seq = seq
                         if p1 == None:
                             p1 = p
                         else:
@@ -443,12 +451,15 @@ class NTNode(Node):
 # If you want to emulate other context, you should rebuild a NTHashTableNode, 
 # which is just like NTNode only binding with one init_context
 class NTHashTableNode(Node):
-    def __init__(self, nt, hashtable, prev=None, next=None, binding_seqNT=None):
+    def __init__(self, nt, hashtable, prev=None, next=None, binding_emitNT=None):
         super(NTHashTableNode, self).__init__(prev, next)
         self.type = "hashnode"
         self.name = nt.name
         self.hashtable = hashtable
-        self.binding_seqNT = binding_seqNT
+        self.binding_emitNT = binding_emitNT
+        self.is_seqnt = False
+        self.otherwise_first = True
+        self.binding_seq = None
         self.nodelst = [self]
 
     def __iter__(self):
@@ -457,14 +468,15 @@ class NTHashTableNode(Node):
         self.init_context = None
         self.act_context = None
         self.num = 0
+        self.last_emit_num = None
         return self
 
     def __next__(self):
         global prev_NT
-        global prev_seqNT
+        global prev_emitNT
 
         prev_NT = self
-        prev_seqNT = self.binding_seqNT
+        prev_emitNT = self.binding_emitNT
 
         if self.init_context:
             self.act_context = next(self.context_iter)[1]
@@ -487,7 +499,7 @@ class NTHashTableNode(Node):
             context = copy.deepcopy(self.init_context)
         else:                               # init here
             self.init_context = context
-            self.context_set = self.hashtable.GetActContext(context)
+            self.context_set = self.hashtable.GetActContext(context, self.otherwise_first)
             self.context_iter = iter(self.context_set)
             context = copy.deepcopy(self.init_context)      # use a new context to do following things
             try:
@@ -526,17 +538,28 @@ class HeadNode(Node):                     # used as a head or tail of a sequence
     def __str__(self):
         return "HEAD===="
 
-def CreateNTNode(nt, gens, obj=None, prev=None, next=None, name="", binding_seqNT=None):
+
+class EmitNode(Node):
+    def __init__(self, name, prev=None, next=None):
+        super(EmitNode, self).__init__(prev, next)
+        self.type = "emit"
+        self.is_seq = False
+        self.name = name
+        self.index = 0
+        self.child = []
+
+
+def CreateNTNode(nt, gens, obj=None, prev=None, next=None, name="", binding_emitNT=None):
     if isinstance(nt, nonterminal_t):
         nt_name = nt.name
         htm = gens.htm
         if nt_name in htm:
             hashtable = htm[nt_name]
-            node = NTHashTableNode(nt, hashtable, prev, next, binding_seqNT)
+            node = NTHashTableNode(nt, hashtable, prev, next, binding_emitNT)
         else:
-            node = NTNode(nt, gens, obj, prev, next, name, binding_seqNT)
+            node = NTNode(nt, gens, obj, prev, next, name, binding_emitNT)
     else:
-        node = NTNode(nt, gens, obj, prev, next, name, binding_seqNT)
+        node = NTNode(nt, gens, obj, prev, next, name, binding_emitNT)
     return node
 
 
@@ -555,6 +578,7 @@ class Emulator(object):
 
         self.route = []
         self.route_num = []
+        self.default_emit_num = "0"
         # self.tst_ins_set_dict = {}
 
     def __iter__(self):
@@ -592,12 +616,12 @@ class Emulator(object):
                 self.route.append(node)
             except StopIteration:
                 node.ClearIter()
-                ret_node = None
+                ret_node = node
                 ret_num = -1
                 self.depth -= 1
                 self.node = node.prev       # backtracking
         else:                               # this path has reached the end, must output
-            ret_node = None
+            ret_node = node
             ret_num = -2
             self.depth -= 1
             self.node = node.prev
@@ -640,7 +664,14 @@ class Emulator(object):
         while node.type != "head":      # if we haven't readched the end
             if node.type == "nt" or node.type == "iform" or node.type == "hashnode":
                 if node.name in self.nt_emitnum_limit:
-                    self.nt_emitnum[node.name] += 1
+                    iter_num = node.GetIterNum()
+                    if not node.last_emit_num:
+                        node.last_emit_num = iter_num
+                        self.nt_emitnum[node.name] += 1
+                    else:
+                        if node.last_emit_num != iter_num:     # if current emit use a new NTContext than last emit, add nt_emitnum
+                            self.nt_emitnum[node.name] += 1
+                            node.last_emit_num = iter_num
             node = node.next
         return self.nt_emitnum
 
@@ -655,14 +686,15 @@ class Emulator(object):
                 p = CreateNTNode(nt, self.gens, name=nt_name)
             else:
                 p = CreateNTNode(iform, self.gens, name="INSTRUCTIONS")
-            p.binding_seqNT = p             # for a seqNT, the binding_seqNT is itself
+            p.binding_emitNT = p             # for a seqNT, the binding_emitNT is itself
+            p.binding_seq = seq
+            p.is_seqnt = True
             if head == None:
                 head = HeadNode(next=p)
             else:
                 p.prev = p_prev
                 p_prev.next = p
             p_prev = p
-            p.is_seqnt = True
         p = HeadNode(prev=p_prev)           # add an end point
         p_prev.next = p
         return head
@@ -673,14 +705,15 @@ class Emulator(object):
             mystr += "%s\t" %str(i)
         return mystr
 
-    def DFSNTContext(self, nt_name_lst, binding_seq=None):
+    def DFSNTContext(self, nt_lst, binding_emit=None):       # nt_lst can be a list of str or nonterminal_t
         nts = self.gens.nts
         ntlufs = self.gens.ntlufs
 
         first_nt = None
         prev_nt = None
-        for nt_name in nt_name_lst:
-            if isinstance(nt_name, str):
+        for nt in nt_lst:
+            if isinstance(nt, str):
+                nt_name = nt
                 # if nt_name == "SIBBASE_ENCODE":             # just 4 debug
                 #     a = 0
                 if "_BIND" in nt_name or "_EMIT" in nt_name:
@@ -693,8 +726,10 @@ class Emulator(object):
                     else:
                         nt = ntlufs[nt_name]
             else:
-                nt = nt_name
-            p = CreateNTNode(nt, self.gens, name=nt_name, binding_seqNT=binding_seq)
+                nt_name = nt.name
+            if not nt:                          # nt is none, occurs when nt is in repeat_nts pr repeat_ntlufs
+                return []
+            p = CreateNTNode(nt, self.gens, name=nt_name, binding_emitNT=binding_emit)
             if first_nt == None:
                 first_nt = p
             else:
@@ -759,6 +794,7 @@ class Emulator(object):
                 # print(node)
             elif depth == -1:
                 backtrack = True
+                node.touchflag = False
             elif depth == -2:
                 # if num == 11:         # just 4 debug
                 #     a = 0
@@ -780,12 +816,12 @@ class Emulator(object):
         all_context = self.DFSNTContext(seq.nonterminals, seq)
         return all_context
 
-    def DFSExecSeqBind(self, seqname, emit_seqname, iform=None, init_context=None, weak_context=None, output_num=1):
+    def DFSExecSeqBind(self, seqname, iform=None, init_context=None, weak_context=None, output_num=1):
         if not seqname in self.gens.seqs:
             raise KeyError("_ExecSeq: Cannot find seqname: %s" %seqname)
 
-        if not emit_seqname in self.gens.seqs:
-            raise KeyError("_ExecSeq: Cannot find emit seqname: %s" %emit_seqname)
+        # if not emit_seqname in self.gens.seqs:
+        #     raise KeyError("_ExecSeq: Cannot find emit seqname: %s" %emit_seqname)
 
         if init_context != None:
             context = init_context
@@ -794,7 +830,7 @@ class Emulator(object):
 
         self.iform = iform
         seq = self.gens.seqs[seqname]
-        emit_seq = self.gens.seqs[emit_seqname]
+        # emit_seq = self.gens.seqs[emit_seqname]
         self.head = self.BuildSeqNode(seq, iform)
 
         self.nt_emitnum = {}
@@ -809,9 +845,9 @@ class Emulator(object):
                     self.InvalidPath()
                 # print(node)
             elif depth == -1:
-                pass
+                node.touchflag = False
             elif depth == -2:
-                ins_str = self.EmitCode(context, emit_seq)
+                ins_str = self.EmitCode(context, self.route)
                 self.ins_set.add(ins_str)
                 num += 1
                 self.RefreshNTEmitNum()
@@ -823,13 +859,131 @@ class Emulator(object):
         self.route_num.clear()
         return 0
 
+    def BuildEmitTree(self, route):
+        head = None
+        prev = None
+        seq = self.gens.seqs["ISA_BINDINGS"]
+        seq_node = EmitNode("ISA_BINDINGS")
+        seq_node.is_seq = True
+        seq_lst = [seq_node]
+        for seq_nt_name in seq.nonterminals:
+            p = EmitNode(seq_nt_name.replace("_BIND", ""))
+            if not head:
+                head = p
+            else:
+                prev.next = p
+                p.prev = prev
+            prev = p
+            seq_node.child.append(p)
+
+        nt_name = ""
+        emit_node = head
+        stack = []
+        current_emit_seq = seq_lst[0]
+        for node in route:                      # traver route of execution and build a tree that indicate where
+                                                # every sequence executed
+            flag = False
+            emit_seq = None
+            nt_name = None
+            if node.type == "iform":
+                nt_name = "INSTRUCTIONS"
+                emit_seq = "ISA_BINDINGS"
+            elif node.type == "nt" or node.type == "hashnode":
+                # if node.is_seqnt:
+                nt_name = node.name
+                if node.binding_seq:
+                    emit_seq = node.binding_seq.name
+            if nt_name:
+                while not emit_node:
+                    emit_node, current_emit_seq = stack.pop()
+                if nt_name == emit_node.name:
+                    emit_node = emit_node.next
+                else:
+                    if node.is_seqnt:
+                        seq_node = EmitNode(emit_seq)
+                        seq_node.is_seq = True
+                        seq_lst.append(seq_node)
+                        emit_node.prev.child.append(seq_node)    # new sequence is added into a NT's chil
+                        seq = self.gens.seqs[emit_seq]
+                        prev = None
+                        for seq_nt_name in seq.nonterminals:
+                            p = EmitNode(seq_nt_name.replace("_BIND", ""))
+                            if prev:
+                                prev.next = p
+                                p.prev = prev
+                            prev = p
+                            seq_node.child.append(p)
+                        stack.append( (emit_node, current_emit_seq) )
+                        current_emit_seq = seq_node
+                        emit_node = seq_node.child[0]
+                        if emit_node.name == nt_name:
+                            emit_node = emit_node.next
+                        else:
+                            raise ValueError("Emit name not Equal to nt_name")
+                    else:
+                        node = EmitNode(nt_name)
+                        emit_node.prev.child.append(node)
+
+        for seq_node in seq_lst:                             # now we rebuild the tree with emit order
+            if seq_node.name == "ISA_BINDINGS":
+                seq = self.gens.seqs["ISA_EMIT"]
+            else:
+                name = seq_node.name.replace("_BIND", "_EMIT")
+                seq = self.gens.seqs[name]
+            old_child = seq_node.child
+            new_child = []
+            prev = None
+            for nt_name in seq.nonterminals:
+                nt_name = nt_name.replace("_EMIT", "")
+                flag = False
+                for node in old_child:
+                    if node.name == nt_name:
+                        flag = True
+                        new_child.append(node)
+                        if prev:
+                            prev.next = node
+                        node.prev = None
+                        prev = node
+                        break
+                if not flag:
+                    ValueError("Cannot Find Emit Node in Sequence")
+            seq_node.child = new_child
+            prev.next = None                        # the last node's next must be None
+
+        emit_nt_lst = []
+        stack = []
+        node = seq_lst[0]
+        index = 0
+        while node:
+            if node.is_seq:
+                node = node.child[0]
+            else:
+                if node.index == 0:
+                    emit_nt_lst.append(node.name)
+                if node.index < len(node.child):
+                    stack.append(node)
+                    tmp = node.index
+                    node.index += 1
+                    node = node.child[tmp]
+                else:
+                    if node.next:
+                        node = node.next
+                    elif len(stack):
+                        node = stack.pop()
+                    else:
+                        node = None
+
+        return emit_nt_lst
+
     # when important_NT specify, any output that without executing important_NT will be ignore
     # def EmitCode(self, context, emitseq, important_NT=None, print=False):
-    def EmitCode(self, context, emitseq):
+    def EmitCode(self, context, route):
         emit_lst = context["emit"]
         ins_hex = []
         tmp_num = 0         # fill bits from bottom
         shift_num = 0
+
+        emit_nt_lst = self.BuildEmitTree(route)
 
         # if important_NT:
         #     important = True
@@ -838,8 +992,7 @@ class Emulator(object):
         # else:
         #     important = False
 
-        for name in emitseq.nonterminals:
-            nt_name = name[:-5]
+        for nt_name in emit_nt_lst:
             for emit_name, act in emit_lst:
                 if emit_name == nt_name:
                     # if important and nt_name in important_NT:
@@ -856,11 +1009,13 @@ class Emulator(object):
                             ins_hex.append(tmp_num & mask)
                             tmp_num = tmp_num >> 8
                     elif act.emit_type == "letters":
-                        key = act.field_name.upper()
+                        key = act.field_name
+                        if key:
+                            key = key.upper()
                         if key in context:
                             context_value = context[key]
                             if context_value == "*":
-                                context_value = "0"
+                                context_value = self.default_emit_num
                             int_value = int(context_value)
                             tmp_num = tmp_num << act.nbits
                             act_value_mask = (1 << act.nbits) - 1
@@ -883,10 +1038,11 @@ class Emulator(object):
                                 shift_num -= 8
                                 ins_hex.append(tmp_num & mask)
                                 tmp_num = tmp_num >> 8
-                            logger.info("Assume %s  Emit 0" %str(act))
+                            logger.warning("Assume %s  Emit 0" %str(act))
                             # logger.error("err: GeneratorIform: Cannot emit letter type value %s" %act.value)
                     else:
                         logger.error("err: GeneratorIform: Unknown emit type: %s" %act.emit_type)
+                        raise ValueError("err: GeneratorIform: Unknown emit type: %s" %act.emit_type)
         ins_str = bytes(ins_hex)
         return ins_str
         # if not ins_str in self.tst_ins_set_dict:              # for testing output and its' context

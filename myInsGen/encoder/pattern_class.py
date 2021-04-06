@@ -8,11 +8,12 @@ from global_init import *
 
 
 class nonterminal_t(object):
-    def __init__(self, name, rettype=None):
+    def __init__(self, name, binding_dir, rettype=None):
         """
         The return type is for the NLTUFs only.
         """
         self.name = name
+        self.binding_dir = binding_dir
         self.rettype = rettype # if non None, then this is a NTLUF
         self.rules = []
 
@@ -212,8 +213,9 @@ class conditions_t(object):
 
 
 class sequencer_t(object):
-    def __init__(self, name):
+    def __init__(self, name, binding_dir):
         self.name = name
+        self.binding_dir = binding_dir
         self.nonterminals = []
     def add(self,nt):
         t = nt_name_pattern.search(nt)
