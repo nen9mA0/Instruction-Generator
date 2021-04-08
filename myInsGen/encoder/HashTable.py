@@ -58,27 +58,36 @@ class HashTable(object):
     #     tmp.sort()
     #     return " ".join(tmp)
 
-    def LoadContext(self, all_context):
+    def LoadContext(self, all_context):             # bug fixed 20210407: previous implement only assume that every context in one NT has the same condition key
+                                                    # **see note**
         self.all_context = all_context
+        for context in all_context:                 # first create all key
+            for key in context[0]:
+                if not key in self.keyname:
+                    self.keyname[key] = {' ':[]}
+
         for context in all_context:
             if len(context[0]):
-                for key in context[0]:
-                    value = context[0][key]
-                    if not value[0] == "!":
-                        if not key in self.keyname:
-                            self.keyname[key] = {}
-                        if not value in self.keyname[key]:
-                            self.keyname[key][value] = [context]
-                        else:
-                            self.keyname[key][value].append(context)
-                    else:                       # for neq
-                        if not key in self.neqkey:
-                            self.neqkey[key] = {}
-                        raw_value = value[1:]
-                        if not raw_value in self.neqkey[key]:
-                            self.neqkey[key][raw_value] = [context]
-                        else:
-                            self.neqkey[key][raw_value].append(context)
+                for key in self.keyname:
+                    if key in context[0]:
+                        value = context[0][key]
+                        if not value[0] == "!":
+                            if not key in self.keyname:
+                                self.keyname[key] = {}
+                            if not value in self.keyname[key]:
+                                self.keyname[key][value] = [context]
+                            else:
+                                self.keyname[key][value].append(context)
+                        else:                       # for neq
+                            if not key in self.neqkey:
+                                self.neqkey[key] = {}
+                            raw_value = value[1:]
+                            if not raw_value in self.neqkey[key]:
+                                self.neqkey[key][raw_value] = [context]
+                            else:
+                                self.neqkey[key][raw_value].append(context)
+                    else:
+                        self.keyname[key][' '].append(context)      # if there is no such condition in context, just add it into key ' '
             else:
                 if not self.otherwise:
                     self.otherwise = [context]
@@ -88,61 +97,41 @@ class HashTable(object):
 
     def GetActContext(self, context, otherwise_first=True):
         ret = None
-        for key in context:
-            if not key == "emit":
+        for key in self.keyname:
+            if key in context:
+                context_lst = []
+                context_lst.extend(self.keyname[key][' '])      # no matter the condition is equal or not, keyname[key][' '] will always satisfy the condition
                 value = context[key]
                 if not value[0] == "!":
-                    if key in self.keyname:
-                        if value in self.keyname[key]:
-                            context_lst = self.keyname[key][value]
-                            if ret:
-                                ret = ret & set(context_lst)
-                            else:
-                                ret = set(context_lst)
-
-                    if key in self.neqkey:      # test if conditions in context satisfy not equal conditions
-                        context_lst = []
+                    if value in self.keyname[key]:
+                        context_lst.extend(self.keyname[key][value])
+                    elif  "*" in self.keyname[key]:
+                        context_lst.extend(self.keyname[key]["*"])
+                    if key in self.neqkey:
                         for neq_value in self.neqkey[key]:
                             if value != neq_value:
                                 context_lst.extend(self.neqkey[key][neq_value])
-                        if ret:
-                            ret = ret & set(context_lst)
-                        else:
-                            ret = set(context_lst)
-                else:                           # if there are not equal conditions in context. This case will occur only when we specify a not equal condition manually
-                    context_lst = []
-                    if key in self.keyname:
-                        neq_value = value[1:]
-                        for key_value in self.keyname[key]:
-                            if key_value != neq_value:
-                                context_lst.extend(self.keyname[key][key_value])
-                        if ret:
-                            ret = ret & set(context_lst)
-                        else:
-                            ret = set(context_lst)
-                    else:
-                        pass
-                        # raise ValueError("Key %s not in keyname" %key)
-
+                else:                           # when condition is not equal
+                    neq_value = value[1:]
+                    for key_value in self.keyname[key]:
+                        if key_value != neq_value:
+                            context_lst.extend(self.keyname[key][key_value])
                     if key in self.neqkey:
-                        neq_value = value[1:]
-                        if neq_value in self.neqkey:
-                            context_lst.extend(self.neqkey[neq_value])
-                        if ret:
-                            ret = ret & set(context_lst)
-                        else:
-                            ret = set(context_lst)
-        if not ret:
-            context_lst = []
-            for key in self.keyname:
-                for value in self.keyname[key]:
-                    context_lst.extend(self.keyname[key][value])
-            for key in self.neqkey:
-                for value in self.neqkey[key]:
-                    context_lst.extend(self.neqkey[key][value])
-            ret = set(context_lst)
+                        if neq_value in self.neqkey[key]:
+                            context_lst.extend(self.neqkey[key][neq_value])
+            else:                               # if key not in context, return all context
+                context_lst = self.all_context
+
+            if ret:
+                ret = ret & set(context_lst)
+            else:
+                ret = set(context_lst)
+
         if self.otherwise:
-            ret = ret | set(self.otherwise)
+            if ret:
+                ret = ret | set(self.otherwise)
+            else:
+                ret = set(self.otherwise)
         ret_lst = list(ret)
         ret_lst.sort(key=lambda obj: obj.id)        # by default(all NTNode's otherwise_first field are True), the id of otherwise will always smaller than others
         if self.otherwise and not otherwise_first:  # if otherwise_first is False, we exchange otherwise(in ret_lst[0] if it has otherwise) with the last element
@@ -160,6 +149,8 @@ class HashTable(object):
             elif key == "OUTREG":
                 has_outreg = True
                 outreg = act_context[key]
+            elif act_context[key] == "*":
+                pass
             else:
                 context[key] = act_context[key]
         return has_outreg, outreg

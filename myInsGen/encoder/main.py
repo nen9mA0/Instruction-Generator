@@ -279,41 +279,46 @@ if __name__ == "__main__":
     nt_emitnum = {}
     nt_emitnum["FIXUP_EOSZ_ENC"] = 2
     nt_emitnum["FIXUP_EASZ_ENC"] = 2
-    nt_emitnum["ASZ_NONTERM"] = 2
+    nt_emitnum["ASZ_NONTERM"] = 1
     nt_emitnum["OSZ_NONTERM_ENC"] = 1
-    nt_emitnum["PREFIX_ENC"] = 1
+    nt_emitnum["PREFIX_ENC"] = 2
     nt_emitnum["REX_PREFIX_ENC"] = 1
 
-    nt_emitnum["SIB_REQUIRED_ENCODE"] = 1
-    nt_emitnum["SIBSCALE_ENCODE"] = 1
-    nt_emitnum["SIBINDEX_ENCODE"] = 1
-    nt_emitnum["SIBBASE_ENCODE"] = 1
-    nt_emitnum["MODRM_RM_ENCODE"] = 1
-    nt_emitnum["MODRM_MOD_ENCODE"] = 1
-    nt_emitnum["SEGMENT_DEFAULT_ENCODE"] = 1
-    nt_emitnum["SEGMENT_ENCODE"] = 1
-    nt_emitnum["SIB_NT"] = 1
-    nt_emitnum["DISP_NT"] = 1
+    nt_emitnum["iform"] = 1
+
+    nt_emitnum["SIB_REQUIRED_ENCODE"] = 2
+    nt_emitnum["SIBSCALE_ENCODE"] = 2
+    nt_emitnum["SIBINDEX_ENCODE"] = 2
+    nt_emitnum["SIBBASE_ENCODE"] = 2
+    nt_emitnum["MODRM_RM_ENCODE"] = 2
+    nt_emitnum["MODRM_MOD_ENCODE"] = 2
+    nt_emitnum["SEGMENT_DEFAULT_ENCODE"] = 2
+    nt_emitnum["SEGMENT_ENCODE"] = 2
+    nt_emitnum["SIB_NT"] = 2
+    nt_emitnum["DISP_NT"] = 2
     # nt_emitnum["PREFIX_ENC"] = 1
     gen.SetNTEmitNum(nt_emitnum)
 # ============== ============
 
 # ============== Set NT otherwise_first ================
 # **See Note**
-# Specify if this NT will execute otherwise **at last** (by default, otherwise will be executed first)
+# Specify if this NT will execute otherwise **first**
 # **Attension** : otherwise_first setting here only work to NTHashNode
-    nt_otherwise_last = {}
-    nt_otherwise_last["PREFIX_ENC"]
+    nt_otherwise_first = {}
+    nt_otherwise_first["PREFIX_ENC"] = True
+    nt_otherwise_first["REX_PREFIX_ENC"] = True
+    gen.SetOtherwiseFirst(nt_otherwise_first)
 # ============== ============
 
-    gen.SetDefaultEmitNum("1")
+    gen.SetDefaultValidEmitNum("1")
+    gen.SetDefaultNovalueEmitNum("2")
 
     print(len(iforms))
 
     for i in iforms:
         tmp_str = str(i).split()
         print("%s %s"%(tmp_str[0], tmp_str[1]))
-        ins_lst = gen.GeneratorIform(i, ins_filter=my_ins_filter, output_num=2)
+        ins_lst = gen.GeneratorIform(i, ins_filter=my_ins_filter, output_num=20)
         if len(ins_lst) > 0:
             for ins in ins_lst:
                 print(ins.hex(), end="")

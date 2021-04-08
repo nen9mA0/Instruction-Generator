@@ -15,18 +15,25 @@ class Generator(object):
     def __getattr__(self, item):
         return getattr(self.emu, item)
 
-    def SetDefaultEmitNum(self, num_str):
-        self.emu.default_emit_num = num_str
+    def SetDefaultValidEmitNum(self, num_str):
+        self.emu.default_valid_emit_num = num_str
+
+    def SetDefaultNovalueEmitNum(self, num_str):
+        self.emu.default_novalue_emit_num = num_str
 
     def SetNTIterNum(self, iternum_dict):
-        for nt in iternum_dict:
-            self.emu.nt_iternum[nt] = iternum_dict[nt]
+        self.emu.nt_iternum = iternum_dict
         return self.emu.nt_iternum
 
     def SetNTEmitNum(self, emitnum_dict):
-        for nt in emitnum_dict:
-            self.emu.nt_emitnum_limit[nt] = emitnum_dict[nt]
+        self.emu.nt_emitnum_limit = emitnum_dict
+        if "iform" in emitnum_dict:
+            self.emu.iform_emit_limit = emitnum_dict["iform"]
         return self.emu.nt_emitnum_limit
+
+    def SetOtherwiseFirst(self, otherwise_first_dict):
+        self.emu.otherwise_first_dict = otherwise_first_dict
+        return self.emu.otherwise_first_dict
 
     def GeneratorIform(self, iform, ins_filter=None, output_num=1):        # a iform_t structure only contains one rule_t
         self.emu.ResetInslst()
