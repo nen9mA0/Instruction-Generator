@@ -166,6 +166,11 @@ class ConditionNode(Node):
         return str(self.cond)
 
 
+# **Attension**: See Note
+#                Because the way we treat otherwise is different from NTHashNode, 
+#                so please DON'T use NTNode to handle NTs instead of NTHashNode in GeneratorIform.
+#                In the current implementation, NTNode is only used to handle iform_t.
+#                Fixed 20210409
 class NTNode(Node):
     def __init__(self, nt, gens, obj=None, prev=None, next=None, name="", binding_emitNT=None, otherwise_first_dict=None):
         super(NTNode, self).__init__(prev, next)
@@ -564,7 +569,10 @@ def CreateNTNode(nt, gens, obj=None, prev=None, next=None, name="", binding_emit
                     node.otherwise_first = otherwise_first_dict[nt_name]        # Attension: only NTHashTableNode will set otherwise_first flag
                                                                                 # according to otherwise_first_dict. See develop_note/note.md for reason
         else:
-            node = NTNode(nt, gens, obj, prev, next, name, binding_emitNT, otherwise_first_dict)
+            if not htm.done:
+                node = NTNode(nt, gens, obj, prev, next, name, binding_emitNT, otherwise_first_dict)
+            else:                                                               # fixed 20210409, because of bug(see note:20210408), we CAN'T simply use NTNode to handle NTs
+                raise ValueError("Use NTNode to handle NT after HashTableNode has already created")
     else:
         node = NTNode(nt, gens, obj, prev, next, name, binding_emitNT, otherwise_first_dict)
     return node
@@ -1033,34 +1041,38 @@ class Emulator(object):
                         key = act.field_name
                         if key:
                             key = key.upper()
-                        if key in context:
-                            context_value = context[key]
-                            if context_value == "*":
-                                context_value = self.default_valid_emit_num
-                            int_value = int(context_value)
-                            tmp_num = tmp_num << act.nbits
-                            act_value_mask = (1 << act.nbits) - 1
-                            tmp_num |= (int_value & act_value_mask)    # TODO: Emit Immediate
-                            shift_num += act.nbits
-                            while shift_num >= 8:
-                                mask = 0xff << (shift_num - 8)
-                                shift_num -= 8
-                                ins_hex.append(tmp_num & mask)
-                                tmp_num = tmp_num >> 8
-                        else:
-                            # if act.nbits == 3:                                # TODO: now this case is just for emit rrr or nnn
-                            int_value = int(self.default_novalue_emit_num)      # TODO: now this case assume the value is simply a 0
-                            tmp_num = tmp_num << act.nbits
-                            act_value_mask = (1 << act.nbits) - 1
-                            tmp_num |= (int_value & act_value_mask)
-                            shift_num += act.nbits
-                            while shift_num >= 8:
-                                mask = 0xff << (shift_num - 8)
-                                shift_num -= 8
-                                ins_hex.append(tmp_num & mask)
-                                tmp_num = tmp_num >> 8
-                            logger.warning("Assume %s  Emit 0" %str(act))
-                            # logger.error("err: GeneratorIform: Cannot emit letter type value %s" %act.value)
+                            if key in context:
+                                context_value = context[key]
+                                if context_value == "*":
+                                    context_value = self.default_valid_emit_num
+                                int_value = int(context_value)
+                                tmp_num = tmp_num << act.nbits
+                                act_value_mask = (1 << act.nbits) - 1
+                                tmp_num |= (int_value & act_value_mask)    # TODO: Emit Immediate
+                                shift_num += act.nbits
+                                while shift_num >= 8:
+                                    mask = 0xff << (shift_num - 8)
+                                    shift_num -= 8
+                                    ins_hex.append(tmp_num & mask)
+                                    tmp_num = tmp_num >> 8
+                            else:
+                                # if act.nbits == 3:                                # TODO: now this case is just for emit rrr or nnn
+                                int_value = int(self.default_novalue_emit_num)      # TODO: now this case assume the value is simply a 0
+                                tmp_num = tmp_num << act.nbits
+                                act_value_mask = (1 << act.nbits) - 1
+                                tmp_num |= (int_value & act_value_mask)
+                                shift_num += act.nbits
+                                while shift_num >= 8:
+                                    mask = 0xff << (shift_num - 8)
+                                    shift_num -= 8
+                                    ins_hex.append(tmp_num & mask)
+                                    tmp_num = tmp_num >> 8
+                                logger.warning("Assume %s  Emit 0" %str(act))
+                                # logger.error("err: GeneratorIform: Cannot emit letter type value %s" %act.value)
+                        else:                       # act.field_name == None
+                            value = act.value
+                            
+
                     else:
                         logger.error("err: GeneratorIform: Unknown emit type: %s" %act.emit_type)
                         raise ValueError("err: GeneratorIform: Unknown emit type: %s" %act.emit_type)

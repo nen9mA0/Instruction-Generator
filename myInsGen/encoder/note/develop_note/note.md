@@ -65,6 +65,21 @@ neqkey:
 
 其中无该条件的以空格为键，实际上存放的就是全集对其他键的集合的补集
 
+#### 20210408
+
+新bug：
+
+* 首先现阶段对于otherwise处理是有问题的：otherwise只能在其他条件都不满足时才会执行，而现在即使满足其他条件也会执行。
+
+  理论上otherwise应该仅在这两种情况下会执行
+
+  * context中当前没有任何与正在执行的NT条件相关的内容，应遍历执行NT中的所有情况，包括otherwise
+  * 当前context不满足所有的rule，则执行otherwise
+
+* 还有就是检查的时候发现一种emit方式，见REX_PREFIX_ENC，具体为：
+
+  emit类型为letter，value为wrxb，其中wrxb分别context中的REXW REXR REXX和REXB
+
 
 
 ### 一些设计
@@ -206,6 +221,8 @@ FIXUP_EOSZ_ENC_2 FIXUP_EASZ_ENC_4 ASZ_NONTERM_3 输出
 
 #### otherwise_first
 
+otherwise机制改动见下面
+
 `relative: Generator.SetOtherwiseFirst  Emulator.otherwise_first_dict  NTNode.otherwise_first_dict  CreateNTNode`
 
 这个机制是用于控制一些NT是否先执行otherwise的
@@ -220,6 +237,37 @@ FIXUP_EOSZ_ENC_2 FIXUP_EASZ_ENC_4 ASZ_NONTERM_3 输出
 
 PS：上述描述也表明最好不要对NTNode设置otherwise_first（除非知道自己在干嘛）。此外基于同样的考虑，专门用于生成HashTable的DFSNTContext函数在调用CreateNTNode时没有使用otherwise_first_dict参数
 
+#### otherwise
+
+在[20210408](#20210408)中提到了一个新bug，由于当前NTNode只用于创建hashtable，而hashtable的创建条件都符合bug描述中提到的执行otherwise的第一种情况，所以只要NTNode不直接用于代替HashNodeTable生成指令，则当前bug不会导致错误（当前的实现中，所有NT已经建表）。
+
+而因为对这种情况修改NTNode的otherwise比较复杂一些
+
+* NTNode的otherwise_first标志肯定不能用了，因为对于NTNode只有知道其他rules的运行情况才能获知当前条件下能不能执行otherwise
+* 仅在下面两种情况下应执行otherwise
+  * 所有的其他rules都能满足条件，即对应[20210408](#20210408)的第一种情况
+  * 所有其他rules都不能满足条件，对应第二种情况
+
+因为修改较为麻烦而且当前没必要（NTNode当前在生成指令过程中只用来处理iform，而iform没有otherwise）
+
+所以**当前仅修改NTHashNode**，也就是说明在GenerateIform中，除了iform_t外，其他都不应使用NTNode（这个限制现在已经加入CreateNTNode，虽然感觉很不优雅）
+
+##### TODO：修改NTNode思路
+
+* dfs_generator有个全局变量prev_NT，此外Emulator类也有个prev_nt属性，这两者都记录了上一个NT
+* NTNode有个成员nodelst，记录了self，和从自己派生的所有node
+* 在执行中，若条件不符合，使用InvalidPath来将当前路径删除
+
+因此思路如下：
+
+* 首先otherwise肯定是要最后执行了
+* 在NTNode中定义一个用于记录当前条件成功次数的变量a，该变量与两个地方有关联：
+  * 刷新prev_NT时，这说明之前NT的条件已经满足，a+1
+  * InvalidPath时，这说明之前NT的条件不满足（但这里其实不需要修改，因为计数不变）
+* 若所有条件执行完，只剩otherwise，则先判断a
+  * 若`a==rule_len`，说明所有rule都被执行过，也就对应上述第一种执行otherwise的情况
+  * 若`a==0`，说明所有rule都不满足，对应第二种情况
+
 #### default_emit_num
 
 `relative: Emulator.default_valid_emit_num Emulator.default_novalue_emit_num`
@@ -230,3 +278,86 @@ PS：上述描述也表明最好不要对NTNode设置otherwise_first（除非知
 
 * 发射类型为letter，context中含有要发射的字段对应的属性值，但属性值为`*`，这说明这个值可以是符合位数的任意数字，默认的发射数字可以在default_valid_emit_num中指定。默认为0
 * 发射类型为letter，context中不含有对应的属性值，则使用default_novalue_emit_num指定发射的值，默认为0
+
+### xed datafile
+
+#### enc-pattern
+
+编码用的pattern，当前代码大多数的nt，全部seq都在这个文件中
+
+##### ISA_BINDINGS/ISA_EMIT
+
+总的编码过程，一共有三个版本，一个是编码大多数指令的，另外两个分别对应AVX512VEX个AVX512EVEX
+
+###### FIXUP_EOSZ_ENC
+
+指定EOSZ，即operand size
+
+###### FIXUP_EASZ_ENC
+
+指定EASZ，即address size
+
+###### ASZ_NONTERM
+
+指定ASZ，实际上就是根据67 prefix（Address-size override prefix）来确定地址操作数的长度
+
+###### OSZ_NONTERM_ENC
+
+指定OSZ/REXW，实际上是根据各种条件来确定是否使用66 prefix（Operand-size override prefix）
+
+###### PREFIX_ENC
+
+根据前面指定的prefix类型，发射对应的prefix
+
+###### REX_PREFIX_ENC
+
+根据前面指定的REX类型，发射对应的prefix
+
+##### MODRM
+
+###### SIB_REQUIRED_ENCODE
+
+用于编码SIB，即是否需要SIB字段（若需要，SIB=1）。
+
+注意eamode16（EASZ=1）的时候SIB始终为0
+
+###### SIBSCALE_ENCODE
+
+编码SIB.SIBSCALE（主要是SCALE长度），若SIB=0则直接跳过
+
+###### SIBINDEX_ENCODE
+
+根据SIB.INDEX使用的寄存器（变址寄存器）确定对应发射的位
+
+###### SIBBASE_ENCODE
+
+根据BASE0使用的寄存器（基址寄存器）确定对应发射的位
+
+###### MODRM_RM_ENCODE
+
+当SIB没有完全编码时，还有对SIB编码中涉及到MODRM.RM位的修正
+
+###### MODRM_MOD_ENCODE
+
+根据address size和displacement的长度对MODRM.MOD进行修正
+
+###### SEGMENT_DEFAULT_ENCODE
+
+根据使用的BASE0寄存器确定默认的段寄存器
+
+###### SEGMENT_ENCODE
+
+根据SEG0和默认段寄存器确定段寄存器前缀类型
+
+###### SIB_NT
+
+输出SIB字段编码
+
+###### DISP_NT
+
+输出displacement编码
+
+#### enc-dec-pattern
+
+编解码都需要用的pattern，当前代码所有ntluf，部分nt都在这个文件中
+

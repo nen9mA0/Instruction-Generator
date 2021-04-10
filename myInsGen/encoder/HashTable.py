@@ -18,6 +18,8 @@ class HashTableItem(object):            # this class is a wrapper of structure (
         self.context = context_tuple
         global hash_num
         self.id = hash_num
+        self.condition_num = 0          # number of key in cond_context
+        self.num = 0                    # number of conditions currently satisfied
         hash_num += 1
 
     # def __hash__(self):                 # hash is address of HashTableItem
@@ -36,7 +38,19 @@ class HashTableItem(object):            # this class is a wrapper of structure (
        return item
 
     def __str__(self):
-        return str(self.context)
+        mystr = "("
+        for context in self.context:
+            mystr += "{"
+            for key in context:
+                if not key == "emit":
+                    mystr += "%s:%s " %(key, context[key])
+                else:
+                    mystr += "["
+                    for emit_name, action in context["emit"]:
+                        mystr += "(%s,%s) " %(emit_name, str(action))
+                    mystr += "]"
+            mystr += "} "
+        return mystr
 
     def __repr__(self):
         return str(self.context)
@@ -49,6 +63,7 @@ class HashTable(object):
         self.keyname = {}
         self.neqkey = {}
         self.all_context = None
+        self.value_context = []       # context without otherwise
         self.otherwise = None
 
     # def GetContextHash(self, context):
@@ -68,12 +83,12 @@ class HashTable(object):
 
         for context in all_context:
             if len(context[0]):
+                self.value_context.append(context)
                 for key in self.keyname:
                     if key in context[0]:
+                        context.condition_num += 1
                         value = context[0][key]
                         if not value[0] == "!":
-                            if not key in self.keyname:
-                                self.keyname[key] = {}
                             if not value in self.keyname[key]:
                                 self.keyname[key][value] = [context]
                             else:
@@ -91,21 +106,24 @@ class HashTable(object):
             else:
                 if not self.otherwise:
                     self.otherwise = [context]
+                    context.condition_num = 1
                 else:
                     raise ValueError("Multi otherwise in NT %s: %s" %(self.name, context))
         return self.keyname
 
     def GetActContext(self, context, otherwise_first=True):
         ret = None
+        sat_lst = []
+        flag = False                     # optimization
         for key in self.keyname:
             if key in context:
+                flag = True
                 context_lst = []
-                context_lst.extend(self.keyname[key][' '])      # no matter the condition is equal or not, keyname[key][' '] will always satisfy the condition
                 value = context[key]
                 if not value[0] == "!":
                     if value in self.keyname[key]:
                         context_lst.extend(self.keyname[key][value])
-                    elif  "*" in self.keyname[key]:
+                    if  "*" in self.keyname[key]:
                         context_lst.extend(self.keyname[key]["*"])
                     if key in self.neqkey:
                         for neq_value in self.neqkey[key]:
@@ -114,30 +132,64 @@ class HashTable(object):
                 else:                           # when condition is not equal
                     neq_value = value[1:]
                     for key_value in self.keyname[key]:
-                        if key_value != neq_value:
+                        if key_value != neq_value and key_value != "*":
                             context_lst.extend(self.keyname[key][key_value])
                     if key in self.neqkey:
                         if neq_value in self.neqkey[key]:
                             context_lst.extend(self.neqkey[key][neq_value])
+                for sat_context in context_lst:     # until now, all the context in context_lst match the condition accuracy
+                    sat_context.num += 1
+                    # === check ===
+                    if sat_context.num > sat_context.condition_num:
+                        raise ValueError("Num bigger than Condition Num")
+                    # === ===
+                context_lst.extend(self.keyname[key][' '])      # no matter the condition is equal or not, keyname[key][' '] will always satisfy the condition
+                                                                # because these context don't have the key
             else:                               # if key not in context, return all context
-                context_lst = self.all_context
+                # context_lst = self.value_context
+                if not flag:
+                    context_lst = self.value_context
+                    flag = True
+                else:
+                    context_lst = None
 
-            if ret:
-                ret = ret & set(context_lst)
+            if context_lst:
+                if ret:
+                    ret = ret & set(context_lst)
+                else:
+                    ret = set(context_lst)
+
+        # check if there is any context that satisfied the condition accuracy, if not, otherwise should be added into ret_lst
+        # see note
+        flag = True            # mark if otherwise should be added
+        if ret:
+            for tmp in ret:
+                if tmp.num == tmp.condition_num:    # if there is one context that satisfied the condition accuracy, otherwise can't be added
+                    flag = False
+                    break
+        otherwise_in_retlst = False                 # if otherwise is in retlst
+        if self.otherwise and flag:
+            if not ret:
+                ret = set(self.otherwise)           # in this case, otherwise is the only context in ret, so we don't need to set otherwise_in_retlst
+                                                    # because we don't need to reorder the otherwise
             else:
-                ret = set(context_lst)
-
-        if self.otherwise:
-            if ret:
                 ret = ret | set(self.otherwise)
+                otherwise_in_retlst = True
+
+        # handle otherwise_first
+        if otherwise_in_retlst:
+            if otherwise_first:                     # otherwise.condition_num = 1, so we do the operation below for sorting
+                self.otherwise[0].num = 2           # this guarantee otherwise will be biggest element after sorting
             else:
-                ret = set(self.otherwise)
+                self.otherwise[0].num = 0           # guarantee otherwise will be smallest
+
+        # sort return list
         ret_lst = list(ret)
-        ret_lst.sort(key=lambda obj: obj.id)        # by default(all NTNode's otherwise_first field are True), the id of otherwise will always smaller than others
-        if self.otherwise and not otherwise_first:  # if otherwise_first is False, we exchange otherwise(in ret_lst[0] if it has otherwise) with the last element
-            tmp = ret_lst[0]
-            ret_lst[0] = ret_lst[-1]
-            ret_lst[-1] = tmp
+        ret_lst.sort(reverse=True, key=lambda obj: (obj.num / obj.condition_num) * 100000 + obj.id)        # by default(all NTNode's otherwise_first field are True), the id of otherwise will always smaller than others
+
+        # reset all num
+        for tmp in self.value_context:
+            tmp.num = 0
         return ret_lst
 
     def RefreshContext(self, context, act_context):
@@ -162,6 +214,7 @@ class HashTableManager(object):
         self.repeat_nts = {}
         self.repeat_ntlufs = {}
         self.seq_names = {}
+        self.done = False
 
     def AddHashTable(self, hashtable):
         name = hashtable.name

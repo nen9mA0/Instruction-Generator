@@ -7,7 +7,7 @@ import dfs_generator
 import generator_storage
 import ins_filter
 import HashTable
-
+import checker
 
 from global_init import *
 
@@ -202,7 +202,7 @@ if __name__ == "__main__":
 
     # ins_filter = generator.Filter(gen)
 
-    cs = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
+    cs = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_64)
 
     # set_iter = iter(iforms)
     # iform = next(set_iter)
@@ -232,6 +232,8 @@ if __name__ == "__main__":
 # ==========================================================
     gen = ins_filter.Generator(gens)
 # =============== Load NT Hash Table =======================
+    # needreload = True
+    # save = True
     needreload = False
     save = False
 
@@ -248,8 +250,21 @@ if __name__ == "__main__":
         for nt_name in gs.repeat_ntlufs:
             htm.repeat_ntlufs[nt_name] = GetNTsHashTable(gen, gs.repeat_ntlufs[nt_name])
         # CreateNTHashTable(gen, gens, htm, ["XMM_SE"])
+        # === check ===
+        # check if old htm is the same as new one, only when the old one is already correct, and new edition just add some optimization
+        # old_htm = HashTable.HashTableManager()
+        # sd.Load(HashTable.HTMLoad, old_htm)
+        # checker.CheckHashTableManager(old_htm, htm)
+
+        # check new htm correction
+        for ht in htm.nt_names:
+            all_context = htm.nt_names[ht].all_context
+            for context in all_context:
+                checker.CheckContextCondNum(context)
+        # === ===
     if save and needreload:
         sd.Save(HashTable.HTMSave, htm)
+    htm.done = True
 
 
 # ==========================================================
@@ -261,7 +276,7 @@ if __name__ == "__main__":
     # my_ins_filter.AppendReg("GPRv_B()", "")
     my_ins_filter["MOD"] = "!3"
     my_ins_filter["extension"] = "BASE"         # TODO: Attension: there are some special operation for AVX512VEX and AVX512EVEX
-    my_ins_filter.SpecifyMode(32)
+    my_ins_filter.SpecifyMode(64)
     iforms = my_ins_filter.GetIfroms()
 
     # my_ins_filter["REG0"] = "XED_REG_AX"       # here we just specify input and output reg
@@ -282,7 +297,7 @@ if __name__ == "__main__":
     nt_emitnum["ASZ_NONTERM"] = 1
     nt_emitnum["OSZ_NONTERM_ENC"] = 1
     nt_emitnum["PREFIX_ENC"] = 2
-    nt_emitnum["REX_PREFIX_ENC"] = 1
+    nt_emitnum["REX_PREFIX_ENC"] = 2
 
     nt_emitnum["iform"] = 1
 
@@ -305,6 +320,9 @@ if __name__ == "__main__":
 # Specify if this NT will execute otherwise **first**
 # **Attension** : otherwise_first setting here only work to NTHashNode
     nt_otherwise_first = {}
+    nt_otherwise_first["SIB_REQUIRED_ENCODE"] = True
+    nt_otherwise_first["SEGMENT_ENCODE"] = True
+    nt_otherwise_first["DISP_NT"] = True
     nt_otherwise_first["PREFIX_ENC"] = True
     nt_otherwise_first["REX_PREFIX_ENC"] = True
     gen.SetOtherwiseFirst(nt_otherwise_first)
@@ -327,8 +345,12 @@ if __name__ == "__main__":
                 i = 0
                 for insn in decode:
                     if i == 0:
+                        first_ins_size = insn.size
                         mystr += "\t%s  %s" % (insn.mnemonic, insn.op_str)
                         i += 1
+                    else:
+                        mystr += "\t\tremain %d bytes" %(len(ins) - first_ins_size)
+                        break
                 print(mystr)
         else:
             logger.warning(str(i))
