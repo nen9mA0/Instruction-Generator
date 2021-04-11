@@ -15,11 +15,9 @@ class Generator(object):
     def __getattr__(self, item):
         return getattr(self.emu, item)
 
-    def SetDefaultValidEmitNum(self, num_str):
-        self.emu.default_valid_emit_num = num_str
-
-    def SetDefaultNovalueEmitNum(self, num_str):
-        self.emu.default_novalue_emit_num = num_str
+    def SetDefaultValidEmitNum(self, num_dict):
+        for key in num_dict:
+            self.emu.default_emit_num[key] = num_dict[key]
 
     def SetNTIterNum(self, iternum_dict):
         self.emu.nt_iternum = iternum_dict
@@ -133,7 +131,7 @@ class InsFilter(object):
         self.gens.nts["VEXED_REX"] = binding_seq
         self.gens.htm.nt_names["VEXED_REX"] = binding_hashtable
 
-    def GetIfroms(self):
+    def GetIforms(self):
         ret_set = None
         isa_binding_set = False
         del_item = []

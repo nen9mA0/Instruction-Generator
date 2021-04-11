@@ -46,9 +46,10 @@ class Node(object):
 
 
 class ActionNode(Node):
-    def __init__(self, obj, prev=None, next=None):
+    def __init__(self, obj, father, prev=None, next=None):
         super(ActionNode, self).__init__(prev, next)
         self.act = obj
+        self.father = father
         self.type = "act"
 
     def Assignment(self, context, item, value):
@@ -79,11 +80,11 @@ class ActionNode(Node):
         elif self.act.type == "emit":
             if prev_emitNT:
                 if isinstance(prev_emitNT, str):
-                    context["emit"].append((prev_emitNT, self.act))
+                    context["emit"].append((prev_emitNT, self.act, self.father.emitbits_binding))
                 else:
-                    context["emit"].append((prev_emitNT.name, self.act))
+                    context["emit"].append((prev_emitNT.name, self.act, self.father.emitbits_binding))
             else:
-                context["emit"].append(("", self.act))
+                context["emit"].append(("", self.act, self.father.emitbits_binding))
             flag = True
         elif self.act.type == "nothing":
             flag = True             # nothing encode
@@ -105,10 +106,11 @@ class ActionNode(Node):
 
 
 class ConditionNode(Node):
-    def __init__(self, obj, prev=None, next=None):
+    def __init__(self, obj, father, prev=None, next=None):
         super(ConditionNode, self).__init__(prev, next)
         self.cond = obj
         self.type = "cond"
+        self.father = father
         if obj.equals:          # condition is equal
             self.equal = True
         else:                   # condition is not equal
@@ -160,6 +162,10 @@ class ConditionNode(Node):
             if self.TestNeq(context, self.cond.field_name, value):
                 flag = True
 
+        if flag and self.cond.bits:
+            if not self.father.emitbits_binding:
+                self.father.emitbits_binding = {}
+            self.father.emitbits_binding[self.cond.bits] = self.cond.field_name
         return (flag, context)
 
     def __str__(self):
@@ -226,6 +232,7 @@ class NTNode(Node):
         prev_NT = self
         prev_emitNT = self.binding_emitNT
 
+        self.emitbits_binding = None
         exec_otherwise = not self.otherwise_done and self.otherwise_first
 
         if not exec_otherwise and self.rule_num < self.rule_len:
@@ -277,9 +284,9 @@ class NTNode(Node):
                         raise KeyError("err: NTNode next: Can not find nt %s" %nt_name)
                     nt = self.gens.ntlufs[nt_name]
                     p1 = CreateNTNode(nt, self.gens, cond, name=nt_name, binding_emitNT=self.binding_emitNT, otherwise_first_dict=self.otherwise_first_dict)
-                    p2 = ConditionNode(cond)            # TODO: special operation for nt condition
+                    p2 = ConditionNode(cond, self)            # TODO: special operation for nt condition
                 else:
-                    p1 = ConditionNode(cond)
+                    p1 = ConditionNode(cond, self)
                     p2 = None
                 flag = True
             else:
@@ -287,7 +294,7 @@ class NTNode(Node):
                     logger.error("NTNode next: Not Equal condition with nt %s in\n%s" %(cond, rule))
                     flag = False
                 else:
-                    p1 = ConditionNode(cond)
+                    p1 = ConditionNode(cond, self)
                     p2 = None
                     flag = True
 
@@ -354,7 +361,7 @@ class NTNode(Node):
                         nodelst_tmp.append(p)
                 # p2 = ActionNode(act)                # TODO: special operation for nt action
             else:
-                p1 = ActionNode(act)
+                p1 = ActionNode(act, self)
                 p2 = None
 
             if not head:                            # linklist operation, same as conditions
@@ -416,7 +423,7 @@ class NTNode(Node):
             if act.nt or act.ntluf:
                 raise ValueError("I used to think that nt will never appear here")
             else:
-                p1 = ActionNode(act)
+                p1 = ActionNode(act, self)
 
             if not head:                            # linklist operation, same as conditions
                 head = p1
@@ -596,8 +603,7 @@ class Emulator(object):
 
         self.route = []
         self.route_num = []
-        self.default_valid_emit_num = "0"
-        self.default_novalue_emit_num = "0"
+        self.default_emit_num = {"default":0}
         # self.tst_ins_set_dict = {}
 
     def __iter__(self):
@@ -1004,6 +1010,14 @@ class Emulator(object):
 
         return emit_nt_lst
 
+    def GetDefaultEmitNum(self, key):
+        if key in self.default_emit_num:
+            ret = self.default_emit_num[key]
+        else:
+            ret = self.default_emit_num["default"]
+            logger.info("Assume %s  Emit %d" %(key, ret))
+        return ret
+
     # when important_NT specify, any output that without executing important_NT will be ignore
     # def EmitCode(self, context, emitseq, important_NT=None, print=False):
     def EmitCode(self, context, route):
@@ -1022,7 +1036,7 @@ class Emulator(object):
         #     important = False
 
         for nt_name in emit_nt_lst:
-            for emit_name, act in emit_lst:
+            for emit_name, act, emitbits_binding in emit_lst:
                 if emit_name == nt_name:
                     # if important and nt_name in important_NT:
                     #     n = important_NT.index(nt_name)
@@ -1044,7 +1058,7 @@ class Emulator(object):
                             if key in context:
                                 context_value = context[key]
                                 if context_value == "*":
-                                    context_value = self.default_valid_emit_num
+                                    context_value = self.GetDefaultEmitNum(key)
                                 int_value = int(context_value)
                                 tmp_num = tmp_num << act.nbits
                                 act_value_mask = (1 << act.nbits) - 1
@@ -1056,8 +1070,7 @@ class Emulator(object):
                                     ins_hex.append(tmp_num & mask)
                                     tmp_num = tmp_num >> 8
                             else:
-                                # if act.nbits == 3:                                # TODO: now this case is just for emit rrr or nnn
-                                int_value = int(self.default_novalue_emit_num)      # TODO: now this case assume the value is simply a 0
+                                int_value = int(self.GetDefaultEmitNum(key))
                                 tmp_num = tmp_num << act.nbits
                                 act_value_mask = (1 << act.nbits) - 1
                                 tmp_num |= (int_value & act_value_mask)
@@ -1067,12 +1080,56 @@ class Emulator(object):
                                     shift_num -= 8
                                     ins_hex.append(tmp_num & mask)
                                     tmp_num = tmp_num >> 8
-                                logger.warning("Assume %s  Emit 0" %str(act))
+                                logger.warning("Assume %s  Emit %s" %(key, int_value))
                                 # logger.error("err: GeneratorIform: Cannot emit letter type value %s" %act.value)
                         else:                       # act.field_name == None
                             value = act.value
-                            
+                            value_bits = []
+                            tmp = None
+                            name = ""               # imm value formats:
+                                                    #  aaa_bbb_ccc abc aaaaaaaa
+                            for c in value:
+                                if c == "_":
+                                    continue
+                                if c != tmp:
+                                    if len(name):
+                                        value_bits.append(name)
+                                    tmp = c
+                                    name = str(c)
+                                else:
+                                    name += c
+                            if len(name):
+                                value_bits.append(name)
 
+                            bit_num = 0
+                            for bits in value_bits:
+                                bits_field = emitbits_binding[bits]
+                                bits_field = bits_field.upper()
+                                bits_len = len(bits)
+                                bit_num += bits_len
+
+                                context_value = self.GetDefaultEmitNum(bits_field)
+                                flag = True
+                                if bits_field in context:
+                                    tmp = context[bits_field]
+                                    if not tmp == "*":
+                                        context_value = tmp
+                                        flag = False
+                                if flag:
+                                    logger.warning("Assume %s  Emit %s" %(bits_field, context_value))
+                                int_value = int(context_value)
+                                tmp_num = tmp_num << bits_len
+                                act_value_mask = (1 << bits_len) - 1
+                                tmp_num |= (int_value & act_value_mask)
+                                shift_num += bits_len
+                                while shift_num >= 8:
+                                    mask = 0xff << (shift_num - 8)
+                                    shift_num -= 8
+                                    ins_hex.append(tmp_num & mask)
+                                    tmp_num = tmp_num >> 8
+                            # === check ===
+                            if bit_num != act.nbits:
+                                raise ValueError("Bits Emit Length No Equal To Act.nbits")
                     else:
                         logger.error("err: GeneratorIform: Unknown emit type: %s" %act.emit_type)
                         raise ValueError("err: GeneratorIform: Unknown emit type: %s" %act.emit_type)

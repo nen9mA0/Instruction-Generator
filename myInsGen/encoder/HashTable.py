@@ -11,7 +11,7 @@ def HTMLoad(f, obj):
     obj.repeat_ntlufs = pickle.load(f)
 
 
-hash_num = 0
+hash_num = 10000
 
 class HashTableItem(object):            # this class is a wrapper of structure ({},{}), and just because dictionary is unhashable
     def __init__(self, context_tuple):
@@ -20,7 +20,7 @@ class HashTableItem(object):            # this class is a wrapper of structure (
         self.id = hash_num
         self.condition_num = 0          # number of key in cond_context
         self.num = 0                    # number of conditions currently satisfied
-        hash_num += 1
+        hash_num -= 1
 
     # def __hash__(self):                 # hash is address of HashTableItem
     #     return id(self)

@@ -202,7 +202,7 @@ if __name__ == "__main__":
 
     # ins_filter = generator.Filter(gen)
 
-    cs = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_64)
+    cs = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
 
     # set_iter = iter(iforms)
     # iform = next(set_iter)
@@ -274,10 +274,14 @@ if __name__ == "__main__":
     # my_ins_filter.AppendReg("GPRv_B()", "")
     # my_ins_filter.AppendReg("XED_REG_EAX", "")
     # my_ins_filter.AppendReg("GPRv_B()", "")
-    my_ins_filter["MOD"] = "!3"
+    # my_ins_filter["MOD"] = "!3"
     my_ins_filter["extension"] = "BASE"         # TODO: Attension: there are some special operation for AVX512VEX and AVX512EVEX
-    my_ins_filter.SpecifyMode(64)
-    iforms = my_ins_filter.GetIfroms()
+    my_ins_filter.SpecifyMode(32)
+
+    # === specify register ===
+    # my_ins_filter["BASE0"] = "XED_REG_EAX"
+
+    iforms = my_ins_filter.GetIforms()
 
     # my_ins_filter["REG0"] = "XED_REG_AX"       # here we just specify input and output reg
     # my_ins_filter["REG1"] = "XED_REG_BX"
@@ -292,24 +296,24 @@ if __name__ == "__main__":
 
 # ============== Set NT iter num ================
     nt_emitnum = {}
-    nt_emitnum["FIXUP_EOSZ_ENC"] = 2
-    nt_emitnum["FIXUP_EASZ_ENC"] = 2
+    nt_emitnum["FIXUP_EOSZ_ENC"] = 1
+    nt_emitnum["FIXUP_EASZ_ENC"] = 1
     nt_emitnum["ASZ_NONTERM"] = 1
     nt_emitnum["OSZ_NONTERM_ENC"] = 1
-    nt_emitnum["PREFIX_ENC"] = 2
-    nt_emitnum["REX_PREFIX_ENC"] = 2
+    nt_emitnum["PREFIX_ENC"] = 1
+    nt_emitnum["REX_PREFIX_ENC"] = 1
 
     nt_emitnum["iform"] = 1
 
-    nt_emitnum["SIB_REQUIRED_ENCODE"] = 2
-    nt_emitnum["SIBSCALE_ENCODE"] = 2
-    nt_emitnum["SIBINDEX_ENCODE"] = 2
-    nt_emitnum["SIBBASE_ENCODE"] = 2
-    nt_emitnum["MODRM_RM_ENCODE"] = 2
-    nt_emitnum["MODRM_MOD_ENCODE"] = 2
-    nt_emitnum["SEGMENT_DEFAULT_ENCODE"] = 2
-    nt_emitnum["SEGMENT_ENCODE"] = 2
-    nt_emitnum["SIB_NT"] = 2
+    nt_emitnum["SIB_REQUIRED_ENCODE"] = 1
+    nt_emitnum["SIBSCALE_ENCODE"] = 1
+    nt_emitnum["SIBINDEX_ENCODE"] = 1
+    nt_emitnum["SIBBASE_ENCODE"] = 1
+    nt_emitnum["MODRM_RM_ENCODE"] = 1
+    nt_emitnum["MODRM_MOD_ENCODE"] = 1
+    nt_emitnum["SEGMENT_DEFAULT_ENCODE"] = 1
+    nt_emitnum["SEGMENT_ENCODE"] = 1
+    nt_emitnum["SIB_NT"] = 1
     nt_emitnum["DISP_NT"] = 2
     # nt_emitnum["PREFIX_ENC"] = 1
     gen.SetNTEmitNum(nt_emitnum)
@@ -328,8 +332,17 @@ if __name__ == "__main__":
     gen.SetOtherwiseFirst(nt_otherwise_first)
 # ============== ============
 
-    gen.SetDefaultValidEmitNum("1")
-    gen.SetDefaultNovalueEmitNum("2")
+# ============== Set Default Emit Number =================
+    default_emit_num = {}
+    default_emit_num["REXW"] = 0
+    default_emit_num["REXR"] = 0
+    default_emit_num["REXB"] = 0
+    default_emit_num["REXX"] = 0
+    default_emit_num["REG"] = 0
+    default_emit_num["UIMM0"] = 10
+    default_emit_num["DISP"] = 0x10
+    gen.SetDefaultValidEmitNum(default_emit_num)
+# ============== ============
 
     print(len(iforms))
 
