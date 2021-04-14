@@ -2,7 +2,7 @@ import logging
 import sys
 
 class logger_t(object):
-    stream_loglevel = (logging.ERROR, logging.INFO)
+    stream_loglevel = (logging.ERROR, )
     # stream_loglevel = (logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR)
     file_loglevel = (logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR)
 

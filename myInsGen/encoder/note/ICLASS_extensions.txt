@@ -1,60 +1,69 @@
 BASE
-LONGMODE
-RDTSCP
-CLFSH
-PAUSE
-MOVBE
-SMX
-AES
-PCLMULQDQ
-3DNOW
-SVM
-AMD
-CLZERO
-MCOMMIT
-RDPRU
-SNP
-TBM
-FMA4
-MPX
-CET
-CLFLUSHOPT
-RDSEED
-RDWRFSGS
-SMAP
-PT
-MOVDIR
-WAITPKG
-CLDEMOTE
-F16C
-FMA
-VMFUNC
-INVPCID
-RTM
-ADOX_ADCX
-PKU
-CLWB
-PREFETCHWT1
-PCONFIG
-GFNI
-VAES
-VPCLMULQDQ
-ENQCMD
-TSX_LDTRK
-SERIALIZE
-WBNOINVD
-RDRAND
-MMX
-VTX
-SHA
-X87
-XOP
-RDPID
-LZCNT
-BMI1 BMI2
-SGX SGX_ENCLV
-MONITOR MONITORX
-XSAVE XSAVEOPT XSAVES XSAVEC
-VIA_PADLOCK_RNG VIA_PADLOCK_AES VIA_PADLOCK_SHA VIA_PADLOCK_MONTMUL
+LONGMODE	64位
+RDTSCP		RDTSCP
+CLFSH		clflush
+PAUSE		pause
+MOVBE		movbe
+SMX		getsec
+AES		AES指令集
+PCLMULQDQ	pclmulqdq 
+3DNOW		3DNow指令集
+SVM		AMD VM虚拟指令集
+AMD		lzcnt
+CLZERO		clzero
+MCOMMIT		mcommit
+RDPRU		rdpru
+SNP		psmash pvalidate rmpadjust rmpupdate
+TBM		AMD tbm指令集
+FMA4		FMA4指令集
+MPX		bndmk bndcl bndcu bndcn bndmov bndldx bndstx
+CET		cet指令集（ENDBR32 INCSSPD RDSSPD等）
+CLFLUSHOPT	clflushopt
+RDSEED		rdseed
+RDWRFSGS	rdfsbase rdgsbase wrfsbase wrgsbase
+SMAP		clac stac
+PT		ptwrite
+MOVDIR		movdir64b movdiri
+WAITPKG		tpause umonitor umwait 
+CLDEMOTE	cldemote
+F16C		vcvtph2ps vcvtps2ph
+FMA		FMA指令集
+VMFUNC		vmfunc
+INVPCID		invpcid
+RTM		xbegin xend xabort xtest
+ADOX_ADCX	adcx adox
+PKU		rdpkru wrpkru
+CLWB		clwb
+PREFETCHWT1	prefetchwt1
+PCONFIG		pconfig
+GFNI		GFNI-SSE指令集
+VAES		VAES指令集
+VPCLMULQDQ	vpclmulqdq
+ENQCMD		enqcmd enqcmds
+TSX_LDTRK	xresldtrk xsusldtrk
+SERIALIZE	serialize
+WBNOINVD	wbnoinvd
+RDRAND		rdrand
+MMX		MMX指令集
+VTX		VTX指令集（vmclear vmptrld等）
+SHA		SHA指令集
+X87		X87指令集
+XOP		XOP指令集
+RDPID		rdpid
+LZCNT		lzcnt
+BMI1		andn blsr blsmsk blsi bextr tzcnt
+BMI2		pdep pext bzhi shlx sarx shrx mulx rorx
+SGX		enclu encls
+SGX_ENCLV	enclv
+MONITOR		monitor mwait
+MONITORX	monitorx mwaitx
+XSAVE		xgetbv xsetbv xsave xrstor xsave64 xrstor64
+XSAVEOPT	xsaveopt xsaveopt64
+XSAVES		xsaves xsaves64 xrstors xrstors64
+XSAVEC		xsavec xsavec64
+VIA_PADLOCK_RNG	xstore rep_xstore
+VIA_PADLOCK_AES	rep_xcryptecb rep_xcryptcbc rep_xcryptctr rep_xcryptcfb rep_xcryptofb
+VIA_PADLOCK_SHA	rep_xsha1 rep_xsha256
+VIA_PADLOCK_MONTMUL	rep_montmul
 AVX AVXAES AVX2 AVX2GATHER AVX512VEX AVX512EVEX
 SSE SSE2 SSE3 SSE4 SSE4a SSSE3

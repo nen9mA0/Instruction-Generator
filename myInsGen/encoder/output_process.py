@@ -1,9 +1,9 @@
 import os
 import re
 
-output_dir = "output"
+output_dir = "output/20210412"
 # files_process = ["out_eax_ebx.txt", "out_ax_bx.txt", "out_al_bl.txt"]
-files_process = ["x87_out.txt"]
+files_process = ["x87_output.txt"]
 
 ins_num_pattern = re.compile("^\d+$")
 iclass_pattern = re.compile("^ICLASS.*$")
@@ -42,29 +42,35 @@ def DeleteIClass(lines):
 def GetUniqueIns(lines):
     ins_set = set()
     ins_lst = []
+    ins_hex = []
     for line in lines:
         line = line.strip()
+        if "remain" in line:
+            continue
         ins = ins_pattern.match(line)
         if ins:
             tmp_ins = ins.group("ins")
+            tmp_hex = ins.group("hex")
             if len(tmp_ins) > 0:
                 ins_set.add(tmp_ins)
                 ins_lst.append(tmp_ins)
-    return ins_set, ins_lst
+                ins_hex.append(tmp_hex)
+    return ins_set, ins_lst, ins_hex
 
 
 if __name__ == "__main__":
     lines, ins_num = GetAllIns(files_process)
     lines = DeleteIClass(lines)
-    ins_set, ins_lst = GetUniqueIns(lines)
+    ins_set, ins_lst, ins_hex = GetUniqueIns(lines)
 
     tmp_lst = list(ins_set)
     tmp_lst.sort()
-    print(len(tmp_lst))
+    print("ins num: %d" %len(tmp_lst))
     for ins in tmp_lst:
         print(ins)
 
     for ins in tmp_lst:
         ins_lst.remove(ins)
-    print("================")
-    print(ins_lst)
+    # print("================")
+    # for ins in ins_lst:
+    #     print(ins)

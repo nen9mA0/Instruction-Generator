@@ -71,16 +71,17 @@ neqkey:
 
 * 首先现阶段对于otherwise处理是有问题的：otherwise只能在其他条件都不满足时才会执行，而现在即使满足其他条件也会执行。
 
-  理论上otherwise应该仅在这两种情况下会执行
+  理论上otherwise应该仅在这三种情况下会执行
 
   * context中当前没有任何与正在执行的NT条件相关的内容，应遍历执行NT中的所有情况，包括otherwise
+  * context中有与正在执行的NT条件相关的内容，但没有完全满足的rule。此时应该删去不满足的情况，并执行其他所有情况，包括otherwise
   * 当前context不满足所有的rule，则执行otherwise
 
 * 还有就是检查的时候发现一种emit方式，见REX_PREFIX_ENC，具体为：
 
   emit类型为letter，value为wrxb，其中wrxb分别context中的REXW REXR REXX和REXB
 
-
+bug修复：1主要修改了hashtable里对于GetActContext的处理。2因为发现这种emit方式中，value定义的bits必定是在同一个NT的condition中，因此给NT绑定一个字典，用来存放有定义这种bit名字与对应field_name的绑定
 
 ### 一些设计
 
@@ -245,7 +246,7 @@ PS：上述描述也表明最好不要对NTNode设置otherwise_first（除非知
 
 * NTNode的otherwise_first标志肯定不能用了，因为对于NTNode只有知道其他rules的运行情况才能获知当前条件下能不能执行otherwise
 * 仅在下面两种情况下应执行otherwise
-  * 所有的其他rules都能满足条件，即对应[20210408](#20210408)的第一种情况
+  * 没有能完全满足rule的情况，即对应[20210408](#20210408)的第一和第二种情况
   * 所有其他rules都不能满足条件，对应第二种情况
 
 因为修改较为麻烦而且当前没必要（NTNode当前在生成指令过程中只用来处理iform，而iform没有otherwise）
@@ -266,7 +267,7 @@ PS：上述描述也表明最好不要对NTNode设置otherwise_first（除非知
   * InvalidPath时，这说明之前NT的条件不满足（但这里其实不需要修改，因为计数不变）
 * 若所有条件执行完，只剩otherwise，则先判断a
   * 若`a==rule_len`，说明所有rule都被执行过，也就对应上述第一种执行otherwise的情况
-  * 若`a==0`，说明所有rule都不满足，对应第二种情况
+  * 若`a==0`，说明所有rule都不满足，对应第二第三种情况
 
 #### default_emit_num
 

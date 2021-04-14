@@ -886,6 +886,8 @@ class Emulator(object):
                 self.ins_set.add(ins_str)
                 num += 1
                 self.RefreshNTEmitNum()
+                if num % 1000 == 0:
+                    print(num)
                 if num >= output_num:
                     break
 
@@ -1018,6 +1020,31 @@ class Emulator(object):
             logger.info("Assume %s  Emit %d" %(key, ret))
         return ret
 
+    def EmitNum(self, tmp_num, shift_num, int_value, nbits, ins_hex):
+        # in this case, we meet an imm and should convert it to little endian format
+        if nbits%8 == 0 and nbits // 8 in (2,4,8,16,32):        # But I think only 2 4 8 is available
+            new_num = 0
+            old_num = int_value
+            shift_bit = 0
+            while shift_bit < nbits:
+                new_num = new_num << 8
+                new_num |= old_num & 0xff
+                old_num = old_num >> 8
+                shift_bit += 8
+            int_value = new_num
+
+        tmp_num = tmp_num << nbits
+        act_value_mask = (1 << nbits) - 1
+        tmp_num |= (int_value & act_value_mask)    # TODO: Emit Immediate
+        shift_num += nbits
+        while shift_num >= 8:
+            shift_tmp = shift_num - 8
+            mask = 0xff << shift_tmp
+            shift_num -= 8
+            ins_hex.append( (tmp_num & mask) >> shift_tmp )
+            tmp_num = tmp_num & (~mask)
+        return tmp_num, shift_num
+
     # when important_NT specify, any output that without executing important_NT will be ignore
     # def EmitCode(self, context, emitseq, important_NT=None, print=False):
     def EmitCode(self, context, route):
@@ -1042,15 +1069,7 @@ class Emulator(object):
                     #     n = important_NT.index(nt_name)
                     #     important_flag |= 1 << n
                     if act.emit_type == "numeric":
-                        tmp_num = tmp_num << act.nbits
-                        act_value_mask = (1 << act.nbits) - 1
-                        tmp_num |= (act.int_value & act_value_mask)
-                        shift_num += act.nbits
-                        while shift_num >= 8:
-                            mask = 0xff << (shift_num - 8)
-                            shift_num -= 8
-                            ins_hex.append(tmp_num & mask)
-                            tmp_num = tmp_num >> 8
+                        tmp_num, shift_num = self.EmitNum(tmp_num, shift_num, act.int_value, act.nbits, ins_hex)
                     elif act.emit_type == "letters":
                         key = act.field_name
                         if key:
@@ -1060,27 +1079,11 @@ class Emulator(object):
                                 if context_value == "*":
                                     context_value = self.GetDefaultEmitNum(key)
                                 int_value = int(context_value)
-                                tmp_num = tmp_num << act.nbits
-                                act_value_mask = (1 << act.nbits) - 1
-                                tmp_num |= (int_value & act_value_mask)    # TODO: Emit Immediate
-                                shift_num += act.nbits
-                                while shift_num >= 8:
-                                    mask = 0xff << (shift_num - 8)
-                                    shift_num -= 8
-                                    ins_hex.append(tmp_num & mask)
-                                    tmp_num = tmp_num >> 8
+                                tmp_num, shift_num = self.EmitNum(tmp_num, shift_num, int_value, act.nbits, ins_hex)
                             else:
                                 int_value = int(self.GetDefaultEmitNum(key))
-                                tmp_num = tmp_num << act.nbits
-                                act_value_mask = (1 << act.nbits) - 1
-                                tmp_num |= (int_value & act_value_mask)
-                                shift_num += act.nbits
-                                while shift_num >= 8:
-                                    mask = 0xff << (shift_num - 8)
-                                    shift_num -= 8
-                                    ins_hex.append(tmp_num & mask)
-                                    tmp_num = tmp_num >> 8
-                                logger.warning("Assume %s  Emit %s" %(key, int_value))
+                                tmp_num, shift_num = self.EmitNum(tmp_num, shift_num, int_value, act.nbits, ins_hex)
+                                # logger.warning("Assume %s  Emit %s" %(key, int_value))
                                 # logger.error("err: GeneratorIform: Cannot emit letter type value %s" %act.value)
                         else:                       # act.field_name == None
                             value = act.value
@@ -1115,18 +1118,10 @@ class Emulator(object):
                                     if not tmp == "*":
                                         context_value = tmp
                                         flag = False
-                                if flag:
-                                    logger.warning("Assume %s  Emit %s" %(bits_field, context_value))
+                                # if flag:
+                                    # logger.warning("Assume %s  Emit %s" %(bits_field, context_value))
                                 int_value = int(context_value)
-                                tmp_num = tmp_num << bits_len
-                                act_value_mask = (1 << bits_len) - 1
-                                tmp_num |= (int_value & act_value_mask)
-                                shift_num += bits_len
-                                while shift_num >= 8:
-                                    mask = 0xff << (shift_num - 8)
-                                    shift_num -= 8
-                                    ins_hex.append(tmp_num & mask)
-                                    tmp_num = tmp_num >> 8
+                                tmp_num, shift_num = self.EmitNum(tmp_num, shift_num, int_value, bits_len, ins_hex)
                             # === check ===
                             if bit_num != act.nbits:
                                 raise ValueError("Bits Emit Length No Equal To Act.nbits")

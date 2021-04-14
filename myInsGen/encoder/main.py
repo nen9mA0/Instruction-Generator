@@ -275,9 +275,17 @@ if __name__ == "__main__":
     # my_ins_filter.AppendReg("XED_REG_EAX", "")
     # my_ins_filter.AppendReg("GPRv_B()", "")
     # my_ins_filter["MOD"] = "!3"
-    my_ins_filter["extension"] = "BASE"         # TODO: Attension: there are some special operation for AVX512VEX and AVX512EVEX
-    my_ins_filter.SpecifyMode(32)
 
+    # Extension XSAVE XSAVEC XSAVEOPT 
+    # my_ins_filter["extension"] = ["BASE", "XSAVE", "XSAVEC", "XSAVES", "XSAVEOPT", "SMAP", "RDSEED", "RDWRFSGS",
+    #                             "ADOX_ADCX", "PKU", "INVPCID", "SVM", "MOVBE", "PREFETCHWT1", "CLFSH",
+    #                             "CLFLUSHOPT", "RDRAND", "RDTSCP", "RDPID"]         # TODO: Attension: there are some special operation for AVX512VEX and AVX512EVEX
+    # "BMI1", "BMI2"
+    # my_ins_filter["iclass"] = ["CRC32", "POPCNT", "PREFETCHW"]
+
+    # my_ins_filter["extension"] = ["X87"]
+    # my_ins_filter["iclass"] = ["FXSAVE", "FXRSTOR"]
+    my_ins_filter.SpecifyMode(32)
     # === specify register ===
     # my_ins_filter["BASE0"] = "XED_REG_EAX"
 
@@ -286,6 +294,20 @@ if __name__ == "__main__":
     # my_ins_filter["REG0"] = "XED_REG_AX"       # here we just specify input and output reg
     # my_ins_filter["REG1"] = "XED_REG_BX"
 
+    # my_ins_filter["REG0"] = "XED_REG_CL"
+    # my_ins_filter["REG1"] = "XED_REG_DL"
+
+    # my_ins_filter["REG1"] = "XED_REG_ST0"
+    # my_ins_filter["REG0"] = "XED_REG_ST1"
+
+    my_ins_filter["BASE0"] = "XED_REG_EAX"
+    my_ins_filter["INDEX"] = "XED_REG_EBX"
+    my_ins_filter["SEG0"] = "@"
+    # my_ins_filter["EOSZ"] = "2"
+    # my_ins_filter["EASZ"] = "2"
+    # my_ins_filter["SIB"] = "0"
+    my_ins_filter["SCALE"] = "1"            # can be 1 2 4 8
+    my_ins_filter["DISP_WIDTH"] = "0"
     # gen.DFSNTContext(["VEX_REXR_ENC"])
     # gen.DFSSeqContext("MODRM_BIND")
     # all_context = gen.DFSNTContext(["SIB_REQUIRED_ENCODE", "SIBSCALE_ENCODE", "SIBINDEX_ENCODE", "SIBBASE_ENCODE", "MODRM_RM_ENCODE"])
@@ -303,19 +325,18 @@ if __name__ == "__main__":
     nt_emitnum["PREFIX_ENC"] = 1
     nt_emitnum["REX_PREFIX_ENC"] = 1
 
-    nt_emitnum["iform"] = 1
+    # nt_emitnum["iform"] = 20
 
-    nt_emitnum["SIB_REQUIRED_ENCODE"] = 1
-    nt_emitnum["SIBSCALE_ENCODE"] = 1
-    nt_emitnum["SIBINDEX_ENCODE"] = 1
-    nt_emitnum["SIBBASE_ENCODE"] = 1
-    nt_emitnum["MODRM_RM_ENCODE"] = 1
-    nt_emitnum["MODRM_MOD_ENCODE"] = 1
-    nt_emitnum["SEGMENT_DEFAULT_ENCODE"] = 1
-    nt_emitnum["SEGMENT_ENCODE"] = 1
-    nt_emitnum["SIB_NT"] = 1
-    nt_emitnum["DISP_NT"] = 2
-    # nt_emitnum["PREFIX_ENC"] = 1
+    # nt_emitnum["SIB_REQUIRED_ENCODE"] = 1
+    # nt_emitnum["SIBSCALE_ENCODE"] = 1
+    # nt_emitnum["SIBINDEX_ENCODE"] = 1
+    # nt_emitnum["SIBBASE_ENCODE"] = 1
+    # nt_emitnum["MODRM_RM_ENCODE"] = 1
+    # nt_emitnum["MODRM_MOD_ENCODE"] = 1
+    # nt_emitnum["SEGMENT_DEFAULT_ENCODE"] = 1
+    # nt_emitnum["SEGMENT_ENCODE"] = 1
+    # nt_emitnum["SIB_NT"] = 1
+    # nt_emitnum["DISP_NT"] = 2
     gen.SetNTEmitNum(nt_emitnum)
 # ============== ============
 
@@ -340,19 +361,22 @@ if __name__ == "__main__":
     default_emit_num["REXX"] = 0
     default_emit_num["REG"] = 0
     default_emit_num["UIMM0"] = 10
+    default_emit_num["UIMM1"] = 20
     default_emit_num["DISP"] = 0x10
     gen.SetDefaultValidEmitNum(default_emit_num)
 # ============== ============
 
-    print(len(iforms))
+    # print(len(iforms))
 
     for i in iforms:
         tmp_str = str(i).split()
         print("%s %s"%(tmp_str[0], tmp_str[1]))
+        logger.info("%s %s"%(tmp_str[0], tmp_str[1]))
         ins_lst = gen.GeneratorIform(i, ins_filter=my_ins_filter, output_num=20)
         if len(ins_lst) > 0:
             for ins in ins_lst:
                 print(ins.hex(), end="")
+                logger.info(ins.hex())
                 decode = cs.disasm(ins, 0)
                 mystr = ""
                 i = 0
@@ -365,6 +389,7 @@ if __name__ == "__main__":
                         mystr += "\t\tremain %d bytes" %(len(ins) - first_ins_size)
                         break
                 print(mystr)
+                logger.info(mystr)
         else:
             logger.warning(str(i))
     pass

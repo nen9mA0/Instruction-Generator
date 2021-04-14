@@ -138,6 +138,7 @@ class InsFilter(object):
         for name in self.context:
             tmp_lst = None
             flag = False
+            or_flag = False
             if "REG" in name:
                 flag = True
                 index = int(name[-1])
@@ -173,26 +174,46 @@ class InsFilter(object):
             elif "extension" == name:
                 flag = True
                 isa_binding_set = True
-                tmp_lst = self.GetExtensionIform(self.context[name])
-                self.SetISABinding(self.context[name])
-                self.SetVexedRexBinding(self.context[name])
+                num = 0
+                tmp_lst = []
+                for ext in self.context[name]:
+                    tmp_lst.extend(self.GetExtensionIform(ext))
+                    if num == 0:
+                        self.SetISABinding(ext)
+                        self.SetVexedRexBinding(ext)
+                    num += 1
                 del_item.append("extension")
+            elif "iclass" == name:
+                tmp_lst = []
+                for iclass in self.context[name]:
+                    all_iform = self.GetAllIform()
+                    for iform in all_iform:
+                        if iform.iclass == iclass:
+                            tmp_lst.append(iform)
+                            flag = True
+                if flag:
+                    or_flag = True
+                del_item.append("iclass")
             else:
                 pass
             if flag:
                 if tmp_lst:                     # some cases is a list, otherwise is a set
                     tmp_set = set(tmp_lst)
                 if ret_set:
-                    ret_set = ret_set & tmp_set
+                    if not or_flag:
+                        ret_set = ret_set & tmp_set
+                    else:
+                        ret_set = ret_set | tmp_set
                 else:
                     ret_set = tmp_set
 
         for i in del_item:
             del self.context[i]
         if not isa_binding_set:
-            raise ValueError("Must at least specify one extension")
-        else:
-            self.gens.MakeSeqNTBind()           # MakeSeqNTBind when ISA seq has been binded
+            default_ext = "BASE"
+            self.SetISABinding(default_ext)         # only do some binding
+            self.SetVexedRexBinding(default_ext)
+        self.gens.MakeSeqNTBind()           # MakeSeqNTBind when ISA seq has been binded
         return ret_set
 
 

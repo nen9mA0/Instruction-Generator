@@ -87,8 +87,8 @@ all_ins =             "all-datafiles/all_test/all-enc-instructions.txt"
 # all_ins =               "all-datafiles/extension/base/base_instructions.txt"
 # all_ins = "all-datafiles/extension/x87/x87_instructions.txt"
 
-# logger = Logger.logger_t("log/out.txt")
-logger = Logger.logger_t()
+logger = Logger.logger_t("log/out.txt")
+# logger = Logger.logger_t()
 
 gs = GlobalStruct()
 # storage_fields = gs.storage_fields
