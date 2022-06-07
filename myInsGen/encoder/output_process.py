@@ -3,7 +3,7 @@ import re
 
 output_dir = "output/20210412"
 # files_process = ["out_eax_ebx.txt", "out_ax_bx.txt", "out_al_bl.txt"]
-files_process = ["x87_output.txt"]
+files_process = ["sse_output.txt"]
 
 ins_num_pattern = re.compile("^\d+$")
 iclass_pattern = re.compile("^ICLASS.*$")

@@ -219,7 +219,7 @@ if __name__ == "__main__":
     #         print(mystr)
 
 # =============== Load Generator Storage ===================
-    needreload = True     # for test
+    needreload = False     # for test
     save = False
     sd = save_data.SaveData(all_ins[:-4]+"_gens", pkl_dir, logger)
     if sd.haspkl and not needreload:
@@ -284,7 +284,9 @@ if __name__ == "__main__":
     # my_ins_filter["iclass"] = ["CRC32", "POPCNT", "PREFETCHW"]
 
     # my_ins_filter["extension"] = ["X87"]
+    my_ins_filter["extension"] = ["SSE2"]
     # my_ins_filter["iclass"] = ["FXSAVE", "FXRSTOR"]
+    # my_ins_filter["iclass"] = ["MOV"]
     my_ins_filter.SpecifyMode(32)
     # === specify register ===
     # my_ins_filter["BASE0"] = "XED_REG_EAX"
@@ -297,11 +299,20 @@ if __name__ == "__main__":
     # my_ins_filter["REG0"] = "XED_REG_CL"
     # my_ins_filter["REG1"] = "XED_REG_DL"
 
+# === for x87 ===
     # my_ins_filter["REG1"] = "XED_REG_ST0"
     # my_ins_filter["REG0"] = "XED_REG_ST1"
+# === ===
 
-    my_ins_filter["BASE0"] = "XED_REG_EAX"
-    my_ins_filter["INDEX"] = "XED_REG_EBX"
+# === for sse ===
+    # my_ins_filter["REG0"] = "XED_REG_XMM0"
+    my_ins_filter["REG0"] = "XED_REG_ECX"
+    my_ins_filter["REG1"] = "XED_REG_XMM0"
+# === ===
+
+
+    my_ins_filter["BASE0"] = "XED_REG_ESI"
+    my_ins_filter["INDEX"] = "XED_REG_EDI"
     my_ins_filter["SEG0"] = "@"
     # my_ins_filter["EOSZ"] = "2"
     # my_ins_filter["EASZ"] = "2"
@@ -324,6 +335,10 @@ if __name__ == "__main__":
     nt_emitnum["OSZ_NONTERM_ENC"] = 1
     nt_emitnum["PREFIX_ENC"] = 1
     nt_emitnum["REX_PREFIX_ENC"] = 1
+
+# === for x87 ===
+    # nt_emitnum["X87"] = 1
+# === ===
 
     # nt_emitnum["iform"] = 20
 
