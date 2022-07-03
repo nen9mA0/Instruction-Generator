@@ -207,6 +207,90 @@ def parse_decode_lines(lines):
         
     return  (nts, ntlufs, repeat_nts, repeat_ntlufs)
 
+
+def parse_decode_pattern_lines(lines):
+    """ Read the flat decoder files (not the ISA file).
+    
+    Return a tuple:
+        ( dict of nonterminals, dict of nonterminal lookup functions )
+        
+        This parses the so-called flat format with the vertical
+        bar used for all the non-instruction tables.
+
+        For decode the semantics are:
+            preconditions | dec-actions
+        However for encode, the semantics change to:
+            enc-actions  | conditions
+
+        And we must take some of the "enc-actions"  and add them to the preconditions.
+        These include the actions associated with: MODE,SMODE,EOSZ,EASZ
+    """
+    nts = {}
+    ntlufs = {}
+    repeat_nts = {}         # some nt/ntluf/seq has multi definition, so we use three dict to record this
+    repeat_ntlufs = {}
+
+    while len(lines) > 0:
+        line = lines.pop(0)
+
+        fn = file_pattern.match(line)
+        if fn:
+            filename = fn.group('file')
+        #msge("LINEOUT:" + line)
+        line = comment_pattern.sub("",line)
+        line = leading_whitespace_pattern.sub("",line)
+        line = line.rstrip()
+        if line == '':
+            continue
+        line = slash_expand.expand_all_slashes(line)
+
+        p =  ntluf_pattern.match(line)
+        if p:
+            nt_name = p.group('ntname')
+            ret_type = p.group('rettype')
+            # create a new nonterminal to use
+            nt = nonterminal_t(nt_name, filename, ret_type)
+            if nt_name in ntlufs:
+                if ntlufs[nt_name]:          # if is not none, shows that this seq only has been defined one time
+                    tmp = ntlufs[nt_name]
+                    repeat_ntlufs[nt_name] = [tmp, nt]
+                    ntlufs[nt_name] = None
+                else:
+                    repeat_ntlufs[nt_name].append(nt)
+            else:
+                ntlufs[nt_name] = nt
+            continue
+        
+        p = nt_pattern.match(line)
+        if p:
+            nt_name =  p.group('ntname')
+            # create a new nonterminal to use
+            nt = nonterminal_t(nt_name, filename)
+            if nt_name in nts:
+                if nts[nt_name]:          # if is not none, shows that this seq only has been defined one time
+                    tmp = nts[nt_name]
+                    repeat_nts[nt_name] = [tmp, nt]
+                    nts[nt_name] = None
+                else:
+                    repeat_nts[nt_name].append(nt)
+            else:
+                nts[nt_name] = nt
+            continue
+        
+        p = decode_rule_pattern.match(line)
+        if p:
+            conds = p.group('cond').split() # rhs, from an encode perspective (decode operands)
+            actions = p.group('action').split() # lhs, from a encode perspective (decode patterns)
+            rule = parse_decode_rule(conds,actions,line,nt.name)
+            if rule:
+                nt.add(rule)
+            continue
+        
+        die("Unhandled line: %s" % line)
+        
+    return  (nts, ntlufs, repeat_nts, repeat_ntlufs)
+
+
 def parse_decode_rule(conds, actions, line, nt_name):
     # conds   -- rhs, from an encode perspective (decode operands)
     # actions -- lhs, from an encode perspective (decode patterns)
@@ -312,6 +396,11 @@ def ReadEncPattern(filename, state_bits):
     lines = open(filename, 'r').readlines()
     lines = expand_state_bits(lines, state_bits)
     return parse_encode_lines(lines, state_bits)
+
+def ReadDecPattern(filename, state_bits):
+    lines = open(filename, 'r').readlines()
+    lines = expand_state_bits(lines, state_bits)
+    return parse_decode_pattern_lines(lines)
 
 def ReadEncDecPattern(filename, state_bits):
     lines = open(filename, "r").readlines()

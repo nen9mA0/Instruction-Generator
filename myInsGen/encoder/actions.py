@@ -217,6 +217,8 @@ class action_t(object):
         s.append(str(self.type))
         if self.nt:
             s.append(" NT[%s]" % (self.nt))
+        if self.ntluf:
+            s.append(" NTLUF[%s]" %(self.ntluf))
         if self.field_name:
             if self.is_not_equal():
                 s.append(" ")

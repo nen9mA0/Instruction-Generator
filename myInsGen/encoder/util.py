@@ -102,6 +102,7 @@ def make_binary(bits):
     bits = re.sub('_', '', bits)
     return bits
 
+
 def make_numeric(s, restriction_pattern=None):
     global make_numeric_old_decimal_pattern
     global make_numeric_hex_pattern

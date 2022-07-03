@@ -1,6 +1,8 @@
 import copy
 from typing import TypeVar, Optional, Generic
 
+from attr import has
+
 import ins_filter
 import HashTable
 
@@ -188,6 +190,7 @@ class NTNode(Node):
         self.otherwise_first = True                         # if is true, otherwise will be execute first
         self.otherwise_first_dict = otherwise_first_dict
         self.last_emit_num = -1
+        self.is_ntluf = False
         if obj != None:
             if isinstance(obj, action_t):
                 self.nt_binding = "act"
@@ -198,6 +201,8 @@ class NTNode(Node):
         if isinstance(nt, nonterminal_t):
             self.rules = nt.rules
             self.type = "nt"
+            if self.nt.rettype:
+                self.is_ntluf = True
             if hasattr(self.nt, "otherwise"):
                 self.otherwise = self.nt.otherwise
                 self.otherwise_done = False
@@ -207,6 +212,11 @@ class NTNode(Node):
         elif isinstance(nt, iform_t):
             self.rules = [nt.rule]
             self.type = "iform"
+            self.otherwise = None
+            self.otherwise_done = True
+        else:
+            self.rules = []
+            self.type = "ins"
             self.otherwise = None
             self.otherwise_done = True
 
@@ -328,10 +338,13 @@ class NTNode(Node):
                     if nt_name in self.gens.nts:
                         flag = True
                         nt = self.gens.nts[nt_name]
-                    if nt_name+"_BIND" in self.gens.seqs:           # TODO: 20210320 fix, an action nt may be a sequence
+                    elif nt_name+"_BIND" in self.gens.seqs:           # TODO: 20210320 fix, an action nt may be a sequence
                         flag = True
                         is_seq = True
                         seq = self.gens.seqs[nt_name+"_BIND"]
+                    elif "INSTRUCTIONS" in nt_name:                     # 20220621 fix
+                        flag = True
+                        nt = None
                     if not flag:
                         raise KeyError("err: NTNode next: Can not find nt %s" %nt_name)
                 else:
@@ -584,6 +597,16 @@ def CreateNTNode(nt, gens, obj=None, prev=None, next=None, name="", binding_emit
         node = NTNode(nt, gens, obj, prev, next, name, binding_emitNT, otherwise_first_dict)
     return node
 
+def ReplaceNTName(nt_name, replace_emit=False):
+    if nt_name.endswith("_BIND"):
+        if replace_emit:
+            new_name = nt_name[:-5]
+        else:
+            new_name = nt_name[:-5] + "_EMIT"
+    else:
+        new_name = nt_name
+    return new_name
+
 
 class Emulator(object):
     def __init__(self, gens):
@@ -740,9 +763,14 @@ class Emulator(object):
             mystr += "%s\t" %str(i)
         return mystr
 
-    def DFSNTContext(self, nt_lst, binding_emit=None):       # nt_lst can be a list of str or nonterminal_t
+    def DFSNTContext(self, nt_lst, binding_emit=None, limit_path=0):       # nt_lst can be a list of str or nonterminal_t
         nts = self.gens.nts
         ntlufs = self.gens.ntlufs
+
+        if limit_path > 0:
+            have_limit = True
+        else:
+            have_limit = False
 
         first_nt = None
         prev_nt = None
@@ -751,7 +779,7 @@ class Emulator(object):
                 nt_name = nt
                 # if nt_name == "SIBBASE_ENCODE":             # just 4 debug
                 #     a = 0
-                if "_BIND" in nt_name or "_EMIT" in nt_name:
+                if nt_name.endswith("_BIND") or nt_name.endswith("_EMIT"):
                     nt_name = nt_name[:-5]
                 if not (nt_name in nts or nt_name in ntlufs):
                     raise KeyError("Cannot find NT/NTluf: %s" %nt_name)
@@ -821,7 +849,12 @@ class Emulator(object):
                             a = 0
                         cond_context_dict[node.name] = copy.deepcopy(cond_context)
                 flag, context = node.ExecNode(context, depth=depth) # real context is executed here
-                self.route_num.append((node.GetIterLen(), node.GetIterNum()))
+                iter_len = node.GetIterLen()
+                if have_limit and iter_len > limit_path:
+                    logger.warning("NT:%s BindingNT:%s have too much path %d" %(node.binding_emitNT, node.name, iter_len))
+                    all_context = None
+                    break
+                self.route_num.append((iter_len, node.GetIterNum()))
                 backtrack = False
                 if not flag:            # if this path cannot satisfy condition, invalid it
                     self.InvalidPath()
@@ -904,7 +937,7 @@ class Emulator(object):
         seq_node.is_seq = True
         seq_lst = [seq_node]
         for seq_nt_name in seq.nonterminals:
-            p = EmitNode(seq_nt_name.replace("_BIND", ""))
+            p = EmitNode(ReplaceNTName(seq_nt_name))
             if not head:
                 head = p
             else:
@@ -944,7 +977,7 @@ class Emulator(object):
                         seq = self.gens.seqs[emit_seq]
                         prev = None
                         for seq_nt_name in seq.nonterminals:
-                            p = EmitNode(seq_nt_name.replace("_BIND", ""))
+                            p = EmitNode(ReplaceNTName(seq_nt_name))
                             if prev:
                                 prev.next = p
                                 p.prev = prev
@@ -965,7 +998,7 @@ class Emulator(object):
             if seq_node.name == "ISA_BINDINGS":
                 seq = self.gens.seqs["ISA_EMIT"]
             else:
-                name = seq_node.name.replace("_BIND", "_EMIT")
+                name = ReplaceNTName(seq_node.name, True)
                 seq = self.gens.seqs[name]
             old_child = seq_node.child
             new_child = []

@@ -1,0 +1,906 @@
+parse end
+SEGMENT_DEFAULT_ENCODE
+   BASE0=rIPa() nothing 
+   BASE0=ArSP() FB DEFAULT_SEG=1 value=0x1 
+   BASE0=ArBP() FB DEFAULT_SEG=1 value=0x1 
+   BASE0=@ FB DEFAULT_SEG=0 value=0x0 
+   BASE0=ArAX() FB DEFAULT_SEG=0 value=0x0 
+   BASE0=ArCX() FB DEFAULT_SEG=0 value=0x0 
+   BASE0=ArDX() FB DEFAULT_SEG=0 value=0x0 
+   BASE0=ArBX() FB DEFAULT_SEG=0 value=0x0 
+   BASE0=ArSI() FB DEFAULT_SEG=0 value=0x0 
+   BASE0=ArDI() FB DEFAULT_SEG=0 value=0x0 
+   BASE0=Ar8() FB DEFAULT_SEG=0 value=0x0 
+   BASE0=Ar9() FB DEFAULT_SEG=0 value=0x0 
+   BASE0=Ar10() FB DEFAULT_SEG=0 value=0x0 
+   BASE0=Ar11() FB DEFAULT_SEG=0 value=0x0 
+   BASE0=Ar12() FB DEFAULT_SEG=0 value=0x0 
+   BASE0=Ar13() FB DEFAULT_SEG=0 value=0x0 
+   BASE0=Ar14() FB DEFAULT_SEG=0 value=0x0 
+   BASE0=Ar15() FB DEFAULT_SEG=0 value=0x0 
+SEGMENT_ENCODE
+   otherwise: FB SEG_OVD=0 value=0x0  return 1
+   DEFAULT_SEG=1 SEG0=@ FB SEG_OVD=0 value=0x0 
+   DEFAULT_SEG=1 SEG0=XED_REG_CS FB SEG_OVD=1 value=0x1 
+   DEFAULT_SEG=1 SEG0=XED_REG_DS FB SEG_OVD=2 value=0x2 
+   DEFAULT_SEG=1 SEG0=XED_REG_SS FB SEG_OVD=0 value=0x0 
+   DEFAULT_SEG=1 SEG0=XED_REG_ES FB SEG_OVD=3 value=0x3 
+   DEFAULT_SEG=1 SEG0=XED_REG_FS FB SEG_OVD=4 value=0x4 
+   DEFAULT_SEG=1 SEG0=XED_REG_GS FB SEG_OVD=5 value=0x5 
+   DEFAULT_SEG=0 SEG0=@ FB SEG_OVD=0 value=0x0 
+   DEFAULT_SEG=0 SEG0=XED_REG_CS FB SEG_OVD=1 value=0x1 
+   DEFAULT_SEG=0 SEG0=XED_REG_DS FB SEG_OVD=0 value=0x0 
+   DEFAULT_SEG=0 SEG0=XED_REG_SS FB SEG_OVD=6 value=0x6 
+   DEFAULT_SEG=0 SEG0=XED_REG_ES FB SEG_OVD=3 value=0x3 
+   DEFAULT_SEG=0 SEG0=XED_REG_FS FB SEG_OVD=4 value=0x4 
+   DEFAULT_SEG=0 SEG0=XED_REG_GS FB SEG_OVD=5 value=0x5 
+SIB_REQUIRED_ENCODE
+   otherwise: return 1
+   EASZ=2 INDEX=GPR32e() FB SIB=1 value=0x1 
+   EASZ=3 INDEX=GPR64e() FB SIB=1 value=0x1 
+   EASZ=3 BASE0=@ DISP_WIDTH=32 FB SIB=1 value=0x1 
+   EASZ=2 MODE=2 BASE0=@ DISP_WIDTH=32 FB SIB=1 value=0x1 
+   EASZ=2 MODE=0 nothing 
+   EASZ=2 MODE=1 nothing 
+   EASZ!=1 BASE0=ArSP() FB SIB=1 value=0x1 
+   EASZ!=1 BASE0=Ar12() FB SIB=1 value=0x1 
+SIBBASE_ENCODE
+   SIB=0 nothing 
+   SIB=1 nt NT[SIBBASE_ENCODE_SIB1] 
+SIBBASE_ENCODE_SIB1
+   otherwise: FB ERROR=XED_ERROR_GENERAL_ERROR  return 1
+   BASE0=ArAX() FB SIBBASE=0 value=0x0 FB REXB=0 value=0x0 
+   BASE0=Ar8() FB SIBBASE=0 value=0x0 FB REXB=1 value=0x1 
+   BASE0=ArCX() FB SIBBASE=1 value=0x1 FB REXB=0 value=0x0 
+   BASE0=Ar9() FB SIBBASE=1 value=0x1 FB REXB=1 value=0x1 
+   BASE0=ArDX() FB SIBBASE=2 value=0x2 FB REXB=0 value=0x0 
+   BASE0=Ar10() FB SIBBASE=2 value=0x2 FB REXB=1 value=0x1 
+   BASE0=ArBX() FB SIBBASE=3 value=0x3 FB REXB=0 value=0x0 
+   BASE0=Ar11() FB SIBBASE=3 value=0x3 FB REXB=1 value=0x1 
+   BASE0=ArSP() FB SIBBASE=4 value=0x4 FB REXB=0 value=0x0 
+   BASE0=Ar12() FB SIBBASE=4 value=0x4 FB REXB=1 value=0x1 
+   BASE0=@ nt NT[DISP_WIDTH_32] FB SIBBASE=5 value=0x5 FB REXB=0 value=0x0 
+   BASE0=ArBP() nt NT[DISP_WIDTH_0_8_32] FB SIBBASE=5 value=0x5 FB REXB=0 value=0x0 
+   BASE0=Ar13() nt NT[DISP_WIDTH_0_8_32] FB SIBBASE=5 value=0x5 FB REXB=1 value=0x1 
+   BASE0=ArSI() FB SIBBASE=6 value=0x6 FB REXB=0 value=0x0 
+   BASE0=Ar14() FB SIBBASE=6 value=0x6 FB REXB=1 value=0x1 
+   BASE0=ArDI() FB SIBBASE=7 value=0x7 FB REXB=0 value=0x0 
+   BASE0=Ar15() FB SIBBASE=7 value=0x7 FB REXB=1 value=0x1 
+SIBINDEX_ENCODE
+   SIB=0 nothing 
+   SIB=1 nt NT[SIBINDEX_ENCODE_SIB1] 
+SIBINDEX_ENCODE_SIB1
+   otherwise: FB ERROR=XED_ERROR_GENERAL_ERROR  return 1
+   INDEX=ArAX() FB SIBINDEX=0 value=0x0 FB REXX=0 value=0x0 
+   INDEX=Ar8() FB SIBINDEX=0 value=0x0 FB REXX=1 value=0x1 
+   INDEX=ArCX() FB SIBINDEX=1 value=0x1 FB REXX=0 value=0x0 
+   INDEX=Ar9() FB SIBINDEX=1 value=0x1 FB REXX=1 value=0x1 
+   INDEX=ArDX() FB SIBINDEX=2 value=0x2 FB REXX=0 value=0x0 
+   INDEX=Ar10() FB SIBINDEX=2 value=0x2 FB REXX=1 value=0x1 
+   INDEX=ArBX() FB SIBINDEX=3 value=0x3 FB REXX=0 value=0x0 
+   INDEX=Ar11() FB SIBINDEX=3 value=0x3 FB REXX=1 value=0x1 
+   INDEX=@ FB SIBINDEX=4 value=0x4 FB REXX=0 value=0x0 
+   INDEX=Ar12() FB SIBINDEX=4 value=0x4 FB REXX=1 value=0x1 
+   INDEX=ArBP() FB SIBINDEX=5 value=0x5 FB REXX=0 value=0x0 
+   INDEX=Ar13() FB SIBINDEX=5 value=0x5 FB REXX=1 value=0x1 
+   INDEX=ArSI() FB SIBINDEX=6 value=0x6 FB REXX=0 value=0x0 
+   INDEX=Ar14() FB SIBINDEX=6 value=0x6 FB REXX=1 value=0x1 
+   INDEX=ArDI() FB SIBINDEX=7 value=0x7 FB REXX=0 value=0x0 
+   INDEX=Ar15() FB SIBINDEX=7 value=0x7 FB REXX=1 value=0x1 
+SIBSCALE_ENCODE
+   otherwise: FB ERROR=XED_ERROR_GENERAL_ERROR  return 1
+   SIB=0 nothing 
+   SIB=1 SCALE=0 FB SIBSCALE=0 value=0x0 
+   SIB=1 SCALE=1 FB SIBSCALE=0 value=0x0 
+   SIB=1 SCALE=2 FB SIBSCALE=1 value=0x1 
+   SIB=1 SCALE=4 FB SIBSCALE=2 value=0x2 
+   SIB=1 SCALE=8 FB SIBSCALE=3 value=0x3 
+MODRM_MOD_ENCODE
+   EASZ=1 DISP_WIDTH=0 nt NT[MODRM_MOD_EA16_DISP0] 
+   EASZ=1 DISP_WIDTH=8 nt NT[MODRM_MOD_EA16_DISP8] 
+   EASZ=1 DISP_WIDTH=16 nt NT[MODRM_MOD_EA16_DISP16] 
+   EASZ=1 DISP_WIDTH=32 nt NT[ERROR] 
+   EASZ=1 DISP_WIDTH=64 nt NT[ERROR] 
+   EASZ=2 DISP_WIDTH=0 nt NT[MODRM_MOD_EA32_DISP0] 
+   EASZ=2 DISP_WIDTH=8 nt NT[MODRM_MOD_EA32_DISP8] 
+   EASZ=2 DISP_WIDTH=16 nt NT[ERROR] 
+   EASZ=2 DISP_WIDTH=32 nt NT[MODRM_MOD_EA32_DISP32] 
+   EASZ=2 DISP_WIDTH=64 nt NT[ERROR] 
+   EASZ=3 DISP_WIDTH=0 nt NT[MODRM_MOD_EA64_DISP0] 
+   EASZ=3 DISP_WIDTH=8 nt NT[MODRM_MOD_EA64_DISP8] 
+   EASZ=3 DISP_WIDTH=16 nt NT[ERROR] 
+   EASZ=3 DISP_WIDTH=32 nt NT[MODRM_MOD_EA64_DISP32] 
+   EASZ=3 DISP_WIDTH=64 nt NT[ERROR] 
+MODRM_MOD_EA16_DISP0
+   BASE0=XED_REG_BX INDEX=@ FB MOD=0 value=0x0 
+   BASE0=XED_REG_SI INDEX=@ FB MOD=0 value=0x0 
+   BASE0=XED_REG_DI INDEX=@ FB MOD=0 value=0x0 
+   BASE0=XED_REG_BP INDEX=@ FB MOD=1 value=0x1 FB DISP_WIDTH=8 value=0x8 FB DISP=0 value=0x0 
+   BASE0=XED_REG_BP INDEX=XED_REG_SI FB MOD=0 value=0x0 
+   BASE0=XED_REG_BP INDEX=XED_REG_DI FB MOD=0 value=0x0 
+   BASE0=XED_REG_BX INDEX=XED_REG_SI FB MOD=0 value=0x0 
+   BASE0=XED_REG_BX INDEX=XED_REG_DI FB MOD=0 value=0x0 
+MODRM_MOD_EA16_DISP8
+   BASE0=XED_REG_BX INDEX=@ FB MOD=1 value=0x1 
+   BASE0=XED_REG_SI INDEX=@ FB MOD=1 value=0x1 
+   BASE0=XED_REG_DI INDEX=@ FB MOD=1 value=0x1 
+   BASE0=XED_REG_BP INDEX=@ FB MOD=1 value=0x1 
+   BASE0=XED_REG_BP INDEX=XED_REG_SI FB MOD=1 value=0x1 
+   BASE0=XED_REG_BP INDEX=XED_REG_DI FB MOD=1 value=0x1 
+   BASE0=XED_REG_BX INDEX=XED_REG_SI FB MOD=1 value=0x1 
+   BASE0=XED_REG_BX INDEX=XED_REG_DI FB MOD=1 value=0x1 
+MODRM_MOD_EA16_DISP16
+   BASE0=@ INDEX=@ FB MOD=0 value=0x0 
+   BASE0=XED_REG_BX INDEX=@ FB MOD=2 value=0x2 
+   BASE0=XED_REG_SI INDEX=@ FB MOD=2 value=0x2 
+   BASE0=XED_REG_DI INDEX=@ FB MOD=2 value=0x2 
+   BASE0=XED_REG_BP INDEX=@ FB MOD=2 value=0x2 
+   BASE0=XED_REG_BP INDEX=XED_REG_SI FB MOD=2 value=0x2 
+   BASE0=XED_REG_BP INDEX=XED_REG_DI FB MOD=2 value=0x2 
+   BASE0=XED_REG_BX INDEX=XED_REG_SI FB MOD=2 value=0x2 
+   BASE0=XED_REG_BX INDEX=XED_REG_DI FB MOD=2 value=0x2 
+MODRM_MOD_EA32_DISP0
+   BASE0=XED_REG_EBP MODE=1 FB MOD=1 value=0x1 FB DISP_WIDTH=8 value=0x8 FB DISP=0 value=0x0 
+   BASE0=XED_REG_EBP MODE=2 FB MOD=1 value=0x1 FB DISP_WIDTH=8 value=0x8 FB DISP=0 value=0x0 
+   BASE0=XED_REG_R13D MODE=2 FB MOD=1 value=0x1 FB DISP_WIDTH=8 value=0x8 FB DISP=0 value=0x0 
+   BASE0=XED_REG_EAX MODE=1 FB MOD=0 value=0x0 
+   BASE0=XED_REG_EBX MODE=1 FB MOD=0 value=0x0 
+   BASE0=XED_REG_ECX MODE=1 FB MOD=0 value=0x0 
+   BASE0=XED_REG_EDX MODE=1 FB MOD=0 value=0x0 
+   BASE0=XED_REG_ESI MODE=1 FB MOD=0 value=0x0 
+   BASE0=XED_REG_EDI MODE=1 FB MOD=0 value=0x0 
+   BASE0=XED_REG_ESP MODE=1 FB MOD=0 value=0x0 
+   BASE0=XED_REG_EAX MODE=2 FB MOD=0 value=0x0 
+   BASE0=XED_REG_EBX MODE=2 FB MOD=0 value=0x0 
+   BASE0=XED_REG_ECX MODE=2 FB MOD=0 value=0x0 
+   BASE0=XED_REG_EDX MODE=2 FB MOD=0 value=0x0 
+   BASE0=XED_REG_ESI MODE=2 FB MOD=0 value=0x0 
+   BASE0=XED_REG_EDI MODE=2 FB MOD=0 value=0x0 
+   BASE0=XED_REG_ESP MODE=2 FB MOD=0 value=0x0 
+   BASE0=XED_REG_R8D MODE=2 FB MOD=0 value=0x0 
+   BASE0=XED_REG_R9D MODE=2 FB MOD=0 value=0x0 
+   BASE0=XED_REG_R10D MODE=2 FB MOD=0 value=0x0 
+   BASE0=XED_REG_R11D MODE=2 FB MOD=0 value=0x0 
+   BASE0=XED_REG_R12D MODE=2 FB MOD=0 value=0x0 
+   BASE0=XED_REG_R14D MODE=2 FB MOD=0 value=0x0 
+   BASE0=XED_REG_R15D MODE=2 FB MOD=0 value=0x0 
+MODRM_MOD_EA32_DISP8
+   otherwise: FB MOD=1 value=0x1  return 1
+MODRM_MOD_EA32_DISP32
+   BASE0=@ FB MOD=0 value=0x0 
+   BASE0=GPR32e() FB MOD=2 value=0x2 
+   BASE0=rIPa() MODE=2 FB MOD=0 value=0x0 
+MODRM_MOD_EA64_DISP0
+   BASE0=XED_REG_EIP FB MOD=0 value=0x0 FB DISP_WIDTH=32 value=0x20 FB DISP=0 value=0x0 
+   BASE0=XED_REG_RIP FB MOD=0 value=0x0 FB DISP_WIDTH=32 value=0x20 FB DISP=0 value=0x0 
+   BASE0=XED_REG_RBP FB MOD=1 value=0x1 FB DISP_WIDTH=8 value=0x8 FB DISP=0 value=0x0 
+   BASE0=XED_REG_R13 FB MOD=1 value=0x1 FB DISP_WIDTH=8 value=0x8 FB DISP=0 value=0x0 
+   BASE0=XED_REG_RAX FB MOD=0 value=0x0 
+   BASE0=XED_REG_RBX FB MOD=0 value=0x0 
+   BASE0=XED_REG_RCX FB MOD=0 value=0x0 
+   BASE0=XED_REG_RDX FB MOD=0 value=0x0 
+   BASE0=XED_REG_RSI FB MOD=0 value=0x0 
+   BASE0=XED_REG_RDI FB MOD=0 value=0x0 
+   BASE0=XED_REG_RSP FB MOD=0 value=0x0 
+   BASE0=XED_REG_R8 FB MOD=0 value=0x0 
+   BASE0=XED_REG_R9 FB MOD=0 value=0x0 
+   BASE0=XED_REG_R10 FB MOD=0 value=0x0 
+   BASE0=XED_REG_R11 FB MOD=0 value=0x0 
+   BASE0=XED_REG_R12 FB MOD=0 value=0x0 
+   BASE0=XED_REG_R14 FB MOD=0 value=0x0 
+   BASE0=XED_REG_R15 FB MOD=0 value=0x0 
+MODRM_MOD_EA64_DISP8
+   BASE0=GPR64e() FB MOD=1 value=0x1 
+MODRM_MOD_EA64_DISP32
+   BASE0=@ FB MOD=0 value=0x0 
+   BASE0=XED_REG_EIP FB MOD=0 value=0x0 
+   BASE0=XED_REG_RIP FB MOD=0 value=0x0 
+   BASE0=XED_REG_RAX FB MOD=2 value=0x2 
+   BASE0=XED_REG_RBX FB MOD=2 value=0x2 
+   BASE0=XED_REG_RCX FB MOD=2 value=0x2 
+   BASE0=XED_REG_RDX FB MOD=2 value=0x2 
+   BASE0=XED_REG_RSI FB MOD=2 value=0x2 
+   BASE0=XED_REG_RDI FB MOD=2 value=0x2 
+   BASE0=XED_REG_RSP FB MOD=2 value=0x2 
+   BASE0=XED_REG_RBP FB MOD=2 value=0x2 
+   BASE0=XED_REG_R8 FB MOD=2 value=0x2 
+   BASE0=XED_REG_R9 FB MOD=2 value=0x2 
+   BASE0=XED_REG_R10 FB MOD=2 value=0x2 
+   BASE0=XED_REG_R11 FB MOD=2 value=0x2 
+   BASE0=XED_REG_R12 FB MOD=2 value=0x2 
+   BASE0=XED_REG_R13 FB MOD=2 value=0x2 
+   BASE0=XED_REG_R14 FB MOD=2 value=0x2 
+   BASE0=XED_REG_R15 FB MOD=2 value=0x2 
+MODRM_RM_ENCODE
+   EASZ=1 SIB=0 nt NT[MODRM_RM_ENCODE_EA16_SIB0] 
+   EASZ=2 SIB=0 nt NT[MODRM_RM_ENCODE_EA32_SIB0] 
+   EASZ=3 SIB=0 nt NT[MODRM_RM_ENCODE_EA64_SIB0] 
+   EASZ!=1 SIB=1 nt NT[MODRM_RM_ENCODE_EANOT16_SIB1] 
+MODRM_RM_ENCODE_EA16_SIB0
+   BASE0=XED_REG_BX INDEX=XED_REG_SI FB RM=0 value=0x0 
+   BASE0=XED_REG_BX INDEX=XED_REG_DI FB RM=1 value=0x1 
+   BASE0=XED_REG_BP INDEX=XED_REG_SI FB RM=2 value=0x2 
+   BASE0=XED_REG_BP INDEX=XED_REG_DI FB RM=3 value=0x3 
+   BASE0=XED_REG_SI INDEX=@ FB RM=4 value=0x4 
+   BASE0=XED_REG_DI INDEX=@ FB RM=5 value=0x5 
+   BASE0=@ INDEX=@ nt NT[DISP_WIDTH_16] FB RM=6 value=0x6 
+   BASE0=XED_REG_BP INDEX=@ nt NT[DISP_WIDTH_0_8_16] FB RM=6 value=0x6 
+   BASE0=XED_REG_BX INDEX=@ FB RM=7 value=0x7 
+MODRM_RM_ENCODE_EA64_SIB0
+   BASE0=XED_REG_RAX FB RM=0 value=0x0 FB REXB=0 value=0x0 
+   BASE0=XED_REG_R8 FB RM=0 value=0x0 FB REXB=1 value=0x1 
+   BASE0=XED_REG_RCX FB RM=1 value=0x1 FB REXB=0 value=0x0 
+   BASE0=XED_REG_R9 FB RM=1 value=0x1 FB REXB=1 value=0x1 
+   BASE0=XED_REG_RDX FB RM=2 value=0x2 FB REXB=0 value=0x0 
+   BASE0=XED_REG_R10 FB RM=2 value=0x2 FB REXB=1 value=0x1 
+   BASE0=XED_REG_RBX FB RM=3 value=0x3 FB REXB=0 value=0x0 
+   BASE0=XED_REG_R11 FB RM=3 value=0x3 FB REXB=1 value=0x1 
+   BASE0=XED_REG_RSI FB RM=6 value=0x6 FB REXB=0 value=0x0 
+   BASE0=XED_REG_R14 FB RM=6 value=0x6 FB REXB=1 value=0x1 
+   BASE0=XED_REG_RDI FB RM=7 value=0x7 FB REXB=0 value=0x0 
+   BASE0=XED_REG_R15 FB RM=7 value=0x7 FB REXB=1 value=0x1 
+   BASE0=@ nt NT[DISP_WIDTH_32] FB RM=5 value=0x5 
+   BASE0=XED_REG_RBP nt NT[DISP_WIDTH_0_8_32] FB RM=5 value=0x5 FB REXB=0 value=0x0 
+   BASE0=XED_REG_RIP FB RM=5 value=0x5 
+   BASE0=XED_REG_EIP FB RM=5 value=0x5 
+   BASE0=XED_REG_R13 nt NT[DISP_WIDTH_0_8_32] FB RM=5 value=0x5 FB REXB=1 value=0x1 
+MODRM_RM_ENCODE_EA32_SIB0
+   BASE0=XED_REG_EAX FB RM=0 value=0x0 FB REXB=0 value=0x0 
+   BASE0=XED_REG_R8D FB RM=0 value=0x0 FB REXB=1 value=0x1 
+   BASE0=XED_REG_ECX FB RM=1 value=0x1 FB REXB=0 value=0x0 
+   BASE0=XED_REG_R9D FB RM=1 value=0x1 FB REXB=1 value=0x1 
+   BASE0=XED_REG_EDX FB RM=2 value=0x2 FB REXB=0 value=0x0 
+   BASE0=XED_REG_R10D FB RM=2 value=0x2 FB REXB=1 value=0x1 
+   BASE0=XED_REG_EBX FB RM=3 value=0x3 FB REXB=0 value=0x0 
+   BASE0=XED_REG_R11D FB RM=3 value=0x3 FB REXB=1 value=0x1 
+   BASE0=XED_REG_ESI FB RM=6 value=0x6 FB REXB=0 value=0x0 
+   BASE0=XED_REG_R14D FB RM=6 value=0x6 FB REXB=1 value=0x1 
+   BASE0=XED_REG_EDI FB RM=7 value=0x7 FB REXB=0 value=0x0 
+   BASE0=XED_REG_R15D FB RM=7 value=0x7 FB REXB=1 value=0x1 
+   BASE0=@ nt NT[DISP_WIDTH_32] FB RM=5 value=0x5 
+   BASE0=XED_REG_EBP nt NT[DISP_WIDTH_0_8_32] FB RM=5 value=0x5 FB REXB=0 value=0x0 
+   BASE0=XED_REG_R13D nt NT[DISP_WIDTH_0_8_32] FB RM=5 value=0x5 FB REXB=1 value=0x1 
+   BASE0=XED_REG_RIP MODE=2 FB RM=5 value=0x5 
+   BASE0=XED_REG_EIP MODE=2 FB RM=5 value=0x5 
+MODRM_RM_ENCODE_EANOT16_SIB1
+   otherwise: FB RM=4 value=0x4  return 1
+SIB_NT
+   SIB=1 SIBBASE[bbb]=* SIBSCALE[ss]=* SIBINDEX[iii]=* emit ss_iii_bbb emit_type=letters nbits=8 
+   SIB=0 nothing 
+DISP_NT
+   otherwise: return 1
+   DISP_WIDTH=8 DISP[dddddddd]=* emit dddddddd emit_type=letters nbits=8 
+   DISP_WIDTH=16 DISP[dddddddddddddddd]=* emit dddddddddddddddd emit_type=letters nbits=16 
+   DISP_WIDTH=32 DISP[dddddddddddddddddddddddddddddddd]=* emit dddddddddddddddddddddddddddddddd emit_type=letters nbits=32 
+   DISP_WIDTH=64 DISP[dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd]=* emit dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd emit_type=letters nbits=64 
+ERROR
+   otherwise: FB ERROR=XED_ERROR_GENERAL_ERROR  return 1
+DISP_WIDTH_0
+   DISP_WIDTH=0 nothing 
+DISP_WIDTH_8
+   DISP_WIDTH=8 nothing 
+DISP_WIDTH_16
+   DISP_WIDTH=16 nothing 
+DISP_WIDTH_32
+   DISP_WIDTH=32 nothing 
+DISP_WIDTH_0_8_16
+   DISP_WIDTH=0 nothing 
+   DISP_WIDTH=8 nothing 
+   DISP_WIDTH=16 nothing 
+DISP_WIDTH_0_8_32
+   DISP_WIDTH=0 nothing 
+   DISP_WIDTH=8 nothing 
+   DISP_WIDTH=32 nothing 
+FIXUP_EOSZ_ENC
+   otherwise: return 1
+   MODE=0 EOSZ=0 FB EOSZ=1 value=0x1 
+   MODE=1 EOSZ=0 FB EOSZ=2 value=0x2 
+   MODE=2 EOSZ=0 FB EOSZ=2 value=0x2 
+FIXUP_EASZ_ENC
+   otherwise: return 1
+   MODE=0 EASZ=0 FB EASZ=1 value=0x1 
+   MODE=1 EASZ=0 FB EASZ=2 value=0x2 
+   MODE=2 EASZ=0 FB EASZ=3 value=0x3 
+FIXUP_SMODE_ENC
+   otherwise: return 1
+   MODE=2 SMODE=0 FB SMODE=2 value=0x2 
+   MODE=2 SMODE=1 FB ERROR=XED_ERROR_GENERAL_ERROR 
+REMOVE_SEGMENT
+   AGEN=0 nothing 
+   AGEN=1 nt NT[REMOVE_SEGMENT_AGEN1] 
+REMOVE_SEGMENT_AGEN1
+   SEG0=@ nothing 
+   SEG0=SEGe() FB ERROR=XED_ERROR_GENERAL_ERROR 
+OVERRIDE_SEG0
+   SEG0=@ FB SEG_OVD=0 value=0x0 
+   SEG0=XED_REG_DS FB SEG_OVD=0 value=0x0 
+   SEG0=XED_REG_CS FB SEG_OVD=1 value=0x1 
+   SEG0=XED_REG_ES FB SEG_OVD=3 value=0x3 
+   SEG0=XED_REG_FS FB SEG_OVD=4 value=0x4 
+   SEG0=XED_REG_GS FB SEG_OVD=5 value=0x5 
+   SEG0=XED_REG_SS FB SEG_OVD=6 value=0x6 
+OVERRIDE_SEG1
+   SEG1=@ FB SEG_OVD=0 value=0x0 
+   SEG1=XED_REG_DS FB SEG_OVD=0 value=0x0 
+   SEG1=XED_REG_CS FB SEG_OVD=1 value=0x1 
+   SEG1=XED_REG_ES FB SEG_OVD=3 value=0x3 
+   SEG1=XED_REG_FS FB SEG_OVD=4 value=0x4 
+   SEG1=XED_REG_GS FB SEG_OVD=5 value=0x5 
+   SEG1=XED_REG_SS FB SEG_OVD=6 value=0x6 
+REX_PREFIX_ENC
+   otherwise: FB ERROR=XED_ERROR_GENERAL_ERROR  return 1
+   MODE=2 NOREX=0 NEEDREX=1 REXW[w]=* REXB[b]=* REXX[x]=* REXR[r]=* emit 0b0100 emit_type=numeric value=0x4 nbits=4 emit wrxb emit_type=letters nbits=4 
+   MODE=2 NOREX=0 REX=1 REXW[w]=* REXB[b]=* REXX[x]=* REXR[r]=* emit 0b0100 emit_type=numeric value=0x4 nbits=4 emit wrxb emit_type=letters nbits=4 
+   MODE=2 NOREX=0 REXW[w]=1 REXB[b]=* REXX[x]=* REXR[r]=* emit 0b0100 emit_type=numeric value=0x4 nbits=4 emit wrxb emit_type=letters nbits=4 
+   MODE=2 NOREX=0 REXW[w]=* REXB[b]=1 REXX[x]=* REXR[r]=* emit 0b0100 emit_type=numeric value=0x4 nbits=4 emit wrxb emit_type=letters nbits=4 
+   MODE=2 NOREX=0 REXW[w]=* REXB[b]=* REXX[x]=1 REXR[r]=* emit 0b0100 emit_type=numeric value=0x4 nbits=4 emit wrxb emit_type=letters nbits=4 
+   MODE=2 NOREX=0 REXW[w]=* REXB[b]=* REXX[x]=* REXR[r]=1 emit 0b0100 emit_type=numeric value=0x4 nbits=4 emit wrxb emit_type=letters nbits=4 
+   MODE=2 NOREX=1 NEEDREX=1 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   MODE=2 NOREX=1 REX=1 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   MODE=2 NOREX=1 REXW=1 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   MODE=2 NOREX=1 REXB=1 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   MODE=2 NOREX=1 REXX=1 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   MODE=2 NOREX=1 REXR=1 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   MODE=2 NEEDREX=0 REX=0 REXW=0 REXB=0 REXX=0 REXR=0 nothing 
+   MODE=1 REX=0 REXW=0 REXB=0 REXX=0 REXR=0 nothing 
+   MODE=0 REX=0 REXW=0 REXB=0 REXX=0 REXR=0 nothing 
+PREFIX_ENC
+   otherwise: return 1
+   REP=2 emit 0xf2 emit_type=numeric value=0xf2 nbits=8 FB NO_RETURN=1 value=0x1 
+   REP=3 emit 0xf3 emit_type=numeric value=0xf3 nbits=8 FB NO_RETURN=1 value=0x1 
+   OSZ=1 emit 0x66 emit_type=numeric value=0x66 nbits=8 FB NO_RETURN=1 value=0x1 
+   ASZ=1 emit 0x67 emit_type=numeric value=0x67 nbits=8 FB NO_RETURN=1 value=0x1 
+   LOCK=1 emit 0xf0 emit_type=numeric value=0xf0 nbits=8 FB NO_RETURN=1 value=0x1 
+   SEG_OVD=4 emit 0x64 emit_type=numeric value=0x64 nbits=8 FB NO_RETURN=1 value=0x1 
+   SEG_OVD=5 emit 0x65 emit_type=numeric value=0x65 nbits=8 FB NO_RETURN=1 value=0x1 
+   MODE=2 HINT=3 emit 0x2e emit_type=numeric value=0x2e nbits=8 FB NO_RETURN=1 value=0x1 
+   MODE=2 HINT=4 emit 0x3e emit_type=numeric value=0x3e nbits=8 FB NO_RETURN=1 value=0x1 
+   MODE!=2 SEG_OVD=1 emit 0x2e emit_type=numeric value=0x2e nbits=8 FB NO_RETURN=1 value=0x1 
+   MODE!=2 HINT=3 emit 0x2e emit_type=numeric value=0x2e nbits=8 FB NO_RETURN=1 value=0x1 
+   MODE!=2 SEG_OVD=2 emit 0x3e emit_type=numeric value=0x3e nbits=8 FB NO_RETURN=1 value=0x1 
+   MODE!=2 HINT=4 emit 0x3e emit_type=numeric value=0x3e nbits=8 FB NO_RETURN=1 value=0x1 
+   MODE!=2 SEG_OVD=3 emit 0x26 emit_type=numeric value=0x26 nbits=8 FB NO_RETURN=1 value=0x1 
+   MODE!=2 SEG_OVD=6 emit 0x36 emit_type=numeric value=0x36 nbits=8 FB NO_RETURN=1 value=0x1 
+DF64
+   MODE=0 nothing 
+   MODE=1 nothing 
+   MODE=2 FB DF64=1 value=0x1 
+OSZ_NONTERM_ENC
+   otherwise: return 1
+   VEXVALID=0 MODE=0 EOSZ=1 nothing 
+   VEXVALID=0 MODE=0 EOSZ=2 DF32=1 nothing 
+   VEXVALID=0 MODE=0 EOSZ=2 DF32=0 FB OSZ=1 value=0x1 
+   VEXVALID=0 MODE=1 EOSZ=1 FB OSZ=1 value=0x1 
+   VEXVALID=0 MODE=1 EOSZ=2 nothing 
+   VEXVALID=0 MODE=2 EOSZ=1 FB OSZ=1 value=0x1 
+   VEXVALID=0 MODE=2 EOSZ=2 DF64=1 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   VEXVALID=0 MODE=2 EOSZ=2 DF64=0 nothing 
+   VEXVALID=0 MODE=2 EOSZ=3 DF64=1 nothing 
+   VEXVALID=0 MODE=2 EOSZ=3 DF64=0 FB REXW=1 value=0x1 
+REFINING66
+   otherwise: return 1
+IGNORE66
+   otherwise: return 1
+IMMUNE66
+   otherwise: return 1
+   MODE=0 FB EOSZ=2 value=0x2 FB DF32=1 value=0x1 
+IMMUNE66_LOOP64
+   otherwise: return 1
+IMMUNE_REXW
+   otherwise: return 1
+CR_WIDTH
+   MODE=0 FB DF32=1 value=0x1 FB EOSZ=2 value=0x2 
+   MODE=1 nothing 
+   MODE=2 FB DF64=1 value=0x1 FB EOSZ=3 value=0x3 
+FORCE64
+   otherwise: FB DF64=1 value=0x1  FB EOSZ=3 value=0x3  return 1
+BRANCH_HINT
+   otherwise: return 1
+VEXED_REX
+   VEXVALID=3 nt NT[XOP_ENC] 
+XOP_TYPE_ENC
+   otherwise: FB ERROR=XED_ERROR_GENERAL_ERROR  return 1
+   MAP=8 emit 0x8F emit_type=numeric value=0x8f nbits=8 
+   MAP=9 emit 0x8F emit_type=numeric value=0x8f nbits=8 
+   MAP=10 emit 0x8F emit_type=numeric value=0x8f nbits=8 
+XOP_MAP_ENC
+   otherwise: FB ERROR=XED_ERROR_GENERAL_ERROR  return 1
+   MAP=8 REXW[w]=* emit 0b0_1000 emit_type=numeric value=0x8 nbits=5 emit w emit_type=letters nbits=1 
+   MAP=9 REXW[w]=* emit 0b0_1001 emit_type=numeric value=0x9 nbits=5 emit w emit_type=letters nbits=1 
+   MAP=10 REXW[w]=* emit 0b0_1010 emit_type=numeric value=0xa nbits=5 emit w emit_type=letters nbits=1 
+XOP_REXXB_ENC
+   otherwise: return 1
+   MODE=2 REXX=0 REXB=0 emit 0b11 emit_type=numeric value=0x3 nbits=2 
+   MODE=2 REXX=1 REXB=0 emit 0b01 emit_type=numeric value=0x1 nbits=2 
+   MODE=2 REXX=0 REXB=1 emit 0b10 emit_type=numeric value=0x2 nbits=2 
+   MODE=2 REXX=1 REXB=1 emit 0b00 emit_type=numeric value=0x0 nbits=2 
+   MODE!=2 REXX=0 REXB=0 emit 0b11 emit_type=numeric value=0x3 nbits=2 
+   MODE!=2 REXX=1 REXB=0 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   MODE!=2 REXX=0 REXB=1 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   MODE!=2 REXX=1 REXB=1 FB ERROR=XED_ERROR_GENERAL_ERROR 
+BND_R_CHECK
+   REXR=0 REG=0x0 nothing 
+   REXR=0 REG=0x1 nothing 
+   REXR=0 REG=0x2 nothing 
+   REXR=0 REG=0x3 nothing 
+   REXR=0 REG=0x4 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   REXR=0 REG=0x5 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   REXR=0 REG=0x6 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   REXR=0 REG=0x7 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   REXR=1 REG=0x0 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   REXR=1 REG=0x1 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   REXR=1 REG=0x2 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   REXR=1 REG=0x3 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   REXR=1 REG=0x4 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   REXR=1 REG=0x5 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   REXR=1 REG=0x6 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   REXR=1 REG=0x7 FB ERROR=XED_ERROR_GENERAL_ERROR 
+BND_B_CHECK
+   REXB=0 RM=0x0 nothing 
+   REXB=0 RM=0x1 nothing 
+   REXB=0 RM=0x2 nothing 
+   REXB=0 RM=0x3 nothing 
+   REXB=0 RM=0x4 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   REXB=0 RM=0x5 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   REXB=0 RM=0x6 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   REXB=0 RM=0x7 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   REXB=1 RM=0x0 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   REXB=1 RM=0x1 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   REXB=1 RM=0x2 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   REXB=1 RM=0x3 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   REXB=1 RM=0x4 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   REXB=1 RM=0x5 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   REXB=1 RM=0x6 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   REXB=1 RM=0x7 FB ERROR=XED_ERROR_GENERAL_ERROR 
+VEX_TYPE_ENC
+   otherwise: emit 0xC5 emit_type=numeric value=0xc5 nbits=8  FB VEX_C4=0 value=0x0  return 1
+   REXX=1 emit 0xC4 emit_type=numeric value=0xc4 nbits=8 FB VEX_C4=1 value=0x1 
+   REXB=1 emit 0xC4 emit_type=numeric value=0xc4 nbits=8 FB VEX_C4=1 value=0x1 
+   MAP=0 emit 0xC4 emit_type=numeric value=0xc4 nbits=8 FB VEX_C4=1 value=0x1 
+   MAP=2 emit 0xC4 emit_type=numeric value=0xc4 nbits=8 FB VEX_C4=1 value=0x1 
+   MAP=3 emit 0xC4 emit_type=numeric value=0xc4 nbits=8 FB VEX_C4=1 value=0x1 
+   REXW=1 emit 0xC4 emit_type=numeric value=0xc4 nbits=8 FB VEX_C4=1 value=0x1 
+VEX_REXR_ENC
+   MODE=2 REXR=1 emit 0b0 emit_type=numeric value=0x0 nbits=1 
+   MODE=2 REXR=0 emit 0b1 emit_type=numeric value=0x1 nbits=1 
+   MODE!=2 REXR=1 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   MODE!=2 REXR=0 emit 0b1 emit_type=numeric value=0x1 nbits=1 
+VEX_REXXB_ENC
+   otherwise: return 1
+   MODE=2 VEX_C4=1 REXX=0 REXB=0 emit 0b11 emit_type=numeric value=0x3 nbits=2 
+   MODE=2 VEX_C4=1 REXX=1 REXB=0 emit 0b01 emit_type=numeric value=0x1 nbits=2 
+   MODE=2 VEX_C4=1 REXX=0 REXB=1 emit 0b10 emit_type=numeric value=0x2 nbits=2 
+   MODE=2 VEX_C4=1 REXX=1 REXB=1 emit 0b00 emit_type=numeric value=0x0 nbits=2 
+   MODE!=2 VEX_C4=1 REXX=0 REXB=0 emit 0b11 emit_type=numeric value=0x3 nbits=2 
+   MODE!=2 VEX_C4=1 REXX=1 REXB=0 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   MODE!=2 VEX_C4=1 REXX=0 REXB=1 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   MODE!=2 VEX_C4=1 REXX=1 REXB=1 FB ERROR=XED_ERROR_GENERAL_ERROR 
+VEX_MAP_ENC
+   otherwise: return 1
+   VEX_C4=1 MAP=0 REXW[w]=* emit 0b0_0000 emit_type=numeric value=0x0 nbits=5 emit w emit_type=letters nbits=1 
+   VEX_C4=1 MAP=1 REXW[w]=* emit 0b0_0001 emit_type=numeric value=0x1 nbits=5 emit w emit_type=letters nbits=1 
+   VEX_C4=1 MAP=2 REXW[w]=* emit 0b0_0010 emit_type=numeric value=0x2 nbits=5 emit w emit_type=letters nbits=1 
+   VEX_C4=1 MAP=3 REXW[w]=* emit 0b0_0011 emit_type=numeric value=0x3 nbits=5 emit w emit_type=letters nbits=1 
+VEX_REG_ENC
+   MODE=2 VEXDEST3[u]=* VEXDEST210[ddd]=* emit u_ddd emit_type=letters nbits=4 
+   MODE!=2 VEXDEST3[u]=* VEXDEST210[ddd]=* emit 1_ddd emit_type=letters nbits=4 
+VEX_ESCVL_ENC
+   VL=0 VEX_PREFIX=0 emit 0b000 emit_type=numeric value=0x0 nbits=3 
+   VL=0 VEX_PREFIX=1 emit 0b001 emit_type=numeric value=0x1 nbits=3 
+   VL=0 VEX_PREFIX=3 emit 0b010 emit_type=numeric value=0x2 nbits=3 
+   VL=0 VEX_PREFIX=2 emit 0b011 emit_type=numeric value=0x3 nbits=3 
+   VL=1 VEX_PREFIX=0 emit 0b100 emit_type=numeric value=0x4 nbits=3 
+   VL=1 VEX_PREFIX=1 emit 0b101 emit_type=numeric value=0x5 nbits=3 
+   VL=1 VEX_PREFIX=3 emit 0b110 emit_type=numeric value=0x6 nbits=3 
+   VL=1 VEX_PREFIX=2 emit 0b111 emit_type=numeric value=0x7 nbits=3 
+SE_IMM8
+   DUMMY=0 ESRC[ssss]=* UIMM0[dddd]=* emit ssss_dddd emit_type=letters nbits=8 
+VMODRM_MOD_ENCODE
+   otherwise: FB ERROR=XED_ERROR_GENERAL_ERROR  return 1
+   EASZ=2 DISP_WIDTH=0 BASE0=ArBP() FB MOD=1 value=0x1 FB DISP_WIDTH=8 value=0x8 FB DISP=0 value=0x0 
+   EASZ=2 DISP_WIDTH=0 BASE0=Ar13() FB MOD=1 value=0x1 FB DISP_WIDTH=8 value=0x8 FB DISP=0 value=0x0 
+   EASZ=3 DISP_WIDTH=0 BASE0=ArBP() FB MOD=1 value=0x1 FB DISP_WIDTH=8 value=0x8 FB DISP=0 value=0x0 
+   EASZ=3 DISP_WIDTH=0 BASE0=Ar13() FB MOD=1 value=0x1 FB DISP_WIDTH=8 value=0x8 FB DISP=0 value=0x0 
+   EASZ=2 DISP_WIDTH=0 BASE0=ArAX() FB MOD=0 value=0x0 
+   EASZ=2 DISP_WIDTH=0 BASE0=ArBX() FB MOD=0 value=0x0 
+   EASZ=2 DISP_WIDTH=0 BASE0=ArCX() FB MOD=0 value=0x0 
+   EASZ=2 DISP_WIDTH=0 BASE0=ArDX() FB MOD=0 value=0x0 
+   EASZ=2 DISP_WIDTH=0 BASE0=ArSI() FB MOD=0 value=0x0 
+   EASZ=2 DISP_WIDTH=0 BASE0=ArDI() FB MOD=0 value=0x0 
+   EASZ=2 DISP_WIDTH=0 BASE0=ArSP() FB MOD=0 value=0x0 
+   EASZ=2 DISP_WIDTH=0 BASE0=Ar8() MODE=2 FB MOD=0 value=0x0 
+   EASZ=2 DISP_WIDTH=0 BASE0=Ar9() MODE=2 FB MOD=0 value=0x0 
+   EASZ=2 DISP_WIDTH=0 BASE0=Ar10() MODE=2 FB MOD=0 value=0x0 
+   EASZ=2 DISP_WIDTH=0 BASE0=Ar11() MODE=2 FB MOD=0 value=0x0 
+   EASZ=2 DISP_WIDTH=0 BASE0=Ar12() MODE=2 FB MOD=0 value=0x0 
+   EASZ=2 DISP_WIDTH=0 BASE0=Ar14() MODE=2 FB MOD=0 value=0x0 
+   EASZ=2 DISP_WIDTH=0 BASE0=Ar15() MODE=2 FB MOD=0 value=0x0 
+   EASZ=3 DISP_WIDTH=0 BASE0=ArAX() FB MOD=0 value=0x0 
+   EASZ=3 DISP_WIDTH=0 BASE0=ArBX() FB MOD=0 value=0x0 
+   EASZ=3 DISP_WIDTH=0 BASE0=ArCX() FB MOD=0 value=0x0 
+   EASZ=3 DISP_WIDTH=0 BASE0=ArDX() FB MOD=0 value=0x0 
+   EASZ=3 DISP_WIDTH=0 BASE0=ArSI() FB MOD=0 value=0x0 
+   EASZ=3 DISP_WIDTH=0 BASE0=ArDI() FB MOD=0 value=0x0 
+   EASZ=3 DISP_WIDTH=0 BASE0=ArSP() FB MOD=0 value=0x0 
+   EASZ=3 DISP_WIDTH=0 BASE0=Ar8() FB MOD=0 value=0x0 
+   EASZ=3 DISP_WIDTH=0 BASE0=Ar9() FB MOD=0 value=0x0 
+   EASZ=3 DISP_WIDTH=0 BASE0=Ar10() FB MOD=0 value=0x0 
+   EASZ=3 DISP_WIDTH=0 BASE0=Ar11() FB MOD=0 value=0x0 
+   EASZ=3 DISP_WIDTH=0 BASE0=Ar12() FB MOD=0 value=0x0 
+   EASZ=3 DISP_WIDTH=0 BASE0=Ar14() FB MOD=0 value=0x0 
+   EASZ=3 DISP_WIDTH=0 BASE0=Ar15() FB MOD=0 value=0x0 
+   EASZ=2 DISP_WIDTH=8 FB MOD=1 value=0x1 
+   EASZ=3 DISP_WIDTH=8 BASE0=GPR64e() FB MOD=1 value=0x1 
+   EASZ=2 DISP_WIDTH=32 BASE0=@ FB MOD=0 value=0x0 
+   EASZ=2 DISP_WIDTH=32 BASE0=GPR32e() FB MOD=2 value=0x2 
+   EASZ=3 DISP_WIDTH=32 BASE0=@ FB MOD=0 value=0x0 
+   EASZ=3 DISP_WIDTH=32 BASE0=ArAX() FB MOD=2 value=0x2 
+   EASZ=3 DISP_WIDTH=32 BASE0=ArBX() FB MOD=2 value=0x2 
+   EASZ=3 DISP_WIDTH=32 BASE0=ArCX() FB MOD=2 value=0x2 
+   EASZ=3 DISP_WIDTH=32 BASE0=ArDX() FB MOD=2 value=0x2 
+   EASZ=3 DISP_WIDTH=32 BASE0=ArSI() FB MOD=2 value=0x2 
+   EASZ=3 DISP_WIDTH=32 BASE0=ArDI() FB MOD=2 value=0x2 
+   EASZ=3 DISP_WIDTH=32 BASE0=ArSP() FB MOD=2 value=0x2 
+   EASZ=3 DISP_WIDTH=32 BASE0=ArBP() FB MOD=2 value=0x2 
+   EASZ=3 DISP_WIDTH=32 BASE0=Ar8() FB MOD=2 value=0x2 
+   EASZ=3 DISP_WIDTH=32 BASE0=Ar9() FB MOD=2 value=0x2 
+   EASZ=3 DISP_WIDTH=32 BASE0=Ar10() FB MOD=2 value=0x2 
+   EASZ=3 DISP_WIDTH=32 BASE0=Ar11() FB MOD=2 value=0x2 
+   EASZ=3 DISP_WIDTH=32 BASE0=Ar12() FB MOD=2 value=0x2 
+   EASZ=3 DISP_WIDTH=32 BASE0=Ar13() FB MOD=2 value=0x2 
+   EASZ=3 DISP_WIDTH=32 BASE0=Ar14() FB MOD=2 value=0x2 
+   EASZ=3 DISP_WIDTH=32 BASE0=Ar15() FB MOD=2 value=0x2 
+VSIB_ENC_BASE
+   otherwise: FB ERROR=XED_ERROR_GENERAL_ERROR  return 1
+   BASE0=ArAX() FB REXB=0 value=0x0 FB SIBBASE=0 value=0x0 
+   BASE0=ArCX() FB REXB=0 value=0x0 FB SIBBASE=1 value=0x1 
+   BASE0=ArDX() FB REXB=0 value=0x0 FB SIBBASE=2 value=0x2 
+   BASE0=ArBX() FB REXB=0 value=0x0 FB SIBBASE=3 value=0x3 
+   BASE0=ArSP() FB REXB=0 value=0x0 FB SIBBASE=4 value=0x4 
+   BASE0=@ nt NT[DISP_WIDTH_32] FB REXB=0 value=0x0 FB SIBBASE=5 value=0x5 
+   BASE0=ArBP() nt NT[DISP_WIDTH_8_32] FB REXB=0 value=0x0 FB SIBBASE=5 value=0x5 
+   BASE0=Ar13() nt NT[DISP_WIDTH_8_32] FB REXB=1 value=0x1 FB SIBBASE=5 value=0x5 
+   BASE0=ArSI() FB REXB=0 value=0x0 FB SIBBASE=6 value=0x6 
+   BASE0=ArDI() FB REXB=0 value=0x0 FB SIBBASE=7 value=0x7 
+   BASE0=Ar8() FB REXB=1 value=0x1 FB SIBBASE=0 value=0x0 
+   BASE0=Ar9() FB REXB=1 value=0x1 FB SIBBASE=1 value=0x1 
+   BASE0=Ar10() FB REXB=1 value=0x1 FB SIBBASE=2 value=0x2 
+   BASE0=Ar11() FB REXB=1 value=0x1 FB SIBBASE=3 value=0x3 
+   BASE0=Ar12() FB REXB=1 value=0x1 FB SIBBASE=4 value=0x4 
+   BASE0=Ar14() FB REXB=1 value=0x1 FB SIBBASE=6 value=0x6 
+   BASE0=Ar15() FB REXB=1 value=0x1 FB SIBBASE=7 value=0x7 
+VSIB_ENC_SCALE
+   otherwise: FB ERROR=XED_ERROR_GENERAL_ERROR  return 1
+   SCALE=0 FB SIBSCALE=0 value=0x0 
+   SCALE=1 FB SIBSCALE=0 value=0x0 
+   SCALE=2 FB SIBSCALE=1 value=0x1 
+   SCALE=4 FB SIBSCALE=2 value=0x2 
+   SCALE=8 FB SIBSCALE=3 value=0x3 
+VSIB_ENC
+   DUMMY=0 SIBBASE[bbb]=* SIBINDEX[iii]=* SIBSCALE[ss]=* emit ss_iii_bbb emit_type=letters nbits=8 
+VSIB_ENC_INDEX_XMM
+   INDEX=XED_REG_XMM0 FB REXX=0 value=0x0 FB SIBINDEX=0 value=0x0 
+   INDEX=XED_REG_XMM1 FB REXX=0 value=0x0 FB SIBINDEX=1 value=0x1 
+   INDEX=XED_REG_XMM2 FB REXX=0 value=0x0 FB SIBINDEX=2 value=0x2 
+   INDEX=XED_REG_XMM3 FB REXX=0 value=0x0 FB SIBINDEX=3 value=0x3 
+   INDEX=XED_REG_XMM4 FB REXX=0 value=0x0 FB SIBINDEX=4 value=0x4 
+   INDEX=XED_REG_XMM5 FB REXX=0 value=0x0 FB SIBINDEX=5 value=0x5 
+   INDEX=XED_REG_XMM6 FB REXX=0 value=0x0 FB SIBINDEX=6 value=0x6 
+   INDEX=XED_REG_XMM7 FB REXX=0 value=0x0 FB SIBINDEX=7 value=0x7 
+   INDEX=XED_REG_XMM8 FB REXX=1 value=0x1 FB SIBINDEX=0 value=0x0 
+   INDEX=XED_REG_XMM9 FB REXX=1 value=0x1 FB SIBINDEX=1 value=0x1 
+   INDEX=XED_REG_XMM10 FB REXX=1 value=0x1 FB SIBINDEX=2 value=0x2 
+   INDEX=XED_REG_XMM11 FB REXX=1 value=0x1 FB SIBINDEX=3 value=0x3 
+   INDEX=XED_REG_XMM12 FB REXX=1 value=0x1 FB SIBINDEX=4 value=0x4 
+   INDEX=XED_REG_XMM13 FB REXX=1 value=0x1 FB SIBINDEX=5 value=0x5 
+   INDEX=XED_REG_XMM14 FB REXX=1 value=0x1 FB SIBINDEX=6 value=0x6 
+   INDEX=XED_REG_XMM15 FB REXX=1 value=0x1 FB SIBINDEX=7 value=0x7 
+VSIB_ENC_INDEX_YMM
+   INDEX=XED_REG_YMM0 FB REXX=0 value=0x0 FB SIBINDEX=0 value=0x0 
+   INDEX=XED_REG_YMM1 FB REXX=0 value=0x0 FB SIBINDEX=1 value=0x1 
+   INDEX=XED_REG_YMM2 FB REXX=0 value=0x0 FB SIBINDEX=2 value=0x2 
+   INDEX=XED_REG_YMM3 FB REXX=0 value=0x0 FB SIBINDEX=3 value=0x3 
+   INDEX=XED_REG_YMM4 FB REXX=0 value=0x0 FB SIBINDEX=4 value=0x4 
+   INDEX=XED_REG_YMM5 FB REXX=0 value=0x0 FB SIBINDEX=5 value=0x5 
+   INDEX=XED_REG_YMM6 FB REXX=0 value=0x0 FB SIBINDEX=6 value=0x6 
+   INDEX=XED_REG_YMM7 FB REXX=0 value=0x0 FB SIBINDEX=7 value=0x7 
+   INDEX=XED_REG_YMM8 FB REXX=1 value=0x1 FB SIBINDEX=0 value=0x0 
+   INDEX=XED_REG_YMM9 FB REXX=1 value=0x1 FB SIBINDEX=1 value=0x1 
+   INDEX=XED_REG_YMM10 FB REXX=1 value=0x1 FB SIBINDEX=2 value=0x2 
+   INDEX=XED_REG_YMM11 FB REXX=1 value=0x1 FB SIBINDEX=3 value=0x3 
+   INDEX=XED_REG_YMM12 FB REXX=1 value=0x1 FB SIBINDEX=4 value=0x4 
+   INDEX=XED_REG_YMM13 FB REXX=1 value=0x1 FB SIBINDEX=5 value=0x5 
+   INDEX=XED_REG_YMM14 FB REXX=1 value=0x1 FB SIBINDEX=6 value=0x6 
+   INDEX=XED_REG_YMM15 FB REXX=1 value=0x1 FB SIBINDEX=7 value=0x7 
+DISP_WIDTH_8_32
+   DISP_WIDTH=8 nothing 
+   DISP_WIDTH=32 nothing 
+NELEM_TUPLE1_4X
+   otherwise: return 1
+EVEX_62_REXR_ENC
+   MODE=2 REXR=1 emit 0x62 emit_type=numeric value=0x62 nbits=8 emit 0b0 emit_type=numeric value=0x0 nbits=1 
+   MODE=2 REXR=0 emit 0x62 emit_type=numeric value=0x62 nbits=8 emit 0b1 emit_type=numeric value=0x1 nbits=1 
+   MODE=1 REXR=1 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   MODE=1 REXR=0 emit 0x62 emit_type=numeric value=0x62 nbits=8 emit 0b1 emit_type=numeric value=0x1 nbits=1 
+EVEX_REXX_ENC
+   MODE=2 REXX=1 emit 0b0 emit_type=numeric value=0x0 nbits=1 
+   MODE=2 REXX=0 emit 0b1 emit_type=numeric value=0x1 nbits=1 
+   MODE=1 REXX=1 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   MODE=1 REXX=0 emit 0b1 emit_type=numeric value=0x1 nbits=1 
+EVEX_REXB_ENC
+   MODE=2 REXB=1 emit 0b0 emit_type=numeric value=0x0 nbits=1 
+   MODE=2 REXB=0 emit 0b1 emit_type=numeric value=0x1 nbits=1 
+   MODE=1 REXB=1 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   MODE=1 REXB=0 emit 0b1 emit_type=numeric value=0x1 nbits=1 
+EVEX_REXRR_ENC
+   MODE=2 REXRR=1 emit 0b0 emit_type=numeric value=0x0 nbits=1 
+   MODE=2 REXRR=0 emit 0b1 emit_type=numeric value=0x1 nbits=1 
+   MODE=1 REXRR=1 FB ERROR=XED_ERROR_GENERAL_ERROR 
+   MODE=1 REXRR=0 emit 0b1 emit_type=numeric value=0x1 nbits=1 
+EVEX_MAP_ENC
+   MAP=0 emit 0b0000 emit_type=numeric value=0x0 nbits=4 
+   MAP=1 emit 0b0001 emit_type=numeric value=0x1 nbits=4 
+   MAP=2 emit 0b0010 emit_type=numeric value=0x2 nbits=4 
+   MAP=3 emit 0b0011 emit_type=numeric value=0x3 nbits=4 
+EVEX_REXW_VVVV_ENC
+   DUMMY=0 REXW[w]=* VEXDEST3[u]=* VEXDEST210[ddd]=* emit w emit_type=letters nbits=1 emit u_ddd emit_type=letters nbits=4 
+EVEX_UPP_ENC
+   VEX_PREFIX=0 emit 0b100 emit_type=numeric value=0x4 nbits=3 
+   VEX_PREFIX=1 emit 0b101 emit_type=numeric value=0x5 nbits=3 
+   VEX_PREFIX=3 emit 0b110 emit_type=numeric value=0x6 nbits=3 
+   VEX_PREFIX=2 emit 0b111 emit_type=numeric value=0x7 nbits=3 
+EVEX_LL_ENC
+   ROUNDC=0 SAE=0 VL=0 FB LLRC=0 value=0x0 
+   ROUNDC=0 SAE=0 VL=1 FB LLRC=1 value=0x1 
+   ROUNDC=0 SAE=0 VL=2 FB LLRC=2 value=0x2 
+   ROUNDC=0 SAE=1 VL=0 FB LLRC=0 value=0x0 FB BCRC=1 value=0x1 
+   ROUNDC=1 SAE=1 VL=0 FB LLRC=0 value=0x0 FB BCRC=1 value=0x1 
+   ROUNDC=2 SAE=1 VL=0 FB LLRC=1 value=0x1 FB BCRC=1 value=0x1 
+   ROUNDC=3 SAE=1 VL=0 FB LLRC=2 value=0x2 FB BCRC=1 value=0x1 
+   ROUNDC=4 SAE=1 VL=0 FB LLRC=3 value=0x3 FB BCRC=1 value=0x1 
+   ROUNDC=0 SAE=1 VL=2 FB LLRC=0 value=0x0 FB BCRC=1 value=0x1 
+   ROUNDC=1 SAE=1 VL=2 FB LLRC=0 value=0x0 FB BCRC=1 value=0x1 
+   ROUNDC=2 SAE=1 VL=2 FB LLRC=1 value=0x1 FB BCRC=1 value=0x1 
+   ROUNDC=3 SAE=1 VL=2 FB LLRC=2 value=0x2 FB BCRC=1 value=0x1 
+   ROUNDC=4 SAE=1 VL=2 FB LLRC=3 value=0x3 FB BCRC=1 value=0x1 
+AVX512_EVEX_BYTE3_ENC
+   ZEROING[z]=* LLRC[nn]=* BCRC[b]=* VEXDEST4=0 MASK[aaa]=* emit z_nn_b emit_type=letters nbits=4 emit 0b1 emit_type=numeric value=0x1 nbits=1 emit aaa emit_type=letters nbits=3 
+   ZEROING[z]=* LLRC[nn]=* BCRC[b]=* VEXDEST4=1 MASK[aaa]=* emit z_nn_b emit_type=letters nbits=4 emit 0b0 emit_type=numeric value=0x0 nbits=1 emit aaa emit_type=letters nbits=3 
+AVX512_ROUND
+   ROUNDC=1 FB LLRC=0 value=0x0 FB BCRC=1 value=0x1 
+   ROUNDC=2 FB LLRC=1 value=0x1 FB BCRC=1 value=0x1 
+   ROUNDC=3 FB LLRC=2 value=0x2 FB BCRC=1 value=0x1 
+   ROUNDC=4 FB LLRC=3 value=0x3 FB BCRC=1 value=0x1 
+SAE
+   SAE=1 FB BCRC=1 value=0x1 
+   SAE=0 FB BCRC=0 value=0x0 
+ESIZE_128_BITS
+   otherwise: return 1
+ESIZE_64_BITS
+   otherwise: return 1
+ESIZE_32_BITS
+   otherwise: return 1
+ESIZE_16_BITS
+   otherwise: return 1
+ESIZE_8_BITS
+   otherwise: return 1
+ESIZE_4_BITS
+   otherwise: return 1
+ESIZE_2_BITS
+   otherwise: return 1
+ESIZE_1_BITS
+   otherwise: return 1
+NELEM_MOVDDUP
+   otherwise: return 1
+NELEM_FULLMEM
+   otherwise: return 1
+NELEM_HALFMEM
+   otherwise: return 1
+NELEM_QUARTERMEM
+   otherwise: return 1
+NELEM_EIGHTHMEM
+   otherwise: return 1
+NELEM_GPR_READER_BYTE
+   otherwise: return 1
+NELEM_GPR_READER_WORD
+   otherwise: return 1
+NELEM_GPR_WRITER_LDOP_D
+   otherwise: return 1
+NELEM_GPR_WRITER_LDOP_Q
+   otherwise: return 1
+NELEM_GPR_WRITER_STORE_BYTE
+   otherwise: return 1
+NELEM_GPR_WRITER_STORE_WORD
+   otherwise: return 1
+NELEM_TUPLE1_BYTE
+   otherwise: return 1
+NELEM_TUPLE1_WORD
+   otherwise: return 1
+NELEM_SCALAR
+   otherwise: return 1
+NELEM_TUPLE1_SUBDWORD
+   otherwise: return 1
+NELEM_GPR_READER
+   otherwise: return 1
+NELEM_GPR_READER_SUBDWORD
+   otherwise: return 1
+NELEM_GPR_WRITER_LDOP
+   otherwise: return 1
+NELEM_GPR_WRITER_STORE
+   otherwise: return 1
+NELEM_GPR_WRITER_STORE_SUBDWORD
+   otherwise: return 1
+NELEM_MEM128
+   otherwise: FB BCRC=0 value=0x0  return 1
+   BCAST!=0 FB ERROR=XED_ERROR_GENERAL_ERROR 
+NELEM_TUPLE1
+   otherwise: return 1
+NELEM_GSCAT
+   otherwise: return 1
+NELEM_TUPLE2
+   otherwise: return 1
+NELEM_TUPLE4
+   otherwise: return 1
+NELEM_TUPLE8
+   otherwise: return 1
+NELEM_FULL
+   otherwise: FB BCRC=0 value=0x0  return 1
+   BCAST!=0 FB BCRC=1 value=0x1 
+NELEM_HALF
+   otherwise: FB BCRC=0 value=0x0  return 1
+   BCAST!=0 FB BCRC=1 value=0x1 
+FIX_ROUND_LEN512
+   otherwise: return 1
+FIX_ROUND_LEN128
+   otherwise: return 1
+UISA_ENC_INDEX_ZMM
+   INDEX=XED_REG_ZMM0 FB VEXDEST4=0 value=0x0 FB REXX=0 value=0x0 FB SIBINDEX=0 value=0x0 
+   INDEX=XED_REG_ZMM1 FB VEXDEST4=0 value=0x0 FB REXX=0 value=0x0 FB SIBINDEX=1 value=0x1 
+   INDEX=XED_REG_ZMM2 FB VEXDEST4=0 value=0x0 FB REXX=0 value=0x0 FB SIBINDEX=2 value=0x2 
+   INDEX=XED_REG_ZMM3 FB VEXDEST4=0 value=0x0 FB REXX=0 value=0x0 FB SIBINDEX=3 value=0x3 
+   INDEX=XED_REG_ZMM4 FB VEXDEST4=0 value=0x0 FB REXX=0 value=0x0 FB SIBINDEX=4 value=0x4 
+   INDEX=XED_REG_ZMM5 FB VEXDEST4=0 value=0x0 FB REXX=0 value=0x0 FB SIBINDEX=5 value=0x5 
+   INDEX=XED_REG_ZMM6 FB VEXDEST4=0 value=0x0 FB REXX=0 value=0x0 FB SIBINDEX=6 value=0x6 
+   INDEX=XED_REG_ZMM7 FB VEXDEST4=0 value=0x0 FB REXX=0 value=0x0 FB SIBINDEX=7 value=0x7 
+   INDEX=XED_REG_ZMM8 FB VEXDEST4=0 value=0x0 FB REXX=1 value=0x1 FB SIBINDEX=0 value=0x0 
+   INDEX=XED_REG_ZMM9 FB VEXDEST4=0 value=0x0 FB REXX=1 value=0x1 FB SIBINDEX=1 value=0x1 
+   INDEX=XED_REG_ZMM10 FB VEXDEST4=0 value=0x0 FB REXX=1 value=0x1 FB SIBINDEX=2 value=0x2 
+   INDEX=XED_REG_ZMM11 FB VEXDEST4=0 value=0x0 FB REXX=1 value=0x1 FB SIBINDEX=3 value=0x3 
+   INDEX=XED_REG_ZMM12 FB VEXDEST4=0 value=0x0 FB REXX=1 value=0x1 FB SIBINDEX=4 value=0x4 
+   INDEX=XED_REG_ZMM13 FB VEXDEST4=0 value=0x0 FB REXX=1 value=0x1 FB SIBINDEX=5 value=0x5 
+   INDEX=XED_REG_ZMM14 FB VEXDEST4=0 value=0x0 FB REXX=1 value=0x1 FB SIBINDEX=6 value=0x6 
+   INDEX=XED_REG_ZMM15 FB VEXDEST4=0 value=0x0 FB REXX=1 value=0x1 FB SIBINDEX=7 value=0x7 
+   INDEX=XED_REG_ZMM16 FB VEXDEST4=1 value=0x1 FB REXX=0 value=0x0 FB SIBINDEX=0 value=0x0 
+   INDEX=XED_REG_ZMM17 FB VEXDEST4=1 value=0x1 FB REXX=0 value=0x0 FB SIBINDEX=1 value=0x1 
+   INDEX=XED_REG_ZMM18 FB VEXDEST4=1 value=0x1 FB REXX=0 value=0x0 FB SIBINDEX=2 value=0x2 
+   INDEX=XED_REG_ZMM19 FB VEXDEST4=1 value=0x1 FB REXX=0 value=0x0 FB SIBINDEX=3 value=0x3 
+   INDEX=XED_REG_ZMM20 FB VEXDEST4=1 value=0x1 FB REXX=0 value=0x0 FB SIBINDEX=4 value=0x4 
+   INDEX=XED_REG_ZMM21 FB VEXDEST4=1 value=0x1 FB REXX=0 value=0x0 FB SIBINDEX=5 value=0x5 
+   INDEX=XED_REG_ZMM22 FB VEXDEST4=1 value=0x1 FB REXX=0 value=0x0 FB SIBINDEX=6 value=0x6 
+   INDEX=XED_REG_ZMM23 FB VEXDEST4=1 value=0x1 FB REXX=0 value=0x0 FB SIBINDEX=7 value=0x7 
+   INDEX=XED_REG_ZMM24 FB VEXDEST4=1 value=0x1 FB REXX=1 value=0x1 FB SIBINDEX=0 value=0x0 
+   INDEX=XED_REG_ZMM25 FB VEXDEST4=1 value=0x1 FB REXX=1 value=0x1 FB SIBINDEX=1 value=0x1 
+   INDEX=XED_REG_ZMM26 FB VEXDEST4=1 value=0x1 FB REXX=1 value=0x1 FB SIBINDEX=2 value=0x2 
+   INDEX=XED_REG_ZMM27 FB VEXDEST4=1 value=0x1 FB REXX=1 value=0x1 FB SIBINDEX=3 value=0x3 
+   INDEX=XED_REG_ZMM28 FB VEXDEST4=1 value=0x1 FB REXX=1 value=0x1 FB SIBINDEX=4 value=0x4 
+   INDEX=XED_REG_ZMM29 FB VEXDEST4=1 value=0x1 FB REXX=1 value=0x1 FB SIBINDEX=5 value=0x5 
+   INDEX=XED_REG_ZMM30 FB VEXDEST4=1 value=0x1 FB REXX=1 value=0x1 FB SIBINDEX=6 value=0x6 
+   INDEX=XED_REG_ZMM31 FB VEXDEST4=1 value=0x1 FB REXX=1 value=0x1 FB SIBINDEX=7 value=0x7 
+UISA_ENC_INDEX_YMM
+   INDEX=XED_REG_YMM0 FB VEXDEST4=0 value=0x0 FB REXX=0 value=0x0 FB SIBINDEX=0 value=0x0 
+   INDEX=XED_REG_YMM1 FB VEXDEST4=0 value=0x0 FB REXX=0 value=0x0 FB SIBINDEX=1 value=0x1 
+   INDEX=XED_REG_YMM2 FB VEXDEST4=0 value=0x0 FB REXX=0 value=0x0 FB SIBINDEX=2 value=0x2 
+   INDEX=XED_REG_YMM3 FB VEXDEST4=0 value=0x0 FB REXX=0 value=0x0 FB SIBINDEX=3 value=0x3 
+   INDEX=XED_REG_YMM4 FB VEXDEST4=0 value=0x0 FB REXX=0 value=0x0 FB SIBINDEX=4 value=0x4 
+   INDEX=XED_REG_YMM5 FB VEXDEST4=0 value=0x0 FB REXX=0 value=0x0 FB SIBINDEX=5 value=0x5 
+   INDEX=XED_REG_YMM6 FB VEXDEST4=0 value=0x0 FB REXX=0 value=0x0 FB SIBINDEX=6 value=0x6 
+   INDEX=XED_REG_YMM7 FB VEXDEST4=0 value=0x0 FB REXX=0 value=0x0 FB SIBINDEX=7 value=0x7 
+   INDEX=XED_REG_YMM8 FB VEXDEST4=0 value=0x0 FB REXX=1 value=0x1 FB SIBINDEX=0 value=0x0 
+   INDEX=XED_REG_YMM9 FB VEXDEST4=0 value=0x0 FB REXX=1 value=0x1 FB SIBINDEX=1 value=0x1 
+   INDEX=XED_REG_YMM10 FB VEXDEST4=0 value=0x0 FB REXX=1 value=0x1 FB SIBINDEX=2 value=0x2 
+   INDEX=XED_REG_YMM11 FB VEXDEST4=0 value=0x0 FB REXX=1 value=0x1 FB SIBINDEX=3 value=0x3 
+   INDEX=XED_REG_YMM12 FB VEXDEST4=0 value=0x0 FB REXX=1 value=0x1 FB SIBINDEX=4 value=0x4 
+   INDEX=XED_REG_YMM13 FB VEXDEST4=0 value=0x0 FB REXX=1 value=0x1 FB SIBINDEX=5 value=0x5 
+   INDEX=XED_REG_YMM14 FB VEXDEST4=0 value=0x0 FB REXX=1 value=0x1 FB SIBINDEX=6 value=0x6 
+   INDEX=XED_REG_YMM15 FB VEXDEST4=0 value=0x0 FB REXX=1 value=0x1 FB SIBINDEX=7 value=0x7 
+   INDEX=XED_REG_YMM16 FB VEXDEST4=1 value=0x1 FB REXX=0 value=0x0 FB SIBINDEX=0 value=0x0 
+   INDEX=XED_REG_YMM17 FB VEXDEST4=1 value=0x1 FB REXX=0 value=0x0 FB SIBINDEX=1 value=0x1 
+   INDEX=XED_REG_YMM18 FB VEXDEST4=1 value=0x1 FB REXX=0 value=0x0 FB SIBINDEX=2 value=0x2 
+   INDEX=XED_REG_YMM19 FB VEXDEST4=1 value=0x1 FB REXX=0 value=0x0 FB SIBINDEX=3 value=0x3 
+   INDEX=XED_REG_YMM20 FB VEXDEST4=1 value=0x1 FB REXX=0 value=0x0 FB SIBINDEX=4 value=0x4 
+   INDEX=XED_REG_YMM21 FB VEXDEST4=1 value=0x1 FB REXX=0 value=0x0 FB SIBINDEX=5 value=0x5 
+   INDEX=XED_REG_YMM22 FB VEXDEST4=1 value=0x1 FB REXX=0 value=0x0 FB SIBINDEX=6 value=0x6 
+   INDEX=XED_REG_YMM23 FB VEXDEST4=1 value=0x1 FB REXX=0 value=0x0 FB SIBINDEX=7 value=0x7 
+   INDEX=XED_REG_YMM24 FB VEXDEST4=1 value=0x1 FB REXX=1 value=0x1 FB SIBINDEX=0 value=0x0 
+   INDEX=XED_REG_YMM25 FB VEXDEST4=1 value=0x1 FB REXX=1 value=0x1 FB SIBINDEX=1 value=0x1 
+   INDEX=XED_REG_YMM26 FB VEXDEST4=1 value=0x1 FB REXX=1 value=0x1 FB SIBINDEX=2 value=0x2 
+   INDEX=XED_REG_YMM27 FB VEXDEST4=1 value=0x1 FB REXX=1 value=0x1 FB SIBINDEX=3 value=0x3 
+   INDEX=XED_REG_YMM28 FB VEXDEST4=1 value=0x1 FB REXX=1 value=0x1 FB SIBINDEX=4 value=0x4 
+   INDEX=XED_REG_YMM29 FB VEXDEST4=1 value=0x1 FB REXX=1 value=0x1 FB SIBINDEX=5 value=0x5 
+   INDEX=XED_REG_YMM30 FB VEXDEST4=1 value=0x1 FB REXX=1 value=0x1 FB SIBINDEX=6 value=0x6 
+   INDEX=XED_REG_YMM31 FB VEXDEST4=1 value=0x1 FB REXX=1 value=0x1 FB SIBINDEX=7 value=0x7 
+UISA_ENC_INDEX_XMM
+   INDEX=XED_REG_XMM0 FB VEXDEST4=0 value=0x0 FB REXX=0 value=0x0 FB SIBINDEX=0 value=0x0 
+   INDEX=XED_REG_XMM1 FB VEXDEST4=0 value=0x0 FB REXX=0 value=0x0 FB SIBINDEX=1 value=0x1 
+   INDEX=XED_REG_XMM2 FB VEXDEST4=0 value=0x0 FB REXX=0 value=0x0 FB SIBINDEX=2 value=0x2 
+   INDEX=XED_REG_XMM3 FB VEXDEST4=0 value=0x0 FB REXX=0 value=0x0 FB SIBINDEX=3 value=0x3 
+   INDEX=XED_REG_XMM4 FB VEXDEST4=0 value=0x0 FB REXX=0 value=0x0 FB SIBINDEX=4 value=0x4 
+   INDEX=XED_REG_XMM5 FB VEXDEST4=0 value=0x0 FB REXX=0 value=0x0 FB SIBINDEX=5 value=0x5 
+   INDEX=XED_REG_XMM6 FB VEXDEST4=0 value=0x0 FB REXX=0 value=0x0 FB SIBINDEX=6 value=0x6 
+   INDEX=XED_REG_XMM7 FB VEXDEST4=0 value=0x0 FB REXX=0 value=0x0 FB SIBINDEX=7 value=0x7 
+   INDEX=XED_REG_XMM8 FB VEXDEST4=0 value=0x0 FB REXX=1 value=0x1 FB SIBINDEX=0 value=0x0 
+   INDEX=XED_REG_XMM9 FB VEXDEST4=0 value=0x0 FB REXX=1 value=0x1 FB SIBINDEX=1 value=0x1 
+   INDEX=XED_REG_XMM10 FB VEXDEST4=0 value=0x0 FB REXX=1 value=0x1 FB SIBINDEX=2 value=0x2 
+   INDEX=XED_REG_XMM11 FB VEXDEST4=0 value=0x0 FB REXX=1 value=0x1 FB SIBINDEX=3 value=0x3 
+   INDEX=XED_REG_XMM12 FB VEXDEST4=0 value=0x0 FB REXX=1 value=0x1 FB SIBINDEX=4 value=0x4 
+   INDEX=XED_REG_XMM13 FB VEXDEST4=0 value=0x0 FB REXX=1 value=0x1 FB SIBINDEX=5 value=0x5 
+   INDEX=XED_REG_XMM14 FB VEXDEST4=0 value=0x0 FB REXX=1 value=0x1 FB SIBINDEX=6 value=0x6 
+   INDEX=XED_REG_XMM15 FB VEXDEST4=0 value=0x0 FB REXX=1 value=0x1 FB SIBINDEX=7 value=0x7 
+   INDEX=XED_REG_XMM16 FB VEXDEST4=1 value=0x1 FB REXX=0 value=0x0 FB SIBINDEX=0 value=0x0 
+   INDEX=XED_REG_XMM17 FB VEXDEST4=1 value=0x1 FB REXX=0 value=0x0 FB SIBINDEX=1 value=0x1 
+   INDEX=XED_REG_XMM18 FB VEXDEST4=1 value=0x1 FB REXX=0 value=0x0 FB SIBINDEX=2 value=0x2 
+   INDEX=XED_REG_XMM19 FB VEXDEST4=1 value=0x1 FB REXX=0 value=0x0 FB SIBINDEX=3 value=0x3 
+   INDEX=XED_REG_XMM20 FB VEXDEST4=1 value=0x1 FB REXX=0 value=0x0 FB SIBINDEX=4 value=0x4 
+   INDEX=XED_REG_XMM21 FB VEXDEST4=1 value=0x1 FB REXX=0 value=0x0 FB SIBINDEX=5 value=0x5 
+   INDEX=XED_REG_XMM22 FB VEXDEST4=1 value=0x1 FB REXX=0 value=0x0 FB SIBINDEX=6 value=0x6 
+   INDEX=XED_REG_XMM23 FB VEXDEST4=1 value=0x1 FB REXX=0 value=0x0 FB SIBINDEX=7 value=0x7 
+   INDEX=XED_REG_XMM24 FB VEXDEST4=1 value=0x1 FB REXX=1 value=0x1 FB SIBINDEX=0 value=0x0 
+   INDEX=XED_REG_XMM25 FB VEXDEST4=1 value=0x1 FB REXX=1 value=0x1 FB SIBINDEX=1 value=0x1 
+   INDEX=XED_REG_XMM26 FB VEXDEST4=1 value=0x1 FB REXX=1 value=0x1 FB SIBINDEX=2 value=0x2 
+   INDEX=XED_REG_XMM27 FB VEXDEST4=1 value=0x1 FB REXX=1 value=0x1 FB SIBINDEX=3 value=0x3 
+   INDEX=XED_REG_XMM28 FB VEXDEST4=1 value=0x1 FB REXX=1 value=0x1 FB SIBINDEX=4 value=0x4 
+   INDEX=XED_REG_XMM29 FB VEXDEST4=1 value=0x1 FB REXX=1 value=0x1 FB SIBINDEX=5 value=0x5 
+   INDEX=XED_REG_XMM30 FB VEXDEST4=1 value=0x1 FB REXX=1 value=0x1 FB SIBINDEX=6 value=0x6 
+   INDEX=XED_REG_XMM31 FB VEXDEST4=1 value=0x1 FB REXX=1 value=0x1 FB SIBINDEX=7 value=0x7 
+ASZ_NONTERM
+   EASZ=1 MODE=0 FB ASZ=0 value=0x0 
+   EASZ=2 MODE=0 FB ASZ=1 value=0x1 
+   EASZ=2 MODE=1 FB ASZ=0 value=0x0 
+   EASZ=1 MODE=1 FB ASZ=1 value=0x1 
+   EASZ=3 MODE=2 FB ASZ=0 value=0x0 
+   EASZ=2 MODE=2 FB ASZ=1 value=0x1 
+ONE
+   IMM_WIDTH=8 UIMM0=1 MODE=0 nothing 
+   IMM_WIDTH=8 UIMM0=1 MODE=1 nothing 
+   IMM_WIDTH=8 UIMM0=1 MODE=2 nothing 
+UIMMv
+   IMM_WIDTH=16 EOSZ=1 UIMM0[iiiiiiiiiiiiiiii]=* emit uimm0=iiiiiiiiiiiiiiii emit_type=letters nbits=16 
+   IMM_WIDTH=32 EOSZ=2 UIMM0[iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii]=* emit uimm0=iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii emit_type=letters nbits=32 
+   IMM_WIDTH=64 EOSZ=3 UIMM0[iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii]=* emit uimm0=iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii emit_type=letters nbits=64 
+SIMMz
+   IMM_WIDTH=16 IMM0SIGNED=1 EOSZ=1 UIMM0[iiiiiiiiiiiiiiii]=* emit uimm0=iiiiiiiiiiiiiiii emit_type=letters nbits=16 
+   IMM_WIDTH=32 IMM0SIGNED=1 EOSZ=2 UIMM0[iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii]=* emit uimm0=iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii emit_type=letters nbits=32 
+   IMM_WIDTH=32 IMM0SIGNED=1 EOSZ=3 UIMM0[iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii]=* emit uimm0=iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii emit_type=letters nbits=32 
+SIMM8
+   IMM_WIDTH=8 IMM0SIGNED=1 UIMM0[iiiiiiii]=* emit uimm0=iiiiiiii emit_type=letters nbits=8 
+UIMM8
+   IMM_WIDTH=8 UIMM0[iiiiiiii]=* emit uimm0=iiiiiiii emit_type=letters nbits=8 
+UIMM8_1
+   DUMMY=0 UIMM1[iiiiiiii]=* emit uimm1=iiiiiiii emit_type=letters nbits=8 
+UIMM16
+   IMM_WIDTH=16 UIMM0[iiiiiiiiiiiiiiii]=* emit uimm0=iiiiiiiiiiiiiiii emit_type=letters nbits=16 
+UIMM32
+   IMM_WIDTH=32 UIMM0[iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii]=* emit uimm0=iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii emit_type=letters nbits=32 
+BRDISP8
+   BRDISP_WIDTH=8 DISP[dddddddd]=* emit disp=dddddddd emit_type=letters nbits=8 
+BRDISP32
+   BRDISP_WIDTH=32 DISP[dddddddddddddddddddddddddddddddd]=* emit disp=dddddddddddddddddddddddddddddddd emit_type=letters nbits=32 
+BRDISPz
+   BRDISP_WIDTH=16 EOSZ=1 DISP[dddddddddddddddd]=* emit disp=dddddddddddddddd emit_type=letters nbits=16 
+   BRDISP_WIDTH=32 EOSZ=2 DISP[dddddddddddddddddddddddddddddddd]=* emit disp=dddddddddddddddddddddddddddddddd emit_type=letters nbits=32 
+   BRDISP_WIDTH=32 EOSZ=3 DISP[dddddddddddddddddddddddddddddddd]=* emit disp=dddddddddddddddddddddddddddddddd emit_type=letters nbits=32 
+MEMDISPv
+   DISP_WIDTH=16 EASZ=1 DISP[aaaaaaaaaaaaaaaa]=* emit disp=aaaaaaaaaaaaaaaa emit_type=letters nbits=16 
+   DISP_WIDTH=32 EASZ=2 DISP[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]=* emit disp=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa emit_type=letters nbits=32 
+   DISP_WIDTH=64 EASZ=3 DISP[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]=* emit disp=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa emit_type=letters nbits=64 
+MEMDISP32
+   DISP_WIDTH=32 DISP[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]=* emit disp=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa emit_type=letters nbits=32 
+MEMDISP16
+   DISP_WIDTH=16 DISP[aaaaaaaaaaaaaaaa]=* emit disp=aaaaaaaaaaaaaaaa emit_type=letters nbits=16 
+MEMDISP8
+   DISP_WIDTH=8 DISP[aaaaaaaa]=* emit disp=aaaaaaaa emit_type=letters nbits=8 
+MEMDISP
+   DISP_WIDTH=0 FB NEED_MEMDISP=0 value=0x0 
+   DISP_WIDTH=8 DISP[aaaaaaaa]=* FB NEED_MEMDISP=8 value=0x8 emit disp=aaaaaaaa emit_type=letters nbits=8 
+   DISP_WIDTH=16 DISP[aaaaaaaaaaaaaaaa]=* FB NEED_MEMDISP=16 value=0x10 emit disp=aaaaaaaaaaaaaaaa emit_type=letters nbits=16 
+   DISP_WIDTH=32 DISP[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]=* FB NEED_MEMDISP=32 value=0x20 emit disp=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa emit_type=letters nbits=32 

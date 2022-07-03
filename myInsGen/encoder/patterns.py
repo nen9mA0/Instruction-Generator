@@ -79,3 +79,51 @@ encoding_template_pattern = re.compile(r'[a-z01]+')
 letter_pattern = re.compile(r'^[a-z]+$')
 letter_and_underscore_pattern = re.compile(r'^[a-z_]+$')
 simple_number_pattern = re.compile(r'^[0-9]+$')
+
+# =================================================================
+
+operand_token_pattern = re.compile('OPERAND')
+underscore_pattern = re.compile(r'_')
+invert_pattern = re.compile(r'[!]')
+instructions_pattern = re.compile(r'INSTRUCTIONS')
+
+quick_equals_pattern= re.compile(r'=')
+colon_pattern= re.compile(r'[:]')
+
+slash_macro_pattern = re.compile(r'([a-z][/][0-9]{1,2})')
+nonterminal_string = r'([A-Z][a-zA-Z0-9_]*)[(][)]'
+
+parens_to_end_of_line = re.compile(r'[(][)].*::.*$') # with double colon
+lookupfn_w_args_pattern =  re.compile(r'[\[][a-z]+]')
+
+nonterminal_start_pattern=re.compile(r'::')
+nonterminal_pattern=re.compile(nonterminal_string)
+nonterminal_parens_pattern = re.compile(r'[(][^)]*[)]')
+
+dec_binary_pattern = re.compile(r'^[01_]+$') # only 1's and 0's
+formal_binary_pattern = re.compile(r'^0b[01_]+$') # only 1's and 0's leading 0b
+one_zero_pattern = re.compile(r'^[01]') # just a leading 0 or 1
+completely_numeric = re.compile(r'^[0-9]+$') # only numbers
+
+# things identified by the restriction_pattern  are the operand deciders:
+restriction_pattern = re.compile(r'([A-Z0-9_]+)(!=|=)([bx0-9A-Z_]+)')
+all_caps_pattern = re.compile(r'^[A-Z_0-9]+$')
+
+not11_pattern = re.compile(r'NOT11[(]([a-z]{2})[)]')
+letter_basis_pattern = re.compile(r'[a-z]')
+
+all_zeros_pattern = re.compile(r'^[0]+$')
+type_ending_pattern = re.compile(r'_t$')
+uniq_pattern = re.compile(r'_uniq(.*)$')
+ntwidth_pattern = re.compile('NTWIDTH')
+paren_underscore_pattern = re.compile(r'[(][)][_]+')
+
+all_lower_case_pattern = re.compile(r'^[a-z]+$')
+
+
+pattern_binding_pattern = re.compile(
+               r'(?P<name>[A-Za-z_0-9]+)[\[](?P<bits>[A-Za-z01_]+)]')
+uppercase_pattern = re.compile(r'[A-Z]')
+
+
+reg_operand_name_pattern = re.compile("^REG(?P<regno>[0-9]+)$")

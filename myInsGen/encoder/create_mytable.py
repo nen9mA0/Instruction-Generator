@@ -30,6 +30,8 @@ def DfsSeq(seq, n, n_max, print_nt):
         if raw_nt_name in gs.seqs:
             print("%s%s" %("   "*n, raw_nt_name))
             new_seq = gs.seqs[raw_nt_name]
+            if not new_seq:                 # seq == None, has repeat seq
+                new_seq = gs.repeat_seqs[raw_nt_name][0]        # Attention: use first repeat ones
             DfsSeq(new_seq, n+1, n_max, print_nt)
         elif nt_name in gs.ntlufs:
             print("%sntluf: %s" %("   "*(n+1), raw_nt_name))
@@ -62,6 +64,8 @@ def ParseSeq(seqname, n_max=2, print_nt=False):        # seq_type can be BIND or
     if seqname in gs.seqs:
         print("%s" %seqname)
         seq = gs.seqs[seqname]
+        if not seq:                 # seq == None, has repeat seq
+            seq = gs.repeat_seqs[seqname][0]        # Attention: use first repeat ones
         DfsSeq(seq, 1, n_max, print_nt)
 
 def ParseIclass():
@@ -76,12 +80,24 @@ def ParseIclass():
             for cond in iform.rule.conditions.and_conditions:
                 print("\t\tconditon: %s" %str(cond))
 
-def ParseNT(nt_dct):
-    for nt_name in nt_dct:
-        nt = nt_dct[nt_name]
-        print("%s" %nt_name)
-        for rule in nt.rules:
-            print("   %s" %str(rule))
+def ParseNT(gs, nt_lst_name):
+    if hasattr(gs, nt_lst_name):
+        nt_dct = getattr(gs, nt_lst_name)
+        for nt_name in nt_dct:
+            nt = nt_dct[nt_name]
+            if not nt:
+                repeat_name = "repeat_" + nt_lst_name
+                if hasattr(gs, repeat_name):
+                    repeat_dct = getattr(gs, repeat_name)
+                    nt = repeat_dct[nt_name][0]     # Attension: use the first one
+                else:
+                    raise ValueError("%s not in global init")
+            print("%s" %nt_name)
+            if hasattr(nt, "otherwise"):
+                otherwise_act = nt.otherwise
+                print("   otherwise: %s" %("  ".join([str(i) for i in otherwise_act])))
+            for rule in nt.rules:
+                print("   %s" %str(rule))
 
 def GetUsedNT():
     num = 0
@@ -142,14 +158,30 @@ def GetNTsHashTable(gen, nt_list):
         hashtable_lst.append(hashtable)
     return hashtable_lst
 
+# def CreateNTHashTable(gen, gens, nt_list):
+#     hashtable_lst = GetNTsHashTable(gen, gens, nt_list)
+#     for hashtable in hashtable_lst:
+#         gens.htm.AddHashTable(hashtable)
+#     return gens
+
 def CreateNTHashTable(gen, gens, nt_list):
-    hashtable_lst = GetNTsHashTable(gen, nt_list)
-    for hashtable in hashtable_lst:
-        gens.htm.AddHashTable(hashtable)
+    for nt in nt_list:
+        if isinstance(nt, str):
+            nt_name = nt
+        else:
+            nt_name = nt.name
+        all_context = gen.DFSNTContext([nt], nt, limit_path=300000)
+        if all_context:
+            if len(all_context) == 0:
+                continue
+            if nt_name.endswith("_BIND") or nt_name.endswith("_EMIT"):
+                nt_name = nt_name[:-5]
+            hashtable = HashTable.HashTable(nt_name)
+            hashtable.LoadContext(all_context)
+            gens.htm.AddHashTable(hashtable)
+
     return gens
 
-def CreateSeqHashTable(gen, gens, htm, seq_list):
-    pass
 
 # def GetRegNTBinding(ntluf, dct)
 
@@ -164,10 +196,10 @@ def CreateSeqHashTable(gen, gens, htm, seq_list):
 
 if __name__ == "__main__":
 # =========== Load GlobalStruct ================
-    save = False
-    needreload = True                  # control if we need to reload pattern files or save them again
+    save = True
+    needreload = False                  # control if we need to reload pattern files or save them again
 
-    sd = save_data.SaveData(all_ins, pkl_dir, logger)
+    sd = save_data.SaveData(all_dec_ins, pkl_dir, logger)
     if sd.haspkl and not needreload:
         sd.Load(GsLoad, gs)
     else:
@@ -176,10 +208,10 @@ if __name__ == "__main__":
         operand = fields_reader.ReadFields(all_field)
         gs.storage_fields = operand.operand_fields
         gs.state_bits = state_bits_reader.ReadState(all_state_file)
-        (gs.seqs, gs.nts, gs.ntlufs, gs.repeat_nts, gs.repeat_ntlufs) = \
-                            enc_patterns_reader.ReadEncPattern(all_enc_pattern, gs.state_bits)
+        (gs.nts, gs.ntlufs, gs.repeat_nts, gs.repeat_ntlufs) = \
+                            enc_patterns_reader.ReadDecPattern(all_dec_pattern, gs.state_bits)
         enc_patterns_reader.ReadEncDecPattern(all_enc_dec_pattern, gs.state_bits)
-        enc_ins_reader.ReadIns(all_ins)
+        enc_ins_reader.ReadIns(all_dec_ins)
 
         if save:
             sd.Save(GsSave, gs)
@@ -229,9 +261,9 @@ if __name__ == "__main__":
     #         print(mystr)
 
 # =============== Load Generator Storage ===================
-    needreload = False     # for test
-    save = False
-    sd = save_data.SaveData(all_ins[:-4]+"_gens", pkl_dir, logger)
+    # needreload = False     # for test
+    # save = False
+    sd = save_data.SaveData(all_dec_ins[:-4]+"_gens", pkl_dir, logger)
     if sd.haspkl and not needreload:
         gens = generator_storage.GeneratorStorage(load=True)
         sd.Load(generator_storage.GensLoad, gens)
@@ -244,10 +276,10 @@ if __name__ == "__main__":
 # =============== Load NT Hash Table =======================
     # needreload = True
     # save = True
-    needreload = False
-    save = False
+    # needreload = False
+    # save = False
 
-    sd = save_data.SaveData(all_ins[:-4]+"_htm", pkl_dir, logger)
+    sd = save_data.SaveData(all_dec_ins[:-4]+"_htm", pkl_dir, logger)
     htm = HashTable.HashTableManager()
     gens.AddHashTableManager(htm)
     if sd.haspkl and not needreload:
@@ -275,6 +307,14 @@ if __name__ == "__main__":
     if save and needreload:
         sd.Save(HashTable.HTMSave, htm)
     htm.done = True
+
+    # ==== print note\nt_tree.txt note\nts.txt and note\ntlufs.txt
+    # for seqname in gs.seqs:
+    #     ParseSeq(seqname, 10, True)
+    # ParseNT(gs, "nts")
+    # ParseNT(gs, "ntlufs")
+
+    gen.DFSSeqContext("MODRM_BIND")
 
 # ==========================================================
 

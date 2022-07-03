@@ -68,9 +68,11 @@ pkl_dir = "pklfiles"
 all_reg =               "all-datafiles/all_test/all-registers.txt"
 all_state_file =        "all-datafiles/all_test/all-state.txt"
 all_enc_pattern =       "all-datafiles/all_test/all-enc-patterns.txt"
+all_dec_pattern =       "all-datafiles/all_test/all-dec-patterns.txt"
 all_enc_dec_pattern =   "all-datafiles/all_test/all-enc-dec-patterns.txt"
 all_field =             "all-datafiles/all_test/all-fields.txt"
 all_ins =               "all-datafiles/all_test/all-enc-instructions.txt"
+all_dec_ins =           "all-datafiles/all_test/all-dec-instructions.txt"
 
 # ===== basic test =====
 # all_reg =               "all-datafiles/basic_test/basic-test-registers.txt"

@@ -201,6 +201,10 @@ class HashTable(object):
             elif key == "OUTREG":
                 has_outreg = True
                 outreg = act_context[key]
+                # seems like we don't have to care about whether the OUTREG is rewrited
+                # if key in context:
+                #     raise ValueError("NT %s: Rewrite OUTREG\ncontext: %s\nact_context: %s" %(self.name, context, act_context))
+                context[key] = outreg
             elif act_context[key] == "*":
                 pass
             else:
