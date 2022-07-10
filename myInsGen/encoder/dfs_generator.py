@@ -877,6 +877,120 @@ class Emulator(object):
         return all_context
 
 
+    def DFSDecNTContext(self, nt_lst, binding_emit=None, limit_path=0):       # nt_lst can be a list of str or nonterminal_t
+        nts = self.gens.nts
+        ntlufs = self.gens.ntlufs
+
+        if limit_path > 0:
+            have_limit = True
+        else:
+            have_limit = False
+
+        first_nt = None
+        prev_nt = None
+        for nt in nt_lst:
+            if isinstance(nt, str):
+                nt_name = nt
+                # if nt_name == "SIBBASE_ENCODE":             # just 4 debug
+                #     a = 0
+                if nt_name.endswith("_BIND") or nt_name.endswith("_EMIT"):
+                    nt_name = nt_name[:-5]
+                if not (nt_name in nts or nt_name in ntlufs):
+                    raise KeyError("Cannot find NT/NTluf: %s" %nt_name)
+                else:
+                    if nt_name in nts:
+                        nt = nts[nt_name]
+                    else:
+                        nt = ntlufs[nt_name]
+            else:
+                nt_name = nt.name
+            if not nt:                          # nt is none, occurs when nt is in repeat_nts pr repeat_ntlufs
+                return []
+            p = CreateNTNode(nt, self.gens, name=nt_name, binding_emitNT=binding_emit)
+            if first_nt == None:
+                first_nt = p
+            else:
+                prev_nt.next = p
+                p.prev = prev_nt
+
+            prev_nt = p
+
+        head = HeadNode(next=first_nt)
+        tail = HeadNode(prev=prev_nt)
+        first_nt.prev = head
+        prev_nt.next = tail
+
+        self.head = head
+
+        self.nt_emitnum = {}
+        context = {"emit":[]}                   # used to save end context for one cond_context
+        cond_context = {}                       # used to save all conds
+        cond_context_dict = {}                  # used to save nt's binding cond_context
+        backtrack = False
+                                                # fix bug 20210323: if one route have multi NTs, and these NT's conditions
+                                                # contains the same item, previous condition will be covered.
+                                                # For example, NT1 has condition EASZ=0, then NT2 has condition EASZ=2,
+                                                # the condition EASZ=0 will be covered.
+        all_context = []
+        # all_route = []                # all_route: just 4 debug
+        prev_cond = False
+
+        nodes = iter(self)
+        prev_depth = 0
+        num = 0
+        for depth, node in nodes:
+            # if node and (node.type == "nt" or node.type == "hashnode"):    # just 4 debug
+            #     if node.name == "DISP_WIDTH_32":
+            #         a = 0
+            if depth >= 0:
+                if node.type == "cond":         # now context is all conditions, create a new context for actions
+                    prev_cond = True
+                    unuse_flag, cond_context = node.ExecNode(cond_context, depth=depth)
+                    if unuse_flag:              # first we must verify if the path is available
+                        if node.equal == False:     # add special handler for not equal conditions
+                            name = node.cond.field_name
+                            value = "!" + node.cond.rvalue.value        # neq conditions has a "!" prefix
+                            if not name in cond_context:
+                                cond_context[name] = value
+                            else:
+                                if cond_context[name] != value:
+                                    raise ValueError("Neq context %s reassignment from %s to %s" %(name, cond_context[name], value))
+                elif node.type == "nt" or node.type == "hashnode":
+                    if backtrack:
+                        cond_context = copy.deepcopy(cond_context_dict[node.name])
+                    else:
+                        if len(node.name) == 0: # just 4  debug
+                            a = 0
+                        cond_context_dict[node.name] = copy.deepcopy(cond_context)
+                flag, context = node.ExecNode(context, depth=depth) # real context is executed here
+                iter_len = node.GetIterLen()
+                if have_limit and iter_len > limit_path:
+                    logger.warning("NT:%s BindingNT:%s have too much path %d" %(node.binding_emitNT, node.name, iter_len))
+                    all_context = None
+                    break
+                self.route_num.append((iter_len, node.GetIterNum()))
+                backtrack = False
+                if not flag:            # if this path cannot satisfy condition, invalid it
+                    self.InvalidPath()
+                    backtrack = True
+                # print(node)
+            elif depth == -1:
+                backtrack = True
+                node.touchflag = False
+            elif depth == -2:
+                # if num == 11:         # just 4 debug
+                #     a = 0
+                all_context.append(HashTable.HashTableItem( (cond_context, context) ))
+                self.RefreshNTEmitNum()
+                # all_route.append(copy.deepcopy([str(i) for i in self.route]))     # all_route: just 4 debug
+                # print(self.GetRoute())
+                num += 1
+        self.head = None
+        self.route.clear()
+        self.route_num.clear()
+        return all_context
+
+
     def DFSSeqContext(self, seqname):
         if not seqname in self.gens.seqs:
             raise KeyError("_ExecSeq: Cannot find seqname: %s" %seqname)

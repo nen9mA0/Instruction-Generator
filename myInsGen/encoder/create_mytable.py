@@ -183,6 +183,24 @@ def CreateNTHashTable(gen, gens, nt_list):
     return gens
 
 
+def CreateDecNTHashTable(gen, gens, nt_list):
+    for nt in nt_list:
+        if isinstance(nt, str):
+            nt_name = nt
+        else:
+            nt_name = nt.name
+        all_context = gen.DFSDecNTContext([nt], nt, limit_path=300000)
+        if all_context:
+            if len(all_context) == 0:
+                continue
+            if nt_name.endswith("_BIND") or nt_name.endswith("_EMIT"):
+                nt_name = nt_name[:-5]
+            hashtable = HashTable.HashTable(nt_name)
+            hashtable.LoadContext(all_context)
+            gens.htm.AddHashTable(hashtable)
+
+    return gens
+
 # def GetRegNTBinding(ntluf, dct)
 
 
@@ -196,8 +214,8 @@ def CreateNTHashTable(gen, gens, nt_list):
 
 if __name__ == "__main__":
 # =========== Load GlobalStruct ================
-    save = True
-    needreload = False                  # control if we need to reload pattern files or save them again
+    save = False
+    needreload = True                  # control if we need to reload pattern files or save them again
 
     sd = save_data.SaveData(all_dec_ins, pkl_dir, logger)
     if sd.haspkl and not needreload:
@@ -261,7 +279,7 @@ if __name__ == "__main__":
     #         print(mystr)
 
 # =============== Load Generator Storage ===================
-    # needreload = False     # for test
+    needreload = False     # for test
     # save = False
     sd = save_data.SaveData(all_dec_ins[:-4]+"_gens", pkl_dir, logger)
     if sd.haspkl and not needreload:
@@ -274,7 +292,7 @@ if __name__ == "__main__":
 # ==========================================================
     gen = ins_filter.Generator(gens)
 # =============== Load NT Hash Table =======================
-    # needreload = True
+    needreload = True
     # save = True
     # needreload = False
     # save = False
@@ -286,6 +304,7 @@ if __name__ == "__main__":
         sd.Load(HashTable.HTMLoad, htm)
     else:
         CreateNTHashTable(gen, gens, gs.ntlufs)
+        # CreateNTHashTable(gen, gens, gs.nts)
         CreateNTHashTable(gen, gens, gs.nts)
         for nt_name in gs.repeat_nts:
             htm.repeat_nts[nt_name] = GetNTsHashTable(gen, gs.repeat_nts[nt_name])
