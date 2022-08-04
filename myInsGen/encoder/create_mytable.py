@@ -12,6 +12,25 @@ import checker
 from global_init import *
 
 import capstone
+import copy
+from collections import deque
+
+
+class FieldTable(object):
+    def __init__(self, nt_field, ntluf_field, iform_field):
+        self.nt_field = nt_field
+        self.ntluf_field = ntluf_field
+        self.iform_field = iform_field
+
+    def __getitem__(self, name):
+        if name in self.nt_field:
+            return self.nt_field[name]
+        elif name in self.ntluf_field:
+            return self.ntluf_field[name]
+        elif name in self.iform_field:
+            return self.iform_field[name]
+        else:
+            raise KeyError("Item %s Not Found in FieldTable" %(name))
 
 
 # def isseq(nt_name):
@@ -201,6 +220,525 @@ def CreateDecNTHashTable(gen, gens, nt_list):
 
     return gens
 
+# use Node definition in dfs_generator.py
+class Node(object):
+    def __init__(self, prev=None, next=None):
+        self.touchflag = False          # just used to determine whether the node is a new generated node
+                                        # used by nt_emitnum in Emulator
+        self.prev = prev
+        self.next = next
+        self.iter = None
+
+    def __iter__(self):
+        self.exec = False
+        return self
+
+    def __next__(self):
+        if self.exec:
+            raise StopIteration
+        else:
+            self.exec = True
+            return self
+
+    def GetIterLen(self):
+        return 1
+
+    def GetIterNum(self):
+        return 1
+
+    def ClearIter(self):
+        self.iter = None
+
+# iter_type:
+#       0:  ActCondNode with no nt
+#       1:  ActCondNode with nt
+#       2:  NTFieldNode
+class ActCondNode(Node):
+    def __init__(self, acts, conds, field_table, field_node_table, prev=None, next=None):
+        super(ActCondNode, self).__init__(prev, next)
+        self.acts = acts
+        self.conds = conds
+        self.field_table = field_table
+        if "nt" in acts:
+            self.nt_nodes = []
+            for nt_name in acts["nt"]:
+                if not nt_name in field_node_table:
+                    self.nt_nodes.append(NTFieldNode(nt_name, field_table, field_node_table))
+                else:
+                    self.nt_nodes.append(field_node_table[nt_name])
+            self.length = len(self.nt_nodes)
+        else:
+            self.nt_nodes = None
+            self.length = 0
+        self.iter_index = -1
+
+    def DisableRoute(self):
+        self.iter_index = self.length
+
+    def GetIterLen(self):
+        return self.length
+
+    def GetIterNum(self):
+        return self.iter_index
+
+    def __len__(self):
+        return self.GetIterLen()
+
+    def __str__(self):
+        mystr = "acts: %s   conds: %s" %(str(self.acts), str(self.conds))
+        return mystr
+
+    def __repr__(self):
+        return str(self)
+
+    def __iter__(self):
+        self.iter_index = -1
+        self.current = None
+        return self
+
+    def __next__(self):
+        flag = True
+        if self.current != None:
+            try:
+                iter_type, tmp = next(self.current)
+                flag = False
+            except StopIteration:
+                pass
+        if flag:
+            if self.iter_index < self.length-1:
+                self.iter_index += 1
+                next_iter = self.nt_nodes[self.iter_index]
+                self.current = iter(next_iter)
+                tmp = self
+                iter_type = 1
+            elif self.iter_index == -1:
+                self.iter_index += 1
+                tmp = self
+                iter_type = 0
+            else:
+                self.current = None
+                raise StopIteration
+        return iter_type, tmp
+
+
+class NTFieldNode(Node):
+    def __init__(self, nt_name, field_table, field_node_table, prev=None, next=None):
+        super(NTFieldNode, self).__init__(prev, next)
+        self.name = nt_name
+        self.field_table = field_table
+        self.nt = field_table[nt_name]
+        self.act_conds = []
+        for acts, conds in self.nt:
+            act_cond_node = ActCondNode(acts, conds, field_table, field_node_table)
+            self.act_conds.append(act_cond_node)
+        self.length = len(self.act_conds)
+        self.iter_index = -1
+
+    def GetIterLen(self):
+        return self.length
+
+    def GetIterNum(self):
+        return self.iter_index
+
+    def __len__(self):
+        return self.GetIterLen()
+
+    def __str__(self):
+        mystr = "Name: %s  Index: %d" %(self.name, self.iter_index)
+        return mystr
+
+    def __repr__(self):
+        return str(self)
+
+    def __iter__(self):
+        self.iter_index = -1
+        self.current = None
+        return self
+
+    def __next__(self):
+        flag = True
+        if self.current != None:
+            try:
+                iter_type, tmp = next(self.current)
+                flag = False
+            except StopIteration:
+                pass
+        if flag:
+            if self.iter_index < self.length-1:
+                self.iter_index += 1
+                next_iter = self.act_conds[self.iter_index]
+                self.current = iter(next_iter)
+                tmp = self
+                iter_type = 2
+            else:
+                self.current = None
+                raise StopIteration
+        return iter_type, tmp
+
+
+class NTFieldHashNode(Node):
+    def __init__(self):
+        pass
+
+
+class EmitTable(object):
+    def __init__(self):
+        pass
+
+#            ______
+#      NT1  | cond |    if cond
+#           |  |   |    then act
+#           | act  |
+#              |
+#              |
+#            ______
+#      NT2  | cond |
+#           |  |   |    NT2's act may overwrite properties
+#           | act  |    but NT1's cond will never conflict with NT1
+
+# for action, the later exec nonterminal will overwrite the previous properties
+# for conditions, if the later exec nonterminal conflict with previous ones, this route will be drop
+
+class CondException(Exception):
+    pass
+
+class ActException(Exception):
+    pass
+
+class CondDict(object):
+    def __init__(self):
+        self.dict = {}
+
+    def update(self, b_dict):
+        for name in b_dict:
+            if name in self.dict and name != "OTHERWISE" and self.dict[name] != b_dict[name]:
+                raise CondException("")
+            else:
+                self.dict[name] = b_dict[name]
+        return self.dict
+
+    def __getitem__(self, name):
+        return self.dict[name]
+
+    def __setitem__(self, name, value):
+        self.dict[name] = value
+
+    def __iter__(self):
+        self.iter = iter(self.dict)
+        return self.iter
+
+    def __next__(self):
+        return next(self.iter)
+
+    def __str__(self):
+        return str(self.dict)
+
+    def __repr__(self):
+        return str(self.dict)
+
+
+class ActDict(object):
+    skip_name = ("emit", "nt")
+    def __init__(self):
+        self.dict = {"neq":{}}
+
+    def update(self, b_dict):
+        for name in b_dict:
+            # new condition is a neq condition
+            if name in self.skip_name:
+                continue
+            if name[0] == "!":
+                o_name = name[1:]
+                if o_name in self.dict:                       # if new neq condition equals old condition
+                    if self.dict[o_name] == b_dict[name]:
+                        raise ActException
+                if o_name in self.dict["neq"]:
+                    raise ValueError()
+                self.dict["neq"][o_name] = b_dict[name]
+                continue
+
+            # new condition is a normal condition
+            if name in self.dict["neq"]:                    # if new condition equals old neq condition
+                if b_dict[name] == self.dict["neq"][name]:
+                    raise ActException("")
+
+            if name in self.dict and self.dict[name] != b_dict[name]:
+                raise ActException("")
+            else:
+                self.dict[name] = b_dict[name]
+        return self.dict
+
+    def __getitem__(self, name):
+        return self.dict[name]
+
+    def __setitem__(self, name, value):
+        self.dict[name] = value
+
+    def __iter__(self):
+        self.iter = iter(self.dict)
+        return self.iter
+
+    def __next__(self):
+        return next(self.iter)
+
+    def __str__(self):
+        return str(self.dict)
+
+    def __repr__(self):
+        return str(self.dict)
+
+
+def ParseActCond(rule):
+    acts = {}
+    for act in rule.actions:
+        if act.type == "FB":
+            acts[act.field_name.upper()] = act.int_value
+        elif act.type == "nothing":
+            pass
+        elif act.type == "emit":
+            field_name = act.field_name
+            if field_name != None:
+                field_name = field_name.upper()
+            if not "emit" in acts:
+                acts["emit"] = []
+            if act.int_value != None:
+                acts["emit"].append( (act.nbits, act.int_value, field_name) )
+            else:
+                acts["emit"].append( (act.nbits, act.value, field_name) )
+        elif act.type == "NEQ":
+            acts["!"+act.field_name.upper()] = act.int_value
+        elif act.type == "nt" or act.type == "ntluf":
+            if not "nt" in acts:
+                acts["nt"] = []
+            if act.nt:
+                acts["nt"].append(act.nt)
+            elif act.ntluf:
+                acts["nt"].append(act.ntluf)
+            else:
+                raise ValueError("NT is None")
+        else:
+            raise ValueError("Unhandled Action %s" %str(act))
+    conds = {}
+    for cond in rule.conditions.and_conditions:
+        if cond.equals == True:
+            if cond.rvalue.string == '*':
+                conds[cond.field_name.upper()] = cond.bits
+            else:
+                if cond.bits:
+                    raise ValueError("Bits is not None")
+                conds[cond.field_name.upper()] = cond.rvalue.string
+        elif cond.equals == False:
+            conds["!"+cond.field_name.upper()] = cond.rvalue.string
+        else:
+            raise ValueError("Unhandled Condition %s" %str(cond))
+    return (acts, conds)
+
+def CreateActionBindingField(nts):
+    nt_field = {}
+    for nt_name in nts:
+        nt = nts[nt_name]
+        field = []
+        if nt:
+            for rule in nt.rules:
+                field.append( ParseActCond(rule) )
+            nt_field[nt_name] = field
+    return nt_field
+
+def CreateInsActionBindingField(iarray):
+    iform_field = {}
+    for ins_name in iarray:
+        iform_lst = iarray[ins_name]
+        field = []
+        if iform_lst:
+            for iform in iform_lst:
+                rule = iform.rule
+                field.append( ParseActCond(rule) )
+            if ins_name not in iform_field:
+                iform_field[ins_name] = field
+            else:
+                raise ValueError("Iform has more than one rule")
+    return iform_field
+
+
+def FindBindCond(value, binding, act_cond):
+    acts = act_cond[0]
+    conds = act_cond[1]
+    ret_value = None
+
+    if binding and binding in acts:
+        ret_value = acts[binding]
+    else:
+        var_str = ""
+        for cond in conds:
+            var = conds[cond]
+            if var and var in value:
+                if not len(var_str):
+                    var_str = value
+                var_str = var_str.replace(var, cond+" ")
+            if len(var_str):
+                ret_value = var_str.split()
+    return ret_value
+
+
+
+# def FindBindCond(value, binding, route):
+#     ret_value = None
+#     for node in route:
+#         if type(node) == NTFieldNode:
+#             pass
+#         elif type(node) == ActCondNode:
+#             for act in node.acts:
+#                 if act == "emit":
+#                     continue
+#                 elif act == binding:
+#                     if ret_value != None:
+#                         a = 0
+#                         # raise ValueError("ret_value overwrite")
+#                     ret_value = node.acts[act]
+#                 else:
+#                     pass
+
+#             var_str = ""
+#             for cond in node.conds:
+#                 var = node.conds[cond]
+#                 if var and var in value:
+#                     if not len(var_str):
+#                         var_str = value
+#                     var_str = var_str.replace(var, cond+" ")
+#             if len(var_str):
+#                 ret_value = var_str.split()
+#         else:
+#             raise ValueError("Unknown Node Type")
+
+#     return ret_value
+
+
+# def EmitBindAct(emit_table, route):
+#     i = 0
+#     for nbits, value, binding in emit_table:
+#         if type(value) == str:
+#             bind_value = FindBindCond(value, binding, route)
+#             if bind_value != None:
+#                 if type(bind_value) == list:
+#                     emit_table[i] = (nbits, value, bind_value)
+#                 else:
+#                     emit_table[i] = (nbits, bind_value, binding)
+#         i += 1
+
+def EmitBindAct(emit_table, act_cond):
+    i = 0
+    for nbits, value, binding in emit_table:
+        if type(value) == str:
+            bind_value = FindBindCond(value, binding, act_cond)
+            if bind_value != None:
+                if type(bind_value) == list:
+                    emit_table[i] = (nbits, value, bind_value)
+                else:
+                    emit_table[i] = (nbits, bind_value, binding)
+        i += 1
+
+
+def GetRoute(route):
+    act_dict = {}
+    cond_dict = {}
+    for node in route:
+        if type(node) == NTFieldNode:
+            pass
+        elif type(node) == ActCondNode:
+            act_dict.update(node.acts)
+            cond_dict.update(node.conds)
+    return (act_dict, cond_dict)
+
+
+def TraverseEmit(traverse_nt_name, field_table, field_node_table):
+    nt_node = NTFieldNode(traverse_nt_name, field_table, field_node_table)
+    emit_table = []
+    emit_table_lst = []
+
+    cond = CondDict()
+    act = ActDict()
+    emit_table_stack = []
+    actcond_stack = []
+    actcond_lst = []
+
+    route = []
+    prev_nt = None
+
+    emit_hash_table = {}
+
+    # for debug
+    if traverse_nt_name == "MODRM":
+        a = 0
+
+    for iter_type, node in nt_node:
+        if iter_type == 2:
+            # for debug
+            # if node.name == "SIB" and node.iter_index == 1:
+            #     a = 0
+
+            if node in route:       # backtrace
+                actcond_lst.append( (act, cond) )
+                if len(emit_table):
+                    EmitBindAct(emit_table, actcond_lst[-1])
+                    emit_hash = str(emit_table)
+                    actcond_ref = actcond_lst[-1]
+                    if not emit_hash in emit_hash_table:
+                        emit_table_lst.append( (emit_table, [actcond_ref]) )
+                        emit_hash_table[emit_hash] = emit_table_lst[-1]
+                    else:
+                        emit_hash_table[emit_hash][1].append(actcond_ref)
+                    # route_lst.append( GetRoute(route) )
+                while node != route[-1]:
+                    top_node = route.pop()
+                    if len(emit_table_stack):
+                        bind_node, top_emit_stack = emit_table_stack[-1]
+                        if bind_node == top_node:
+                            emit_table_stack.pop()
+                            actcond_stack.pop()
+                act, cond = copy.deepcopy(actcond_stack[-1])
+                if len(emit_table_stack):
+                    emit_table = copy.deepcopy(emit_table_stack[-1][1])
+            else:
+                route.append(node)
+                prev_nt = node
+                # if len(emit_table):
+                emit_table_stack.append( (node, copy.deepcopy(emit_table)) )
+                actcond_stack.append( (copy.deepcopy(act), copy.deepcopy(cond)) )
+        else:
+            flag = False
+            try:
+                cond.update(node.conds)
+            except CondException as e:                  # if conditon conflict
+                flag = True
+
+            try:
+                act.update(node.acts)
+            except ActException as e:
+                flag = True
+
+            if flag:
+                node.DisableRoute()
+                continue
+
+            route.append(node)
+            if "emit" in node.acts:
+                emit_table.extend(node.acts["emit"])    # reflush emit_table
+
+    # the last round of iteration will not save the context
+    actcond_lst.append( (act, cond) )
+    if len(emit_table):
+        EmitBindAct(emit_table, actcond_lst[-1])
+        emit_hash = str(emit_table)
+        actcond_ref = actcond_lst[-1]
+        if not emit_hash in emit_hash_table:
+            emit_table_lst.append( (emit_table, [actcond_ref]) )
+            emit_hash_table[emit_hash] = emit_table_lst[-1]
+        else:
+            emit_hash_table[emit_hash][1].append(actcond_ref)
+
+    return emit_table_lst, actcond_lst
+
+
 # def GetRegNTBinding(ntluf, dct)
 
 
@@ -215,7 +753,7 @@ def CreateDecNTHashTable(gen, gens, nt_list):
 if __name__ == "__main__":
 # =========== Load GlobalStruct ================
     save = False
-    needreload = True                  # control if we need to reload pattern files or save them again
+    needreload = False                  # control if we need to reload pattern files or save them again
 
     sd = save_data.SaveData(all_dec_ins, pkl_dir, logger)
     if sd.haspkl and not needreload:
@@ -237,242 +775,32 @@ if __name__ == "__main__":
 
     print("parse end")
 
-    # nt_used = GetUsedNT()
-    # for nt_name in nt_used:
-    #     print(nt_name)
-    # print(num)
 
-    # for seqname in gs.seqs:
-    #     ParseSeq(seqname, 10, True)
+# ===== Parse All Action Binding Field =====
+    nt_act_field = CreateActionBindingField(gs.nts)
+    ntluf_act_field = CreateActionBindingField(gs.ntlufs)
+    iform_act_field = CreateInsActionBindingField(gs.iarray)
 
-    # ParseIclass()
+    field_table = FieldTable(nt_act_field, ntluf_act_field, iform_act_field)
 
-    # regonly_iform_dct = GetRegOnly()
+    field_node_table = {}
 
-    # for iclass in regonly_iform_dct:
-    #     print("%s" %iclass)
-    #     for i in regonly_iform_dct[iclass]:
-    #         # print(gs.iarray[iclass][i])
-    #         iform = gs.iarray[iclass][i]
-    #         for action in iform.rule.actions:
-    #             print("\t\taction: %s" %str(action))
-    #         for cond in iform.rule.conditions.and_conditions:
-    #             print("\t\tconditon: %s" %str(cond))
-    #         print("")
+    nt_act_emit_bind = {}
+    for nt_name in nt_act_field:
+        nt_act_emit_bind[nt_name] = TraverseEmit(nt_name, field_table, field_node_table)
 
-    # ins_filter = generator.Filter(gen)
+    ntluf_act_emit_bind = {}
+    for nt_name in ntluf_act_field:
+        ntluf_act_emit_bind[nt_name] = TraverseEmit(nt_name, field_table, field_node_table)
 
-    cs = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
+    iform_act_emit_bind = {}
+    for nt_name in iform_act_field:
+        iform_act_emit_bind[nt_name] = TraverseEmit(nt_name, field_table, field_node_table)
 
-    # set_iter = iter(iforms)
-    # iform = next(set_iter)
-    # print(str(iform))
-    # my_ins_filter = ins_filter.InsFilter(iform=iform)
-    # ins_lst = gen.GeneratorIform(iform, ins_filter=my_ins_filter)
-    # if len(ins_lst) > 0:
-    #     for ins in ins_lst:
-    #         print(ins.hex(), end="")
-    #         decode = cs.disasm(ins, 0)
-    #         mystr = ""
-    #         for insn in decode:
-    #             mystr += "\t%s  %s\n" % (insn.mnemonic, insn.op_str)
-    #         print(mystr)
-
-# =============== Load Generator Storage ===================
-    needreload = False     # for test
-    # save = False
-    sd = save_data.SaveData(all_dec_ins[:-4]+"_gens", pkl_dir, logger)
-    if sd.haspkl and not needreload:
-        gens = generator_storage.GeneratorStorage(load=True)
-        sd.Load(generator_storage.GensLoad, gens)
-    else:
-        gens = generator_storage.GeneratorStorage()
-    if save and needreload:
-        sd.Save(generator_storage.GensSave, gens)
-# ==========================================================
-    gen = ins_filter.Generator(gens)
-# =============== Load NT Hash Table =======================
-    needreload = True
-    # save = True
-    # needreload = False
-    # save = False
-
-    sd = save_data.SaveData(all_dec_ins[:-4]+"_htm", pkl_dir, logger)
-    htm = HashTable.HashTableManager()
-    gens.AddHashTableManager(htm)
-    if sd.haspkl and not needreload:
-        sd.Load(HashTable.HTMLoad, htm)
-    else:
-        CreateNTHashTable(gen, gens, gs.ntlufs)
-        # CreateNTHashTable(gen, gens, gs.nts)
-        CreateNTHashTable(gen, gens, gs.nts)
-        for nt_name in gs.repeat_nts:
-            htm.repeat_nts[nt_name] = GetNTsHashTable(gen, gs.repeat_nts[nt_name])
-        for nt_name in gs.repeat_ntlufs:
-            htm.repeat_ntlufs[nt_name] = GetNTsHashTable(gen, gs.repeat_ntlufs[nt_name])
-        # CreateNTHashTable(gen, gens, htm, ["XMM_SE"])
-        # === check ===
-        # check if old htm is the same as new one, only when the old one is already correct, and new edition just add some optimization
-        # old_htm = HashTable.HashTableManager()
-        # sd.Load(HashTable.HTMLoad, old_htm)
-        # checker.CheckHashTableManager(old_htm, htm)
-
-        # check new htm correction
-        for ht in htm.nt_names:
-            all_context = htm.nt_names[ht].all_context
-            for context in all_context:
-                checker.CheckContextCondNum(context)
-        # === ===
-    if save and needreload:
-        sd.Save(HashTable.HTMSave, htm)
-    htm.done = True
-
-    # ==== print note\nt_tree.txt note\nts.txt and note\ntlufs.txt
-    # for seqname in gs.seqs:
-    #     ParseSeq(seqname, 10, True)
-    # ParseNT(gs, "nts")
-    # ParseNT(gs, "ntlufs")
-
-    gen.DFSSeqContext("MODRM_BIND")
-
-# ==========================================================
-
-    my_ins_filter = ins_filter.InsFilter(gens)
-    # my_ins_filter.AppendReg("XED_REG_AL", "output")
-    # my_ins_filter.AppendReg("GPRv_B()", "")
-    # my_ins_filter.AppendReg("XED_REG_EAX", "")
-    # my_ins_filter.AppendReg("GPRv_B()", "")
-    # my_ins_filter["MOD"] = "!3"
-
-    # Extension XSAVE XSAVEC XSAVEOPT 
-    # my_ins_filter["extension"] = ["BASE", "XSAVE", "XSAVEC", "XSAVES", "XSAVEOPT", "SMAP", "RDSEED", "RDWRFSGS",
-    #                             "ADOX_ADCX", "PKU", "INVPCID", "SVM", "MOVBE", "PREFETCHWT1", "CLFSH",
-    #                             "CLFLUSHOPT", "RDRAND", "RDTSCP", "RDPID"]         # TODO: Attension: there are some special operation for AVX512VEX and AVX512EVEX
-    # "BMI1", "BMI2"
-    # my_ins_filter["iclass"] = ["CRC32", "POPCNT", "PREFETCHW"]
-
-    # my_ins_filter["extension"] = ["X87"]
-    my_ins_filter["extension"] = ["SSE2"]
-    # my_ins_filter["iclass"] = ["FXSAVE", "FXRSTOR"]
-    # my_ins_filter["iclass"] = ["MOV"]
-    my_ins_filter.SpecifyMode(32)
-    # === specify register ===
-    # my_ins_filter["BASE0"] = "XED_REG_EAX"
-
-    iforms = my_ins_filter.GetIforms()
-
-    # my_ins_filter["REG0"] = "XED_REG_AX"       # here we just specify input and output reg
-    # my_ins_filter["REG1"] = "XED_REG_BX"
-
-    # my_ins_filter["REG0"] = "XED_REG_CL"
-    # my_ins_filter["REG1"] = "XED_REG_DL"
-
-# === for x87 ===
-    # my_ins_filter["REG1"] = "XED_REG_ST0"
-    # my_ins_filter["REG0"] = "XED_REG_ST1"
-# === ===
-
-# === for sse ===
-    # my_ins_filter["REG0"] = "XED_REG_XMM0"
-    my_ins_filter["REG0"] = "XED_REG_ECX"
-    my_ins_filter["REG1"] = "XED_REG_XMM0"
-# === ===
+    print("parse 2 end")
 
 
-    my_ins_filter["BASE0"] = "XED_REG_ESI"
-    my_ins_filter["INDEX"] = "XED_REG_EDI"
-    my_ins_filter["SEG0"] = "@"
-    # my_ins_filter["EOSZ"] = "2"
-    # my_ins_filter["EASZ"] = "2"
-    # my_ins_filter["SIB"] = "0"
-    my_ins_filter["SCALE"] = "1"            # can be 1 2 4 8
-    my_ins_filter["DISP_WIDTH"] = "0"
-    # gen.DFSNTContext(["VEX_REXR_ENC"])
-    # gen.DFSSeqContext("MODRM_BIND")
-    # all_context = gen.DFSNTContext(["SIB_REQUIRED_ENCODE", "SIBSCALE_ENCODE", "SIBINDEX_ENCODE", "SIBBASE_ENCODE", "MODRM_RM_ENCODE"])
-
-    # for route in all_route:           # all_route: just 4 debug
-    #     print(route)
-
-
-# ============== Set NT iter num ================
-    nt_emitnum = {}
-    nt_emitnum["FIXUP_EOSZ_ENC"] = 1
-    nt_emitnum["FIXUP_EASZ_ENC"] = 1
-    nt_emitnum["ASZ_NONTERM"] = 1
-    nt_emitnum["OSZ_NONTERM_ENC"] = 1
-    nt_emitnum["PREFIX_ENC"] = 1
-    nt_emitnum["REX_PREFIX_ENC"] = 1
-
-# === for x87 ===
-    # nt_emitnum["X87"] = 1
-# === ===
-
-    # nt_emitnum["iform"] = 20
-
-    # nt_emitnum["SIB_REQUIRED_ENCODE"] = 1
-    # nt_emitnum["SIBSCALE_ENCODE"] = 1
-    # nt_emitnum["SIBINDEX_ENCODE"] = 1
-    # nt_emitnum["SIBBASE_ENCODE"] = 1
-    # nt_emitnum["MODRM_RM_ENCODE"] = 1
-    # nt_emitnum["MODRM_MOD_ENCODE"] = 1
-    # nt_emitnum["SEGMENT_DEFAULT_ENCODE"] = 1
-    # nt_emitnum["SEGMENT_ENCODE"] = 1
-    # nt_emitnum["SIB_NT"] = 1
-    # nt_emitnum["DISP_NT"] = 2
-    gen.SetNTEmitNum(nt_emitnum)
-# ============== ============
-
-# ============== Set NT otherwise_first ================
-# **See Note**
-# Specify if this NT will execute otherwise **first**
-# **Attension** : otherwise_first setting here only work to NTHashNode
-    nt_otherwise_first = {}
-    nt_otherwise_first["SIB_REQUIRED_ENCODE"] = True
-    nt_otherwise_first["SEGMENT_ENCODE"] = True
-    nt_otherwise_first["DISP_NT"] = True
-    nt_otherwise_first["PREFIX_ENC"] = True
-    nt_otherwise_first["REX_PREFIX_ENC"] = True
-    gen.SetOtherwiseFirst(nt_otherwise_first)
-# ============== ============
-
-# ============== Set Default Emit Number =================
-    default_emit_num = {}
-    default_emit_num["REXW"] = 0
-    default_emit_num["REXR"] = 0
-    default_emit_num["REXB"] = 0
-    default_emit_num["REXX"] = 0
-    default_emit_num["REG"] = 0
-    default_emit_num["UIMM0"] = 10
-    default_emit_num["UIMM1"] = 20
-    default_emit_num["DISP"] = 0x10
-    gen.SetDefaultValidEmitNum(default_emit_num)
-# ============== ============
-
-    # print(len(iforms))
-
-    for i in iforms:
-        tmp_str = str(i).split()
-        print("%s %s"%(tmp_str[0], tmp_str[1]))
-        logger.info("%s %s"%(tmp_str[0], tmp_str[1]))
-        ins_lst = gen.GeneratorIform(i, ins_filter=my_ins_filter, output_num=20)
-        if len(ins_lst) > 0:
-            for ins in ins_lst:
-                print(ins.hex(), end="")
-                logger.info(ins.hex())
-                decode = cs.disasm(ins, 0)
-                mystr = ""
-                i = 0
-                for insn in decode:
-                    if i == 0:
-                        first_ins_size = insn.size
-                        mystr += "\t%s  %s" % (insn.mnemonic, insn.op_str)
-                        i += 1
-                    else:
-                        mystr += "\t\tremain %d bytes" %(len(ins) - first_ins_size)
-                        break
-                print(mystr)
-                logger.info(mystr)
-        else:
-            logger.warning(str(i))
-    pass
+# TODO  处理不等的condition  Done
+#       开始分块优化
+#       看一下为什么displacement没有被加进emit数组中
+#       emit列表的对应关系有问题，出现emit列表不唯一的情况  Done
