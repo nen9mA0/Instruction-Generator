@@ -1,3 +1,14 @@
+# 2022.8.8
+# cond act 更新规则：
+#       非strict模式
+#           从前向后遍历，若context中
+#                   * 没有cond与对应act，则加入cond与act（包含neq的各种判断情况，见下面）
+#                   * 若cond或act在context中，则判断cond与act是否满足当前context，注意这里若act不满足也会判定为整体条件不满足，与dfs_generator中不一样
+#       strict模式
+#           从前向后遍历，当且仅当cond **或** act在context中存在且 **相等**，才视为满足条件
+
+
+from multiprocessing.sharedctypes import Value
 import fields_reader
 import state_bits_reader
 import enc_patterns_reader
@@ -254,11 +265,13 @@ class Node(object):
 #       1:  ActCondNode with nt
 #       2:  NTFieldNode
 class ActCondNode(Node):
-    def __init__(self, acts, conds, field_table, field_node_table, prev=None, next=None):
+    def __init__(self, acts, conds, field_table, field_node_table, father, strict=False, prev=None, next=None):
         super(ActCondNode, self).__init__(prev, next)
         self.acts = acts
         self.conds = conds
         self.field_table = field_table
+        self.father = father
+        self.strict = strict
         if "nt" in acts:
             self.nt_nodes = []
             for nt_name in acts["nt"]:
@@ -267,10 +280,36 @@ class ActCondNode(Node):
                 else:
                     self.nt_nodes.append(field_node_table[nt_name])
             self.length = len(self.nt_nodes)
+            self.has_nt = True
         else:
             self.nt_nodes = None
             self.length = 0
-        self.iter_index = -1
+            self.has_nt = False
+
+
+#   ___       ___
+#  | A | --> | B |
+#  |___| <-- |___|
+#    | act
+#  [C D]
+#
+#
+#   ___       ___       ___       ___
+#  | A | --> | C | --> | D | --> | B |
+#  |___| <-- |___| <-- |___| <-- |___|
+
+
+    def BuildTree(self):
+        if self.has_nt:
+            prev = self.father
+            next_node = self.father.next
+            for nt_node in self.nt_nodes:
+                prev.next = nt_node
+                nt_node.prev = prev
+                prev = nt_node
+            if next_node != None:
+                prev.next = next_node
+                next_node.prev = prev
 
     def DisableRoute(self):
         self.iter_index = self.length
@@ -292,45 +331,72 @@ class ActCondNode(Node):
         return str(self)
 
     def __iter__(self):
-        self.iter_index = -1
+        self.flag = False       # if has traversed
         self.current = None
+        self.BuildTree()
         return self
 
+    # don't have nt:
+    #   case 1: haven't traversed   --> return 0, self
+    #   case 2: have traversed      --> if self.father.next   iter()
+
+    # have nt:
+    #   case 1: have nt and current=None             begin to iterate first nt
+    #                        --> iter(nt[0]) return 1, self
+    #   case 2:  have nt and current!=None
+    #                        --> next(iter)
+
     def __next__(self):
-        flag = True
         if self.current != None:
             try:
                 iter_type, tmp = next(self.current)
-                flag = False
             except StopIteration:
-                pass
-        if flag:
-            if self.iter_index < self.length-1:
-                self.iter_index += 1
-                next_iter = self.nt_nodes[self.iter_index]
-                self.current = iter(next_iter)
-                tmp = self
-                iter_type = 1
-            elif self.iter_index == -1:
-                self.iter_index += 1
-                tmp = self
-                iter_type = 0
-            else:
-                self.current = None
+                if self.has_nt:
+                    if self.father.next == self.nt_nodes[0]:
+                        next_node = self.nt_nodes[-1].next
+                        self.father.next = next_node
+                        if next_node:
+                            next_node.prev = self.father
                 raise StopIteration
+        else:
+            if not self.has_nt:
+                if not self.flag:       # haven't traverse
+                    self.flag = True
+                    tmp = self
+                    iter_type = 0
+
+                    if self.father.next != None:
+                        self.current = iter(self.father.next)
+                else:
+                    self.current = None
+                    raise StopIteration
+            else:
+                if not self.flag:
+                    self.flag = True
+                    self.current = iter(self.nt_nodes[0])
+                    tmp = self
+                    iter_type = 1
+                else:
+                    raise ValueError()
         return iter_type, tmp
 
 
 class NTFieldNode(Node):
-    def __init__(self, nt_name, field_table, field_node_table, prev=None, next=None):
+    strict_nt = ["MEMDISP"]
+    def __init__(self, nt_name, field_table, field_node_table, init=False, prev=None, next=None):
         super(NTFieldNode, self).__init__(prev, next)
         self.name = nt_name
         self.field_table = field_table
         self.nt = field_table[nt_name]
         self.act_conds = []
-        for acts, conds in self.nt:
-            act_cond_node = ActCondNode(acts, conds, field_table, field_node_table)
-            self.act_conds.append(act_cond_node)
+        if not init and nt_name in self.strict_nt:
+            for acts, conds in self.nt:
+                act_cond_node = ActCondNode(acts, conds, field_table, field_node_table, self, strict=True)
+                self.act_conds.append(act_cond_node)
+        else:
+            for acts, conds in self.nt:
+                act_cond_node = ActCondNode(acts, conds, field_table, field_node_table, self, strict=False)
+                self.act_conds.append(act_cond_node)
         self.length = len(self.act_conds)
         self.iter_index = -1
 
@@ -405,17 +471,132 @@ class CondException(Exception):
 class ActException(Exception):
     pass
 
+class ActCondDict(object):
+    skip_name = ("emit", "nt")
+    def __init__(self):
+        self.act = ActDict()
+        self.cond = CondDict()
+
+    def update(self, act_dict, cond_dict, strict=False):
+        for name in act_dict:
+            flag = False
+            value = act_dict[name]
+            if name[0] == "!":
+                neq = True
+            if name in self.skip_name:
+                continue
+            if neq:
+                flag = self.act.NeqActTest(name, value) and self.cond.NeqCondTest(name, value)
+                if flag:
+                    if not "neq" in self.act:
+                        self.act["neq"] = {}
+                    self.act["neq"][name[1:]] = value
+                else:
+                    raise ActException("")
+            else:
+                flag = self.act.Test(name, value, strict) or self.cond.Test(name, value, strict)
+                if flag:
+                    self.act[name] = value
+                else:
+                    raise ActException("")
+
+        for name in cond_dict:
+            flag = False
+            value = cond_dict[name]
+            if name[0] == "!":
+                neq = True
+            if neq:
+                flag = self.act.NeqActTest(name, value) and self.cond.NeqCondTest(name, value)
+                if flag:
+                    if not "neq" in self.act:
+                        self.cond["neq"] = {}
+                    self.cond["neq"][name[1:]] = value
+                else:
+                    raise CondException("")
+            else:
+                flag = self.act.Test(name, value, strict) or self.cond.Test(name, value, strict)
+                if flag:
+                    self.cond[name] = value
+                else:
+                    raise CondException("")
+
+    def __getitem__(self, name):
+        if name in self.act:
+            return (0, self.act[name])
+        elif name in self.cond:
+            return (1, self.cond[name])
+        else:
+            raise KeyError("Key %s not in ActCondDict" %name)
+
+    def __setitem__(self, name, value):
+        item_type, item = value
+        if item_type == 0:
+            self.act[name] = item
+        else:
+            self.cond[name] = item
+
+    def __iter__(self):
+        self.iter = iter(self.act)
+        self.flag = True
+        return self.iter
+
+    def __next__(self):
+        try:
+            obj = next(self.iter)
+        except StopIteration:
+            if self.flag:
+                self.iter = iter(self.cond)
+                self.flag = False
+            else:
+                raise StopIteration
+
+    def __str__(self):
+        return str(self.act) + str(self.cond)
+
+    def __repr__(self):
+        return str(self)
+
+
 class CondDict(object):
     def __init__(self):
         self.dict = {}
 
-    def update(self, b_dict):
-        for name in b_dict:
-            if name in self.dict and name != "OTHERWISE" and self.dict[name] != b_dict[name]:
-                raise CondException("")
+    # def update(self, b_dict):
+    #     for name in b_dict:
+    #         if name in self.dict and name != "OTHERWISE" and self.dict[name] != b_dict[name]:
+    #             raise CondException("")
+    #         else:
+    #             self.dict[name] = b_dict[name]
+    #     return self.dict
+
+    def NeqCondTest(self, name, value):
+        if name in self.dict:
+            if self.dict[name] == value:
+                return False
+        if "neq" in self.dict:
+            if name in self.dict["neq"]:
+                if self.dict["neq"][name] != value:
+                    raise ValueError("")               # reassign not equal
+        return True
+
+    def Test(self, name, value, strict=False):
+        if not strict:
+            if name in self.dict and name != "OTHERWISE" and (self.dict[name] != value or not self.TestNeq(name, value)):
+                return False
             else:
-                self.dict[name] = b_dict[name]
-        return self.dict
+                return True
+        else:
+            if name in self.dict and self.dict[name] == value and self.TestNeq(name, value):
+                return True
+            else:
+                return False
+
+    def TestNeq(self, name, value):
+        if "neq" in self.dict:
+            if name in self.dict["neq"]:
+                if self.dict["neq"][name] == value:
+                    return False
+        return True
 
     def __getitem__(self, name):
         return self.dict[name]
@@ -438,35 +619,68 @@ class CondDict(object):
 
 
 class ActDict(object):
-    skip_name = ("emit", "nt")
     def __init__(self):
-        self.dict = {"neq":{}}
+        self.dict = {}
 
-    def update(self, b_dict):
-        for name in b_dict:
-            # new condition is a neq condition
-            if name in self.skip_name:
-                continue
-            if name[0] == "!":
-                o_name = name[1:]
-                if o_name in self.dict:                       # if new neq condition equals old condition
-                    if self.dict[o_name] == b_dict[name]:
-                        raise ActException
-                if o_name in self.dict["neq"]:
-                    raise ValueError()
-                self.dict["neq"][o_name] = b_dict[name]
-                continue
+    # def update(self, b_dict, strict=False):
+    #     for name in b_dict:
+    #         # new condition is a neq condition
+    #         if name in self.skip_name:
+    #             continue
+    #         if name[0] == "!":
+    #             o_name = name[1:]
+    #             if o_name in self.dict:                       # if new neq condition equals old condition
+    #                 if self.dict[o_name] == b_dict[name]:
+    #                     raise ActException
+    #             if o_name in self.dict["neq"]:
+    #                 raise ValueError()
+    #             self.dict["neq"][o_name] = b_dict[name]
+    #             continue
 
-            # new condition is a normal condition
-            if name in self.dict["neq"]:                    # if new condition equals old neq condition
-                if b_dict[name] == self.dict["neq"][name]:
-                    raise ActException("")
+    #         # new condition is a normal condition
+    #         if name in self.dict["neq"]:                    # if new condition equals old neq condition
+    #             if b_dict[name] == self.dict["neq"][name]:
+    #                 raise ActException("")
 
-            if name in self.dict and self.dict[name] != b_dict[name]:
-                raise ActException("")
+    #         if name in self.dict:
+    #             if self.dict[name] != b_dict[name]:
+    #                 raise ActException("")
+    #             else:
+    #                 if strict:                  # for debug
+    #                     a = 0
+    #         else:
+    #             if strict:
+    #                 raise ActException("")
+    #             else:
+    #                 self.dict[name] = b_dict[name]
+    #     return self.dict
+
+    def NeqActTest(self, name, value):
+        if name in self.dict:
+            if self.dict[name] == value:
+                return False
+        if "neq" in self.dict:
+            if name in self.dict["neq"]:
+                raise ValueError("")
+
+    def Test(self, name, value, strict=False):
+        if not strict:
+            if name in self.dict and (self.dict[name] != value or not self.TestNeq(name, value)):
+                return False
             else:
-                self.dict[name] = b_dict[name]
-        return self.dict
+                return True
+        else:
+            if name in self.dict and self.dict[name] == value and self.TestNeq(name, value):
+                return True
+            else:
+                return False
+
+    def TestNeq(self, name, value):
+        if "neq" in self.dict:
+            if name in self.dict["neq"]:
+                if self.dict["neq"][name] == value:
+                    return False
+        return True
 
     def __getitem__(self, name):
         return self.dict[name]
@@ -651,7 +865,7 @@ def GetRoute(route):
 
 
 def TraverseEmit(traverse_nt_name, field_table, field_node_table):
-    nt_node = NTFieldNode(traverse_nt_name, field_table, field_node_table)
+    nt_node = NTFieldNode(traverse_nt_name, field_table, field_node_table, init=True)
     emit_table = []
     emit_table_lst = []
 
@@ -712,7 +926,7 @@ def TraverseEmit(traverse_nt_name, field_table, field_node_table):
                 flag = True
 
             try:
-                act.update(node.acts)
+                act.update(node.acts, node.strict)
             except ActException as e:
                 flag = True
 
@@ -802,5 +1016,6 @@ if __name__ == "__main__":
 
 # TODO  处理不等的condition  Done
 #       开始分块优化
-#       看一下为什么displacement没有被加进emit数组中
+#       -- 看一下为什么displacement没有被加进emit数组中  有bug
+#       需要把act与cond合并，因为NEED_MEMDISP在cond中，而对应判断在act中
 #       emit列表的对应关系有问题，出现emit列表不唯一的情况  Done
