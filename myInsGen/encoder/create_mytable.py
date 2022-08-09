@@ -480,10 +480,12 @@ class ActCondDict(object):
     def update(self, act_dict, cond_dict, strict=False):
         for name in act_dict:
             flag = False
+            neq = False
             value = act_dict[name]
             if name[0] == "!":
                 neq = True
             if name in self.skip_name:
+                # self.act[name] = value
                 continue
             if neq:
                 flag = self.act.NeqActTest(name, value) and self.cond.NeqCondTest(name, value)
@@ -501,7 +503,8 @@ class ActCondDict(object):
                     raise ActException("")
 
         for name in cond_dict:
-            flag = False
+            flag = True
+            neq = False
             value = cond_dict[name]
             if name[0] == "!":
                 neq = True
@@ -514,7 +517,7 @@ class ActCondDict(object):
                 else:
                     raise CondException("")
             else:
-                flag = self.act.Test(name, value, strict) or self.cond.Test(name, value, strict)
+                # flag = self.act.Test(name, value, strict) or self.cond.Test(name, value, strict)
                 if flag:
                     self.cond[name] = value
                 else:
@@ -662,6 +665,7 @@ class ActDict(object):
         if "neq" in self.dict:
             if name in self.dict["neq"]:
                 raise ValueError("")
+        return True
 
     def Test(self, name, value, strict=False):
         if not strict:
@@ -740,9 +744,15 @@ def ParseActCond(rule):
             else:
                 if cond.bits:
                     raise ValueError("Bits is not None")
-                conds[cond.field_name.upper()] = cond.rvalue.string
+                try:
+                    conds[cond.field_name.upper()] = int(cond.rvalue.string)
+                except:
+                    conds[cond.field_name.upper()] = cond.rvalue.string
         elif cond.equals == False:
-            conds["!"+cond.field_name.upper()] = cond.rvalue.string
+            try:
+                conds["!"+cond.field_name.upper()] = int(cond.rvalue.string)
+            except:
+                conds["!"+cond.field_name.upper()] = cond.rvalue.string
         else:
             raise ValueError("Unhandled Condition %s" %str(cond))
     return (acts, conds)
@@ -775,8 +785,8 @@ def CreateInsActionBindingField(iarray):
 
 
 def FindBindCond(value, binding, act_cond):
-    acts = act_cond[0]
-    conds = act_cond[1]
+    acts = act_cond.act
+    conds = act_cond.cond
     ret_value = None
 
     if binding and binding in acts:
@@ -785,7 +795,7 @@ def FindBindCond(value, binding, act_cond):
         var_str = ""
         for cond in conds:
             var = conds[cond]
-            if var and var in value:
+            if var and type(var)==str and var in value:
                 if not len(var_str):
                     var_str = value
                 var_str = var_str.replace(var, cond+" ")
@@ -869,8 +879,7 @@ def TraverseEmit(traverse_nt_name, field_table, field_node_table):
     emit_table = []
     emit_table_lst = []
 
-    cond = CondDict()
-    act = ActDict()
+    act_cond = ActCondDict()
     emit_table_stack = []
     actcond_stack = []
     actcond_lst = []
@@ -891,16 +900,17 @@ def TraverseEmit(traverse_nt_name, field_table, field_node_table):
             #     a = 0
 
             if node in route:       # backtrace
-                actcond_lst.append( (act, cond) )
-                if len(emit_table):
-                    EmitBindAct(emit_table, actcond_lst[-1])
-                    emit_hash = str(emit_table)
-                    actcond_ref = actcond_lst[-1]
-                    if not emit_hash in emit_hash_table:
-                        emit_table_lst.append( (emit_table, [actcond_ref]) )
-                        emit_hash_table[emit_hash] = emit_table_lst[-1]
-                    else:
-                        emit_hash_table[emit_hash][1].append(actcond_ref)
+                if not flag:
+                    actcond_lst.append( act_cond )
+                    if len(emit_table):
+                        EmitBindAct(emit_table, actcond_lst[-1])
+                        emit_hash = str(emit_table)
+                        actcond_ref = actcond_lst[-1]
+                        if not emit_hash in emit_hash_table:
+                            emit_table_lst.append( (emit_table, [actcond_ref]) )
+                            emit_hash_table[emit_hash] = emit_table_lst[-1]
+                        else:
+                            emit_hash_table[emit_hash][1].append(actcond_ref)
                     # route_lst.append( GetRoute(route) )
                 while node != route[-1]:
                     top_node = route.pop()
@@ -909,7 +919,7 @@ def TraverseEmit(traverse_nt_name, field_table, field_node_table):
                         if bind_node == top_node:
                             emit_table_stack.pop()
                             actcond_stack.pop()
-                act, cond = copy.deepcopy(actcond_stack[-1])
+                act_cond = copy.deepcopy(actcond_stack[-1])
                 if len(emit_table_stack):
                     emit_table = copy.deepcopy(emit_table_stack[-1][1])
             else:
@@ -917,16 +927,13 @@ def TraverseEmit(traverse_nt_name, field_table, field_node_table):
                 prev_nt = node
                 # if len(emit_table):
                 emit_table_stack.append( (node, copy.deepcopy(emit_table)) )
-                actcond_stack.append( (copy.deepcopy(act), copy.deepcopy(cond)) )
+                actcond_stack.append( (copy.deepcopy(act_cond)) )
         else:
             flag = False
             try:
-                cond.update(node.conds)
+                act_cond.update(node.acts, node.conds, node.strict)
             except CondException as e:                  # if conditon conflict
                 flag = True
-
-            try:
-                act.update(node.acts, node.strict)
             except ActException as e:
                 flag = True
 
@@ -939,16 +946,17 @@ def TraverseEmit(traverse_nt_name, field_table, field_node_table):
                 emit_table.extend(node.acts["emit"])    # reflush emit_table
 
     # the last round of iteration will not save the context
-    actcond_lst.append( (act, cond) )
-    if len(emit_table):
-        EmitBindAct(emit_table, actcond_lst[-1])
-        emit_hash = str(emit_table)
-        actcond_ref = actcond_lst[-1]
-        if not emit_hash in emit_hash_table:
-            emit_table_lst.append( (emit_table, [actcond_ref]) )
-            emit_hash_table[emit_hash] = emit_table_lst[-1]
-        else:
-            emit_hash_table[emit_hash][1].append(actcond_ref)
+    if not flag:
+        actcond_lst.append( (act_cond) )
+        if len(emit_table):
+            EmitBindAct(emit_table, actcond_lst[-1])
+            emit_hash = str(emit_table)
+            actcond_ref = actcond_lst[-1]
+            if not emit_hash in emit_hash_table:
+                emit_table_lst.append( (emit_table, [actcond_ref]) )
+                emit_hash_table[emit_hash] = emit_table_lst[-1]
+            else:
+                emit_hash_table[emit_hash][1].append(actcond_ref)
 
     return emit_table_lst, actcond_lst
 
@@ -999,13 +1007,13 @@ if __name__ == "__main__":
 
     field_node_table = {}
 
-    nt_act_emit_bind = {}
-    for nt_name in nt_act_field:
-        nt_act_emit_bind[nt_name] = TraverseEmit(nt_name, field_table, field_node_table)
+    # nt_act_emit_bind = {}
+    # for nt_name in nt_act_field:
+    #     nt_act_emit_bind[nt_name] = TraverseEmit(nt_name, field_table, field_node_table)
 
-    ntluf_act_emit_bind = {}
-    for nt_name in ntluf_act_field:
-        ntluf_act_emit_bind[nt_name] = TraverseEmit(nt_name, field_table, field_node_table)
+    # ntluf_act_emit_bind = {}
+    # for nt_name in ntluf_act_field:
+    #     ntluf_act_emit_bind[nt_name] = TraverseEmit(nt_name, field_table, field_node_table)
 
     iform_act_emit_bind = {}
     for nt_name in iform_act_field:
