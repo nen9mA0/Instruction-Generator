@@ -82,7 +82,8 @@ class PackerYara(object):
             else:
                 break
         if len(num_str) and len(num_str) != 2:
-            raise ValueError("")    # check
+            # raise ValueError("")    # check
+            return int(num_str[:2], 16), 2
         if len(num_str):
             return int(num_str, 16), i
         else:
@@ -142,7 +143,7 @@ class PackerYara(object):
         self.rule.append(mybytes)
 
 
-yara_file = "I:\\Project\\auto_yara\\rules\\automine-new721test.yar"
+yara_file = "I:\\Project\\auto_yara\\rules\\automine-new721test_back.yar"
 if __name__ == "__main__":
     with open(yara_file) as f:
         lines = f.readlines()
