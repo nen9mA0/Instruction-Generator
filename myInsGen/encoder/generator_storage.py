@@ -1,3 +1,4 @@
+from multiprocessing.sharedctypes import Value
 import opcode
 from global_init import *
 import HashTable
@@ -307,9 +308,51 @@ class GeneratorStorage(object):
                         self.PtnDictUpdate(new_opcode_dict, opcode_dict)
         return new_opcode_dict
 
+    def HandlePrefix(self, iform_ptn):
+        # hard code according to enc-pattern.txt
+        # TODO: convert to rules
+        # now we don't care not equal prefix conditions
+        # TODO: care about not equal
+        prefix_encode = {
+            "REP": {
+                2: 0xf2,
+                3: 0xf3
+            },
+            "OSZ": {
+                1: 0x66
+            },
+            "ASZ": {
+                1: 0x67
+            },
+            "LOCK": {
+                1: 0xf0
+            },
+            "SEG_OVD": {
+                1: 0x2e,
+                2: 0x3e,
+                3: 0x26,
+                4: 0x64,
+                5: 0x65,
+                6: 0x36
+            }
+        }
+
+        prefix_lst = []
+        nbits = 8       # now for 32 mode, all nbits are 8
+        if "prefix" in iform_ptn:
+            for prefix in iform_ptn["prefix"]:
+                # don't care not equal at present
+                if prefix in prefix_encode:
+                    if iform_ptn["prefix"][prefix] in prefix_encode[prefix]:
+                        num = iform_ptn["prefix"][prefix]
+                        prefix_lst.append( (prefix_encode[prefix][num], nbits) )
+        return prefix_lst
 
     def MakeOpcodeLst(self):
+        # hard code here
+        # TODO: convert to rules
         special_letter = ("srm")
+        prefix_letter = ("REP", "OSZ", "ASZ", "LOCK", "SEG_OVD")
         for iclass in gs.iarray:
             for iform in gs.iarray[iclass]:
                 iform_ptn = {"opcode":[], "iform":[iform]}
@@ -324,6 +367,22 @@ class GeneratorStorage(object):
                             if not act.nt in self.nt_iform_bind:
                                 self.nt_iform_bind[act.nt] = []
                             self.nt_iform_bind[act.nt].append(iform)
+                        elif act.type == "FB":
+                            if field_name in prefix_letter:
+                                if not "prefix" in iform_ptn:
+                                    iform_ptn["prefix"] = {}
+                                if act.not_equal:
+                                    new_key = "!%s"%act.field_name
+                                    if new_key in iform_ptn["prefix"]:
+                                        raise ValueError("Prefix %s Collision in %s" %(str(act), iform_ptn["prefix"]))
+                                    else:
+                                        iform_ptn["prefix"][new_key] = act.int_value
+                                else:
+                                    new_key = act.field_name
+                                    if new_key in iform_ptn["prefix"]:
+                                        raise ValueError("Prefix %s Collision in %s" %(str(act), iform_ptn["prefix"]))
+                                    else:
+                                        iform_ptn["prefix"][new_key] = act.int_value
                         elif act.not_equal:
                             if field_name in self.emit_letter:
                                 has_modrm = True
@@ -362,6 +421,9 @@ class GeneratorStorage(object):
                             pass
                     else:
                         raise ValueError("Unknown Emit Type")
+                prefix_lst = self.HandlePrefix(iform_ptn)
+                for prefix in prefix_lst:
+                    iform_ptn["opcode"].insert(0, prefix)
                 self.iform_ptn_lst.append(iform_ptn)
                 ptn_dict = self.Ptn2Opcode(iform_ptn)
                 self.PtnDictUpdate(self.ptn_dict, ptn_dict)

@@ -75,7 +75,7 @@ all_field =             "all-datafiles/all_test/all-fields.txt"
 
 all_ins =               "all-datafiles/basic_test/basic-test-enc-instructions.txt"
 # all_ins =               "all-datafiles/all_test/all-enc-instructions.txt"
-# all_dec_ins =           "all-datafiles/all_test/all-dec-instructions.txt"
+all_dec_ins =           "all-datafiles/basic_test/basic-test-dec-instructions.txt"
 
 # ===== basic test =====
 # all_reg =               "all-datafiles/basic_test/basic-test-registers.txt"

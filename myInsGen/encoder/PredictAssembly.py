@@ -1,3 +1,4 @@
+from turtle import st
 from sklearn.tree import export_text
 import fields_reader
 import state_bits_reader
@@ -57,90 +58,111 @@ def MakeMODRMBind(gens):
     return modrm_bind
 
 def MakeOpcodeBind(gens):
-    opcode_bind_reverse = []
-    opcode_bind_forward = []
-    for opcode in gens.ptn_dict:
-        prev_code = None
-        for i in range(len(opcode)):
-            if i > len(opcode_bind_reverse)-1:
-                opcode_bind_reverse.append({})
-                opcode_bind_forward.append({})
-            new_opcode = opcode[i]
-            if not new_opcode in opcode_bind_reverse[i]:
-                opcode_bind_reverse[i][new_opcode] = []
-            if not new_opcode in opcode_bind_forward[i]:
-                opcode_bind_forward[i][new_opcode] = []
+    search_trees = []
+    for opcode in gens.ptn_dict:                        # build a trie tree for every length of opcode
+        length = len(opcode)
+        while length > len(search_trees):
+            search_trees.append({})
 
-            if prev_code != None:
-                if not prev_code in opcode_bind_reverse[i][new_opcode]:
-                    opcode_bind_reverse[i][new_opcode].append(prev_code)
-                if not new_opcode in opcode_bind_forward[i-1][prev_code]:
-                    opcode_bind_forward[i-1][prev_code].append(new_opcode)
-            prev_code = new_opcode
-    return opcode_bind_forward, opcode_bind_reverse
-
-
-# check forward and backward
-# assume that 0F 1F 44 00, 0F 1F 80 00, 0E 1F 44 00 (may not exist)
-# reverse bind:
-#   (1) ["0F":[], "0E":[]]
-#   (2) ["1F":[0E, 0F]]
-#   (3) ["44":[1F], "80":[1F]]
-#   (4) ["00":[44, 80]]
-# when we traverse back, all possible results are:
-#   * 00 44 1F 0E
-#   * 00 44 1F 0F
-#   * 00 80 1F 0E       # wrong
-#   * 00 80 1F 0F
-# so we must create a forward table:
-#   (1) ["0F":[1F], "0E":[1F]]
-#   (2) ["1F":[44 80]]
-#   (3) ["44":[00], "80":[00]]
-#   (4) ["00":[]]
-# when we traverse back, we check if the new bytes meet the rules of forward table
-#   * 00 44 1F 0E
-#   * 00 44 1F 0F
-#   * 00 80 1F 0E       # wrong
-#   * 00 80 1F 0F
-def GenOpcodeMismatch(test_bytes, opcode_bind_forward, opcode_bind_reverse):
-    begin_index = len(opcode_bind_reverse) - 1
-    index = begin_index
-    first_byte = test_bytes[0]
-    while index > 0:
-        if first_byte in opcode_bind_reverse[index]:
-            mismatch_lst = []
-            depth = index-1
-            tmp_byte_lst = [first_byte]
-            tmp_byte = first_byte
-            stack = []
-
-            flag = True
-            while (depth < index-1) or flag:
-                flag = False
-                if depth == 0:
-                    if tmp_byte in opcode_bind_reverse[depth]:
-                        tmp_byte_lst.append(tmp_byte)
-                        mismatch_lst.append(tmp_byte_lst)           # emit one mismatch context
-                        depth += 1                                  # backward
-                else:
-                    if index-1-depth >= len(stack):             # forward
-                        if tmp_byte in opcode_bind_reverse[depth] and tmp_byte_lst[-1] in opcode_bind_forward[depth][tmp_byte]:
-                            next_iter = iter(opcode_bind_reverse[depth][tmp_byte])
-                            tmp_byte_lst.append(tmp_byte)
-                            try:
-                                tmp_byte = next(next_iter)
-                                stack.append(next_iter)
-                                depth -= 1
-                            except StopIteration:       # empty iterator, backward
-                                tmp_byte_lst.pop()
-                                depth += 1
-                        else:                           # else: tmp_byte invalid, backward
-                            depth += 1
-                    else:                               # backward
-                        pass
+        reverse_opcode = opcode[::-1]
+        search_node = search_trees[length-1]           # search from the root
+        for tmp_byte in reverse_opcode:
+            if not tmp_byte in search_node:
+                search_node[tmp_byte] = {}
+            prev_node = search_node
+            search_node = search_node[tmp_byte]
+        if len(search_node):
+            raise ValueError("Opcode Ending Is Not A Leaf Node")
         else:
-            index -= 1
+            prev_node[tmp_byte] = None              # prevent some unexpected operation
+    return search_trees
 
+# Calc mismath
+# test_bytes:
+#   01 02 03 04
+# assume the max opcode length is 6
+# (if len(test_bytes) >= max opcode length-1)
+#  xx 01 02 03 04 05
+#
+#  xx xx 01 02 03 04
+#  xx 01 02 03 04
+#
+#  xx xx xx 01 02 03
+#  xx xx 01 02 03
+#  xx 01 02 03
+#
+#  xx xx xx xx 01 02
+#  xx xx xx 01 02
+#  xx xx 01 02
+#  xx 01 02
+#
+#  xx xx xx xx xx 01
+#  xx xx xx xx 01
+#  xx xx xx 01
+#  xx xx 01
+#  xx 01
+
+def GenOpcodeMismatch(test_bytes, search_trees):
+    mismatch_lst = []
+    opcode_length = len(search_trees)
+    if opcode_length-1 > len(test_bytes):
+        begin_mismatch_len = len(test_bytes)
+    else:
+        begin_mismatch_len = opcode_length-1
+
+    for i in range(begin_mismatch_len, 0, -1):
+        for j in range(i, opcode_length):
+            index = i-1
+            search_node = search_trees[j]
+            opcode_lst = []
+            while test_bytes[index] in search_node:
+                new_byte = test_bytes[index]
+                index -= 1
+                search_node = search_node[new_byte]
+                opcode_lst.append(new_byte)
+                if index < 0:
+                    break
+            if index >= 0:          # means the bytes doesn't meet any prefix
+                continue
+            else:
+                if search_node != None:
+                    stack = [ (search_node, iter(search_node), opcode_lst) ]
+                else:
+                    raise ValueError("Search Node Reach None Before Emit")
+                while len(stack):
+                    search_node, search_node_iter, my_opcode_lst = stack.pop()
+                    try:
+                        new_opcode = next(search_node_iter)
+                    except StopIteration:
+                        continue
+                    stack.append( (search_node, search_node_iter, copy.deepcopy(my_opcode_lst)) )
+                    new_search_node = search_node[new_opcode]
+                    my_opcode_lst.append(new_opcode)
+                    if new_search_node != None:
+                        stack.append( (new_search_node, iter(new_search_node), copy.deepcopy(my_opcode_lst)) )
+                    else:
+                        mismatch_code = bytes(my_opcode_lst[::-1])
+                        flag = True
+                        for exist_code, exist_i in mismatch_lst:
+                            if mismatch_code==exist_code and exist_i==i:
+                                flag = False
+                        if flag:
+                            mismatch_lst.append( (mismatch_code, i) )
+    return mismatch_lst
+
+def CheckMismatch(test_bytes, gens):
+    mismatch_lst = []
+    for i in range(1, len(test_bytes)+1):
+        for opcode in gens.ptn_dict:
+            if len(opcode) > i:
+                if opcode[-i:] == test_bytes[:i]:
+                    flag = True
+                    for exist_code, exist_i in mismatch_lst:
+                        if opcode == exist_code and exist_i==i:
+                            flag = False
+                    if flag:
+                        mismatch_lst.append( (opcode, i) )
+    return mismatch_lst
 
 
 if __name__ == "__main__":
@@ -148,7 +170,7 @@ if __name__ == "__main__":
     save = False
     needreload = False                  # control if we need to reload pattern files or save them again
 
-    sd = save_data.SaveData(all_ins, pkl_dir, logger)
+    sd = save_data.SaveData(all_dec_ins, pkl_dir, logger)
     if sd.haspkl and not needreload:
         sd.Load(GsLoad, gs)
     else:
@@ -160,7 +182,7 @@ if __name__ == "__main__":
         (gs.seqs, gs.nts, gs.ntlufs, gs.repeat_seqs, gs.repeat_nts, gs.repeat_ntlufs) = \
                             enc_patterns_reader.ReadEncPattern(all_enc_pattern, gs.state_bits)
         enc_patterns_reader.ReadEncDecPattern(all_enc_dec_pattern, gs.state_bits)
-        enc_ins_reader.ReadIns(all_ins)
+        enc_ins_reader.ReadIns(all_dec_ins)
 
         if save:
             sd.Save(GsSave, gs)
@@ -168,7 +190,7 @@ if __name__ == "__main__":
 # =============== Load Generator Storage ===================
     needreload = False     # for test
     save = False
-    sd = save_data.SaveData(all_ins[:-4]+"_gens", pkl_dir, logger)
+    sd = save_data.SaveData(all_dec_ins[:-4]+"_gens", pkl_dir, logger)
     if sd.haspkl and not needreload:
         gens = generator_storage.GeneratorStorage(load=True)
         sd.Load(generator_storage.GensLoad, gens)
@@ -178,8 +200,11 @@ if __name__ == "__main__":
         sd.Save(generator_storage.GensSave, gens)
 
     modrm_bind = MakeMODRMBind(gens)
-    opcode_bind_forward, opcode_bind_reverse = MakeOpcodeBind(gens)
+    search_trees = MakeOpcodeBind(gens)
 
     # test opcode mismatch
-    test_bytes = b"\x00"
-    GenOpcodeMismatch(test_bytes, opcode_bind_forward, opcode_bind_reverse)
+    # test_bytes = b"\x00\x00\x00\x00\x00"
+    test_bytes = b"\x41\xe9"
+    mismatch_lst = GenOpcodeMismatch(test_bytes, search_trees)
+    # mismatch_lst_check = CheckMismatch(test_bytes, gens)
+    a = 0
