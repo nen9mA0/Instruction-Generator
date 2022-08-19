@@ -284,8 +284,17 @@ def HashInsn(slice):
 
 
 yara_file = "I:\\Project\\auto_yara\\rules\\automine-new721test_back.yar"
-ngram_database = "C:\\Users\\root\\Documents\\WeChat Files\\wxid_k0oaccu7xi0a22\\FileStorage\\File\\2022-08\\database10.pkl"
-onegram_database = "C:\\Users\\root\\Documents\\WeChat Files\\wxid_k0oaccu7xi0a22\\FileStorage\\File\\2022-08\\databases_1\\database_1_0.pkl"
+
+gram1_database = "C:\\Users\\root\\Documents\\WeChat Files\\wxid_k0oaccu7xi0a22\\FileStorage\\File\\2022-08\\databases_1\\database_1_0.pkl"
+gram2_database = ""
+gram3_database = ""
+gram4_database = "C:\\Users\\root\\Documents\\WeChat Files\\wxid_k0oaccu7xi0a22\\FileStorage\\File\\2022-08\\database10.pkl"
+
+gram_filename = [gram1_database, gram2_database, gram3_database, gram4_database]
+gram_database = [None for i in range(len(gram_filename))]
+gram_data =     [None for i in range(len(gram_filename))]
+gram_max = len(gram_data)-1
+
 result_file = "result\\result.pkl"
 slice_length = 4
 
@@ -350,13 +359,14 @@ if __name__ == "__main__":
     # test opcode mismatch
     # test_bytes = b"\x00\x00\x00\x00\x00"
 
-    with open(ngram_database, "rb") as f:
-        ngram_database = pickle.load(f)
-    ngram_data = ngram_database["data"]
-
-    with open(onegram_database, "rb") as f:
-        onegram_database = pickle.load(f)
-    onegram_data = onegram_database["data"]
+    index = 0
+    for path in gram_filename:
+        with open(path, "rb") as f:
+            tmp_database = pickle.load(f)
+        tmp_data = tmp_database["data"]
+        gram_database[index] = tmp_database
+        gram_data[index] = tmp_data
+        index += 1
 
 
     result = {}
@@ -400,35 +410,28 @@ if __name__ == "__main__":
             total_insn = 0
             ori_insn_num = 0
             probability = 0.0
-            if len(ori_insn) >= slice_length:                   # if length of origin insn equal or greater than slice length
-                for mismatch_insn in mismatch_insn_lst:
-                    if len(mismatch_insn) >= slice_length:
-                        insn_hash = HashInsn(mismatch_insn[:slice_length])
-                        if insn_hash in ngram_data:
-                            total_insn += ngram_data[insn_hash]
-                ori_insn_hash = HashInsn(ori_insn[:slice_length])
-                if ori_insn_hash in ngram_data:
-                    ori_insn_num = ngram_data[ori_insn_hash]
-                    total_insn += ori_insn_num
-                    probability = ori_insn_num / total_insn
-                    result[packyara.name].append( (rule_index, total_insn, ori_insn_num, probability) )
-                    flag = True
-                else:
-                    print("Rule%d:\t  %s  Not In Database  HASH:%s  rule_insn_length: %d" %(rule_index, bytes_rule[:ori_bytes_len], ori_insn_hash.hex(), len(ori_insn)))
+            ori_insn_len = len(ori_insn)
+            if ori_insn_len >= slice_length:                   # if length of origin insn equal or greater than slice length
+                tmp_data = gram_data[gram_max]
+                length = slice_length
             else:
-                for mismatch_insn in mismatch_insn_lst:
-                    insn_hash = HashInsn(mismatch_insn[:1])      # for now we only extract the first insn for the rules shorter than slice length
-                    if insn_hash in onegram_data:
-                        total_insn += onegram_data[insn_hash]
-                ori_insn_hash = HashInsn(ori_insn[:1])
-                if ori_insn_hash in onegram_data:
-                    ori_insn_num = onegram_data[ori_insn_hash]
-                    total_insn += ori_insn_num
-                    probability = ori_insn_num / total_insn
-                    result[packyara.name].append( (rule_index, total_insn, ori_insn_num, probability) )
-                    flag = True
-                else:
-                    print("Rule%d:\t  %s  Not In Database  HASH:%s  rule_insn_length: %d" %(rule_index, bytes_rule[:ori_bytes_len], ori_insn_hash.hex(), len(ori_insn)))
+                tmp_data = gram_data[ori_insn_len-1]
+                length = ori_insn_len
+            for mismatch_insn in mismatch_insn_lst:
+                if len(mismatch_insn) >= length:
+                    insn_hash = HashInsn(mismatch_insn[:length])
+                    if insn_hash in tmp_data:
+                        total_insn += tmp_data[insn_hash]
+            ori_insn_hash = HashInsn(ori_insn[:length])
+            if ori_insn_hash in tmp_data:
+                ori_insn_num = tmp_data[ori_insn_hash]
+                total_insn += ori_insn_num
+                probability = ori_insn_num / total_insn
+                result[packyara.name].append( (rule_index, total_insn, ori_insn_num, probability) )
+                flag = True
+            else:
+                print("Rule%d:\t  %s  Not In Database  HASH:%s  rule_insn_length: %d" %(rule_index, bytes_rule[:ori_bytes_len], ori_insn_hash.hex(), len(ori_insn)))
+            tmp_data = None
             if flag:
                 print("Rule%d:\t\ttotal_insn: %d  ori_insn_num: %d  rule_insn_length: %d  probability: %f" %(rule_index, total_insn, ori_insn_num, len(ori_insn), probability))
         with open(result_file, "wb") as f:                      # save every packer to prevent accident
