@@ -377,8 +377,8 @@ if __name__ == "__main__":
         result[packyara.name] = []
         for bytes_rule in packyara.rule:
             ori_bytes_len = len(bytes_rule)
-            bytes_rule += b"\x00\x00\x00\x00\x00\x00\x00"        # we pad 6 bytes for fixing the last jump opcode
-
+            # bytes_rule += b"\x00\x00\x00\x00\x00\x00\x00"     # duplicated: we pad 6 bytes for fixing the last jump opcode
+                                                                # don't do this, because we don't know the operand of these jmp
             rule_index += 1
             log_index = rule_index
             mismatch_lst = []
