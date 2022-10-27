@@ -179,6 +179,7 @@ def GenModrmMismatch(test_bytes, modrm_bind):
 
 # only consider 32-bit now
 def InitSibLst():
+    # wrong config: sib_modrm_hash = ["00100___", "01100___", "10100___"]
     sib_modrm_hash = ["00___100", "01___100", "10___100"]
     sib_modrm_lst = []
     for myhash in sib_modrm_hash:
@@ -323,31 +324,11 @@ def HashInsn(slice):
             ret += b"\x00"
 
         # for debug
-        # slice_bytes += insn.bytes
-    # return ret, slice_bytes
-    return ret
+        slice_bytes += insn.bytes
+
+    return ret, slice_bytes
 
 
-
-
-yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\automine_customized.yar"
-
-gram1_database = "I:\\Project\\auto_yara\\ngram\\database\\1gram\\database.pkl"
-gram2_database = "I:\\Project\\auto_yara\\ngram\\database\\2gram\\database.pkl"
-gram3_database = "I:\\Project\\auto_yara\\ngram\\database\\3gram\\database.pkl"
-gram4_database = "I:\\Project\\auto_yara\\ngram\\database\\4gram\\database.pkl"
-
-gram_filename = [gram1_database, gram2_database, gram3_database, gram4_database]
-gram_database = [None for i in range(len(gram_filename))]
-gram_data =     [None for i in range(len(gram_filename))]
-gram_max = len(gram_data)-1
-
-result_file = "I:\\Project\\auto_yara\\GetStat\\final_data\\automine_customized.pkl"
-slice_length = 4
-
-# for logging
-log_name = ""
-log_index = -1
 
 if __name__ == "__main__":
 # =========== Load GlobalStruct ================
@@ -399,99 +380,66 @@ if __name__ == "__main__":
     sib_modrm_lst = InitSibLst()
     sib_mismatch_lst = GenSibMismatch(modrm_sib_bind, sib_modrm_lst)
 
-    with open(yara_file) as f:
-        lines = f.readlines()
-
-    packyara_lst = []
-    reader = YaraReader.YaraReader(lines)
-    for name, lines in reader:
-        packyara = YaraReader.PackerYara(name, lines)
-        if not packyara.no_test:
-            packyara_lst.append(packyara)
-
-    a = 0
     # test opcode mismatch
-    # test_bytes = b"\x00\x00\x00\x00\x00"
+    # bytes_rule = b"\xa4\xeb"
+    # bytes_rule = b"\x6a\x10\x68\x28\x89\x00\x01"
+    bytes_rule = b"\x03\xd3\xeb"
+    # bytes_rule = b"\x41\xe9"
+    orig_bytes_len = len(bytes_rule)
 
-    index = 0
-    for path in gram_filename:
-        with open(path, "rb") as f:
-            tmp_database = pickle.load(f)
-        tmp_data = tmp_database["data"]
-        gram_database[index] = tmp_database
-        gram_data[index] = tmp_data
-        index += 1
+    bytes_rule += b"\x00" * (15-orig_bytes_len)
+
+    mismatch_lst = []
+    opcode_mismatch_lst = GenOpcodeMismatch(bytes_rule, search_trees)
+    # mismatch_lst_check = CheckOpcodeMismatch(test_bytes, gens)
+    modrm_mismatch_lst = GenModrmMismatch(bytes_rule, modrm_bind)
+    mismatch_lst.append( ("Opcode Mismatch", opcode_mismatch_lst) )
+    mismatch_lst.append( ("MODRM Mismatch", modrm_mismatch_lst) )
+    # mismatch_lst.append( ("SIB Mismatch", sib_mismatch_lst) )
 
 
-    result = {}
-    for packyara in packyara_lst:
-        print("==== Processing %s ====" %packyara.name)
-        log_name = packyara.name
-        rule_index = -1
-        result[packyara.name] = []
-        for bytes_rule in packyara.rule:
-            ori_bytes_len = len(bytes_rule)
-            # bytes_rule += b"\x00\x00\x00\x00\x00\x00\x00"     # duplicated: we pad 6 bytes for fixing the last jump opcode
-                                                                # don't do this because we don't know the operand of these jmp
-            rule_index += 1
-            log_index = rule_index
-            mismatch_lst = []
-            opcode_mismatch_lst = GenOpcodeMismatch(bytes_rule, search_trees)
-            # mismatch_lst_check = CheckOpcodeMismatch(test_bytes, gens)
-            modrm_mismatch_lst = GenModrmMismatch(bytes_rule, modrm_bind)
-            mismatch_lst.extend(opcode_mismatch_lst)
-            mismatch_lst.extend(modrm_mismatch_lst)
-            mismatch_lst.extend(sib_mismatch_lst)
-            mismatch_insn_lst = DisasmMismatch(cs, mismatch_lst, bytes_rule)
-            ori_insn = []
-            try:
-                decode = cs.disasm(bytes_rule, 0)
-            except Exception as e:
-                print(e)
-                print("Disasm Bytes %s Failed!  PackYara: %s  Rule: %d" %(bytes_rule.hex(), log_name, rule_index))
-                continue
-            decode_len = 0
-            for insn in decode:
-                ori_insn.append(insn)
-                decode_len += insn.size
-                if decode_len > ori_bytes_len:
+    print("===== No Mismatch =====")
+    try:
+        decode = cs.disasm(bytes_rule, 0)
+    except Exception as e:
+        pass
+    ori_index = 0
+    for insn in decode:
+        if ori_index < orig_bytes_len:
+            print("%s\t%s %s" %(insn.bytes.hex(), insn.mnemonic, insn.op_str))
+            ori_index += insn.size
+
+    for describe, mismatch in mismatch_lst:
+        print("===== %15s =====" %describe)
+        mismatch_insn_lst = DisasmMismatch(cs, mismatch, bytes_rule, length_first=orig_bytes_len, restrict_one_insn=False)
+        print("Total: %d" %len(mismatch_insn_lst))
+        index = 0
+        for insn_lst, mismatch_len in mismatch_insn_lst:
+            # print("=================")
+            size = 0
+            index += 1
+            for insn in insn_lst:
+                # print("%d:  %20s\t\t%s %s" %(index, insn.bytes.hex(), insn.mnemonic, insn.op_str))
+                insn_str = "%s %s" %(insn.mnemonic, insn.op_str)
+                print("{0:>20}{1:>50}".format(insn.bytes.hex(), insn_str), end="")
+                size += insn.size
+                if size >= mismatch_len+orig_bytes_len:
                     break
-            # if decode_len != len(bytes_rule):         # now the last byte of rule is an opcode of a jump/call/ret instruction
-            #     # raise ValueError("Someting Wrong With Bytes %s? Disasm Failed" %(bytes_rule.hex()))
-            #     print("Someting Wrong With Bytes %s? Disasm Failed!  PackYara: %s  Rule: %d" %(bytes_rule.hex(), packyara.name, rule_index))
-            #     continue
-            flag = False
-            total_insn = 0
-            ori_insn_num = 0
-            probability = 0.0
-            ori_insn_len = len(ori_insn)
-            if ori_insn_len >= slice_length:                   # if length of origin insn equal or greater than slice length
-                tmp_data = gram_data[gram_max]
-                length = slice_length
-            else:
-                tmp_data = gram_data[ori_insn_len-1]
-                length = ori_insn_len
-            for mismatch_insn in mismatch_insn_lst:
-                if len(mismatch_insn) >= length:
-                    insn_hash = HashInsn(mismatch_insn[:length])
-                    if insn_hash in tmp_data:
-                        total_insn += tmp_data[insn_hash]
-            ori_insn_hash = HashInsn(ori_insn[:length])
-            if ori_insn_hash in tmp_data:
-                ori_insn_num = tmp_data[ori_insn_hash]
-                total_insn += ori_insn_num
-                probability = ori_insn_num / total_insn
-                result[packyara.name].append( (rule_index, total_insn, ori_insn_num, probability) )
-                flag = True
-            else:
-                result[packyara.name].append( (rule_index, total_insn, ori_insn_num, probability) )
-                print("Rule%d:\t  %s  Not In Database  HASH:%s  rule_insn_length: %d" %(rule_index, bytes_rule[:ori_bytes_len], ori_insn_hash.hex(), len(ori_insn)))
-            tmp_data = None
-            if flag:
-                print("Rule%d:\t\ttotal_insn: %d  ori_insn_num: %d  rule_insn_length: %d  probability: %f" %(rule_index, total_insn, ori_insn_num, len(ori_insn), probability))
-        with open(result_file, "wb") as f:                      # save every packer to prevent accident
-            pickle.dump(result, f)
-    a = 0
+            print("")
+    # ori_insn = []
+    # try:
+    #     decode = cs.disasm(bytes_rule, 0)
+    # except Exception as e:
+    #     print(e)
+    #     print("Disasm Bytes %s Failed!  PackYara: %s  Rule: %d" %(bytes_rule.hex(), log_name, rule_index))
+    # decode_len = 0
+    # for insn in decode:
+    #     ori_insn.append(insn)
+    #     decode_len += insn.size
+    #     if decode_len > ori_bytes_len:
+    #         break
+
 
 # TODO:  hash中使用了MODRM的reg，但没有区分哪条指令是确实使用reg来作为opcode的，这可能使得某些指令操作的寄存器不同就被当做不同指令
 # TODO:  predict 过程中似乎缺失了一些情况，比如opcode比bytes长，所以完全覆盖bytes的情况
+# TODO:  SIB Mismatch 有大问题，查表的时候没有判断对应的opcode中是否存在MODRM编码，会导致一部分实际上没有MODRM()的也被认为存在SIB字段，然后就被识别成立即数了

@@ -20,6 +20,7 @@ def GensSave(f, obj):
     pickle.dump(obj.nt_iform_bind, f)
     pickle.dump(obj.iform_ptn_lst, f)
     pickle.dump(obj.ptn_dict, f)
+    pickle.dump(obj.nt_ptn_bind, f)
 
 def GensLoad(f, obj):
     obj.reg_nt_bind = pickle.load(f)
@@ -35,6 +36,7 @@ def GensLoad(f, obj):
     obj.nt_iform_bind = pickle.load(f)
     obj.iform_ptn_lst = pickle.load(f)
     obj.ptn_dict = pickle.load(f)
+    obj.nt_ptn_bind = pickle.load(f)
 
 class GeneratorStorage(object):
     emit_letter = ("mod", "reg", "rm")
@@ -59,6 +61,7 @@ class GeneratorStorage(object):
         self.nt_iform_bind = {}
         self.iform_ptn_lst = []
         self.ptn_dict = {}
+        self.nt_ptn_bind = {}
         self.htm = None
 
         if not load:
@@ -367,6 +370,9 @@ class GeneratorStorage(object):
                             if not act.nt in self.nt_iform_bind:
                                 self.nt_iform_bind[act.nt] = []
                             self.nt_iform_bind[act.nt].append(iform)
+                            if not act.nt in self.nt_ptn_bind:
+                                self.nt_ptn_bind[act.nt] = []
+                            self.nt_ptn_bind[act.nt].append(iform_ptn)
                         elif act.type == "FB":
                             if field_name in prefix_letter:
                                 if not "prefix" in iform_ptn:
