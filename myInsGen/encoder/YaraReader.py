@@ -303,7 +303,7 @@ class YaraRuleGroup(object):
                     myrule += num
                     i += i_add
                 else:
-                    break
+                    raise ValueError("")
         self.rules.append(self.FormatRule(myrule))
 
     def FormatRule(self, rule_str):

@@ -1,3 +1,4 @@
+from multiprocessing.sharedctypes import Value
 import fields_reader
 import state_bits_reader
 import enc_patterns_reader
@@ -13,10 +14,33 @@ from global_init import *
 
 import capstone
 import copy
-from collections import deque
+import binascii
+from fractions import Fraction
 
 import YaraReader
 import pickle
+
+
+yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\artificial.yar"
+
+gram1_database = "I:\\Project\\auto_yara\\ngram\\database\\1gram\\database.pkl"
+gram2_database = "I:\\Project\\auto_yara\\ngram\\database\\2gram\\database.pkl"
+gram3_database = "I:\\Project\\auto_yara\\ngram\\database\\3gram\\database.pkl"
+gram4_database = "I:\\Project\\auto_yara\\ngram\\database\\4gram\\database.pkl"
+
+gram_filename = [gram1_database, gram2_database, gram3_database, gram4_database]
+gram_data =     [None for i in range(len(gram_filename))]
+gram_database = [None for i in range(len(gram_filename))]
+gram_max = len(gram_data)-1
+
+result_file = "I:\\Project\\auto_yara\\GetStat\\final_data\\20221028\\artificial.pkl"
+slice_length = 4
+
+use_zero_padding = True
+
+# for logging
+log_name = ""
+log_index = -1
 
 
 def ExpandHash(myhash, hash_tmp=None):    # hash_tmp for speed
@@ -212,9 +236,14 @@ def CheckOpcodeMismatch(test_bytes, gens):
 # length to specify how long the bytes_rule appear in first disasm
 def DisasmMismatch(cs, mismatch_lst, bytes_rule, length_first=0, restrict_one_insn=False):
     mismatch_insn_lst = []
+    i = 0
     for mismatch_bytes, mismatch_index in mismatch_lst:
+        i += 1
         new_bytes = mismatch_bytes + bytes_rule[mismatch_index:]
         length_tmp = length_first + len(mismatch_bytes)-mismatch_index
+        ori_bytes_len = len(new_bytes)
+        if use_zero_padding:
+            new_bytes += b"\x00\x00\x00\x00\x00\x00\x00"
         total_length = len(new_bytes)
         decode_len = 0
         try:
@@ -231,7 +260,7 @@ def DisasmMismatch(cs, mismatch_lst, bytes_rule, length_first=0, restrict_one_in
                     global log_index
                     # raise ValueError("%s first insn shorter than mismatch index %d" %(new_bytes.hex(), mismatch_index))
                     print("%s first insn shorter than mismatch index %d  PackYara: %s  Rule: %d" %(new_bytes.hex(), mismatch_index, log_name, log_index))
-                    continue
+                    break
                 decode_len += insn.size
 
                 # === here restrict a bytes rule must be in one instruction ===
@@ -246,14 +275,17 @@ def DisasmMismatch(cs, mismatch_lst, bytes_rule, length_first=0, restrict_one_in
             else:
                 decode_len += insn.size
                 insn_lst.append(insn)
-        if decode_len >= length_tmp:
+            if decode_len >= ori_bytes_len:
+                break
+        if decode_len >= ori_bytes_len:
             if len(insn_lst):
-                mismatch_insn_lst.append( (insn_lst, len(mismatch_bytes)-mismatch_index) )
+                mismatch_insn_lst.append( (insn_lst, len(mismatch_bytes)-mismatch_index, decode_len) )
     return mismatch_insn_lst
 
 # Port from AutoYara_ngram
 def HashInsn(slice):
     ret = b""
+    index = []
     # checksum = self.HashBytes(slice)
 
     # for debug
@@ -322,32 +354,83 @@ def HashInsn(slice):
         if mnemonic_too_long:
             ret += b"\x00"
 
+        index.append(len(ret))
         # for debug
         # slice_bytes += insn.bytes
     # return ret, slice_bytes
-    return ret
+    return ret, index
 
 
+def CvtBytesRule(bytes_rule_raw):
+    if not '?' in bytes_rule_raw:
+        bytes_rule_raw = bytes_rule_raw.replace(' ', '')
+        bytes_rule = binascii.a2b_hex(bytes_rule_raw)
+    else:           # now we just fill them with \x00
+        bytes_rule_raw = bytes_rule_raw.replace('?', '0')
+        bytes_rule_raw = bytes_rule_raw.replace(' ', '')
+        bytes_rule = binascii.a2b_hex(bytes_rule_raw)
+    return bytes_rule
 
+def GetProbability(my_lst, n=0, decode_len=0, smooth=True, smooth_gram=2, detail=True):
+    if detail:
+        lst = []
+    else:
+        lst = None
+    insn_lst = my_lst[0]
+    mismatch = my_lst[1]
+    mydecode_len = my_lst[2]
+    if decode_len != 0 and mydecode_len-mismatch != decode_len:
+        return (n, 0, 1, lst)
+    insn_len = len(insn_lst)
+    if n == 0:
+        if insn_len <= slice_length:
+            n = insn_len
+        else:
+            n = slice_length
+    tmp_data = gram_data[n-1]
+    tmp_database = gram_database[n-1]
 
-yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\automine_customized.yar"
+    i = 0
+    all_num = 1
+    all_total = 1
+    for i in range(insn_len-n+1):
+        insn_hash, index = HashInsn(insn_lst[i:i+n])
+        if insn_hash in tmp_data:
+            num, total = tmp_data[insn_hash]
+        elif smooth:            # n-gram laplace smoothing
+            num = 1
+            flag = False
+            low = -1 if (smooth_gram-2 < -1) else smooth_gram-2
+            for j in range(n-2, low, -1):
+                new_hash = insn_hash[:index[j]]
+                if new_hash in tmp_database["every_total"][j]:
+                    total = tmp_database["every_total"][j][new_hash]
+                    flag = True
+                    # add to hash for speeding
+                    tmp_data[insn_hash] = (num, total)
+                    break
+            if not flag:
+                if low > -1:
+                    num = 0
+                    total = 1
+                else:
+                    total = tmp_database["total"]
+        else:
+            num = 0
+            total = 1
+        all_num = all_num * num
+        all_total = all_total * total
 
-gram1_database = "I:\\Project\\auto_yara\\ngram\\database\\1gram\\database.pkl"
-gram2_database = "I:\\Project\\auto_yara\\ngram\\database\\2gram\\database.pkl"
-gram3_database = "I:\\Project\\auto_yara\\ngram\\database\\3gram\\database.pkl"
-gram4_database = "I:\\Project\\auto_yara\\ngram\\database\\4gram\\database.pkl"
+        if detail:
+            lst.append( (num, total) )
+        if all_num == 0:
+            break
+    return n, all_num, all_total, lst
 
-gram_filename = [gram1_database, gram2_database, gram3_database, gram4_database]
-gram_database = [None for i in range(len(gram_filename))]
-gram_data =     [None for i in range(len(gram_filename))]
-gram_max = len(gram_data)-1
-
-result_file = "I:\\Project\\auto_yara\\GetStat\\final_data\\automine_customized.pkl"
-slice_length = 4
-
-# for logging
-log_name = ""
-log_index = -1
+# === for debug ===
+def PrintInsn(insn_lst):
+    for insn in insn_lst:
+        print("%s:  %s %s" %(insn.bytes.hex(), insn.mnemonic, insn.op_str))
 
 if __name__ == "__main__":
 # =========== Load GlobalStruct ================
@@ -417,78 +500,130 @@ if __name__ == "__main__":
     for path in gram_filename:
         with open(path, "rb") as f:
             tmp_database = pickle.load(f)
-        tmp_data = tmp_database["data"]
+        gram_data[index] = tmp_database["data"]
         gram_database[index] = tmp_database
-        gram_data[index] = tmp_data
         index += 1
 
 
     result = {}
     for packyara in packyara_lst:
-        print("==== Processing %s ====" %packyara.name)
+        print("\n\n\n==== Processing %s ====" %packyara.name)
         log_name = packyara.name
-        rule_index = -1
         result[packyara.name] = []
-        for bytes_rule in packyara.rule:
-            ori_bytes_len = len(bytes_rule)
-            # bytes_rule += b"\x00\x00\x00\x00\x00\x00\x00"     # duplicated: we pad 6 bytes for fixing the last jump opcode
-                                                                # don't do this because we don't know the operand of these jmp
-            rule_index += 1
-            log_index = rule_index
-            mismatch_lst = []
-            opcode_mismatch_lst = GenOpcodeMismatch(bytes_rule, search_trees)
-            # mismatch_lst_check = CheckOpcodeMismatch(test_bytes, gens)
-            modrm_mismatch_lst = GenModrmMismatch(bytes_rule, modrm_bind)
-            mismatch_lst.extend(opcode_mismatch_lst)
-            mismatch_lst.extend(modrm_mismatch_lst)
-            mismatch_lst.extend(sib_mismatch_lst)
-            mismatch_insn_lst = DisasmMismatch(cs, mismatch_lst, bytes_rule)
-            ori_insn = []
-            try:
-                decode = cs.disasm(bytes_rule, 0)
-            except Exception as e:
-                print(e)
-                print("Disasm Bytes %s Failed!  PackYara: %s  Rule: %d" %(bytes_rule.hex(), log_name, rule_index))
-                continue
-            decode_len = 0
-            for insn in decode:
-                ori_insn.append(insn)
-                decode_len += insn.size
-                if decode_len > ori_bytes_len:
-                    break
-            # if decode_len != len(bytes_rule):         # now the last byte of rule is an opcode of a jump/call/ret instruction
-            #     # raise ValueError("Someting Wrong With Bytes %s? Disasm Failed" %(bytes_rule.hex()))
-            #     print("Someting Wrong With Bytes %s? Disasm Failed!  PackYara: %s  Rule: %d" %(bytes_rule.hex(), packyara.name, rule_index))
-            #     continue
-            flag = False
-            total_insn = 0
-            ori_insn_num = 0
-            probability = 0.0
-            ori_insn_len = len(ori_insn)
-            if ori_insn_len >= slice_length:                   # if length of origin insn equal or greater than slice length
-                tmp_data = gram_data[gram_max]
-                length = slice_length
-            else:
-                tmp_data = gram_data[ori_insn_len-1]
-                length = ori_insn_len
-            for mismatch_insn in mismatch_insn_lst:
-                if len(mismatch_insn) >= length:
-                    insn_hash = HashInsn(mismatch_insn[:length])
-                    if insn_hash in tmp_data:
-                        total_insn += tmp_data[insn_hash]
-            ori_insn_hash = HashInsn(ori_insn[:length])
-            if ori_insn_hash in tmp_data:
-                ori_insn_num = tmp_data[ori_insn_hash]
-                total_insn += ori_insn_num
-                probability = ori_insn_num / total_insn
-                result[packyara.name].append( (rule_index, total_insn, ori_insn_num, probability) )
-                flag = True
-            else:
-                result[packyara.name].append( (rule_index, total_insn, ori_insn_num, probability) )
-                print("Rule%d:\t  %s  Not In Database  HASH:%s  rule_insn_length: %d" %(rule_index, bytes_rule[:ori_bytes_len], ori_insn_hash.hex(), len(ori_insn)))
-            tmp_data = None
-            if flag:
-                print("Rule%d:\t\ttotal_insn: %d  ori_insn_num: %d  rule_insn_length: %d  probability: %f" %(rule_index, total_insn, ori_insn_num, len(ori_insn), probability))
+        group_index = -1
+        for group_name in packyara.rule_groups:
+            print("\n\n=== RuleGroup %s ===" %group_name)
+            rule_group = packyara.rule_groups[group_name]
+            rule_index = -1
+            group_index += 1
+            for bytes_rule_raw in rule_group.rules:
+                bytes_rule = CvtBytesRule(bytes_rule_raw)
+                ori_bytes_len = len(bytes_rule)
+                rule_index += 1
+                log_index = rule_index
+                mismatch_lst = []
+                opcode_mismatch_lst = GenOpcodeMismatch(bytes_rule, search_trees)
+                # mismatch_lst_check = CheckOpcodeMismatch(test_bytes, gens)
+                modrm_mismatch_lst = GenModrmMismatch(bytes_rule, modrm_bind)
+                mismatch_lst.extend(opcode_mismatch_lst)
+                mismatch_lst.extend(modrm_mismatch_lst)
+                mismatch_lst.extend(sib_mismatch_lst)
+                mismatch_insn_lst = DisasmMismatch(cs, mismatch_lst, bytes_rule)
+
+                if use_zero_padding:
+                    bytes_rule += b"\x00\x00\x00\x00\x00\x00\x00"   # duplicated: we pad 6 bytes for fixing the last jump opcode
+                                                                    # don't do this because we don't know the operand of these jmp
+                ori_insn = []
+                try:
+                    decode = cs.disasm(bytes_rule, 0)
+                except Exception as e:
+                    print(e)
+                    print("Disasm Bytes %s Failed!  PackYara: %s  Rule: %d" %(bytes_rule.hex(), log_name, rule_index))
+                    continue
+                decode_len = 0
+                for insn in decode:
+                    ori_insn.append(insn)
+                    decode_len += insn.size
+                    if decode_len > ori_bytes_len:
+                        break
+                # if decode_len != len(bytes_rule):         # now the last byte of rule is an opcode of a jump/call/ret instruction
+                #     # raise ValueError("Someting Wrong With Bytes %s? Disasm Failed" %(bytes_rule.hex()))
+                #     print("Someting Wrong With Bytes %s? Disasm Failed!  PackYara: %s  Rule: %d" %(bytes_rule.hex(), packyara.name, rule_index))
+                #     continue
+                flag = False
+                total_insn = 0
+                ori_insn_num = 0
+                probability = 0.0
+
+                n, ori_num, ori_total, ori_lst = GetProbability( (ori_insn, 0, decode_len), smooth_gram=1 )
+
+                probability_mole = Fraction(ori_num, ori_total)
+                mismatch_insn_probability = []
+                mismatch_index = 0
+                for mismatch_insns in mismatch_insn_lst:
+                    a, num, total, lst = GetProbability(mismatch_insns, n, decode_len)
+                    if not num == 0:
+                        mismatch_insn_probability.append( (num, total, mismatch_index, lst) )
+                    mismatch_index += 1
+
+                probability_deno = Fraction()
+                a = 0
+                # === for debug ===
+                ori_init = ( ori_insn, ori_lst )
+
+                max_probability_long_len = probability_mole
+                max_probability_lst_long_len = ori_init
+                max_probability = probability_mole
+                max_probability_lst = ori_init
+                # === for debug ===
+
+                for num, total, mismatch_index, lst in mismatch_insn_probability:
+                    tmp = Fraction(num, total)
+                    probability_deno += tmp
+                    if tmp > probability_mole:
+                        a += 1
+                        if len(lst) >= len(ori_lst):
+                            if tmp > max_probability_long_len:
+                                max_probability_long_len = tmp
+                                max_probability_lst_long_len = ( mismatch_insn_lst[mismatch_index][0], lst )
+                        if tmp > max_probability:
+                            max_probability = tmp
+                            max_probability_lst = ( mismatch_insn_lst[mismatch_index][0], lst )
+
+                probability_deno += probability_mole
+                a = 0
+
+                # === for debug ===
+                if not max_probability_lst == ori_init:
+                    print("\norigin insn")
+                    PrintInsn(ori_insn)
+                    print(ori_lst)
+
+                    print("\nmax_probability_lst")
+                    PrintInsn(max_probability_lst[0])
+                    print(max_probability_lst[1])
+
+                    if not max_probability_lst_long_len == ori_init:
+                        print("\nmax_probability_lst_long_len")
+                        PrintInsn(max_probability_lst_long_len[0])
+                        print(max_probability_lst_long_len[1])
+
+
+                result[packyara.name].append( (group_index, rule_index, probability_deno, probability_mole) )
+                # === for debug ===
+
+                # if ori_insn_hash in tmp_data:
+                #     ori_insn_num = tmp_data[ori_insn_hash]
+                #     total_insn += ori_insn_num
+                #     probability = ori_insn_num / total_insn
+                #     result[packyara.name].append( (rule_index, total_insn, ori_insn_num, probability) )
+                #     flag = True
+                # else:
+                #     result[packyara.name].append( (rule_index, total_insn, ori_insn_num, probability) )
+                #     print("Rule %s_%d:\t  %s  Not In Database  HASH:%s  rule_insn_length: %d" %(group_name, rule_index, bytes_rule[:ori_bytes_len], ori_insn_hash.hex(), len(ori_insn)))
+                # tmp_data = None
+                if flag:
+                    print("Rule %s_%d:\t\ttotal_insn: %d  ori_insn_num: %d  rule_insn_length: %d  probability: %f" %(group_name, rule_index, total_insn, ori_insn_num, len(ori_insn), probability))
         with open(result_file, "wb") as f:                      # save every packer to prevent accident
             pickle.dump(result, f)
     a = 0
