@@ -1,6 +1,4 @@
-from hashlib import new
 import re
-from tkinter import S, Pack
 
 expand_chr = [chr(i) for i in range(ord('0'), ord('9')+1)] + [chr(i) for i in range(ord('a'), ord('f')+1)]
 
@@ -22,12 +20,15 @@ class YaraReader(object):
         end_index = self.index
         begin_index = self.index
         begin = False
+
+        flag = False
         while end_index < self.length:
             line = self.lines[end_index]
             p = self.packer_name_ptn.match(line)
             if p:
                 name = p.group("name")
                 end_index += 1
+                flag = True
                 continue
             if line[0] == "{":
                 begin = True
@@ -42,9 +43,9 @@ class YaraReader(object):
                 break
             else:
                 end_index += 1
-        if end_index >= self.length:
-            raise StopIteration
 
+        if not flag and end_index >= self.length:
+            raise StopIteration
         # filter comments and empty
         for i in range(begin_index, end_index):
             line = self.lines[i]
@@ -403,7 +404,7 @@ class YaraCondition(object):
 
 
 
-yara_file = "I:\\Project\\auto_yara\\ngram\\new-rules\\artificial\\artificial.yar"
+yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\autoyara.yar"
 # yara_file = "I:\\Project\\auto_yara\\ngram\\new-rules\\automine_818.yar"
 if __name__ == "__main__":
     with open(yara_file) as f:
