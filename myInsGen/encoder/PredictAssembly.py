@@ -21,7 +21,7 @@ import YaraReader
 import pickle
 
 
-yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\autoyara.yar"
+yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\test.yar"
 
 gram1_database = "I:\\Project\\auto_yara\\ngram\\database\\1gram\\database.pkl"
 gram2_database = "I:\\Project\\auto_yara\\ngram\\database\\2gram\\database.pkl"
@@ -33,7 +33,7 @@ gram_data =     [None for i in range(len(gram_filename))]
 gram_database = [None for i in range(len(gram_filename))]
 gram_max = len(gram_data)-1
 
-result_file = "I:\\Project\\auto_yara\\GetStat\\final_data\\20221028\\artificial.pkl"
+result_file = "I:\\Project\\auto_yara\\GetStat\\final_data\\20221028\\test.pkl"
 slice_length = 4
 
 use_zero_padding = True
@@ -305,7 +305,8 @@ def DisasmMismatch(cs, mismatch_lst, bytes_rule, ori_insn_index, length_first=0,
         if get_alignment:
             mismatch_insn_lst.append( (insn_lst, mismatch_index - len(mismatch_bytes), decode_len) )
         elif decode_len > ori_bytes_len:
-            logger.debug("Fully Mismatch %s" %new_bytes[:decode_len].hex())
+            pass
+            # logger.debug("Fully Mismatch %s" %new_bytes[:decode_len].hex())
         # if decode_len >= ori_bytes_len:
         #     if len(insn_lst):
         #         mismatch_insn_lst.append( (insn_lst, len(mismatch_bytes), decode_len) )
@@ -400,11 +401,14 @@ def CvtBytesRule(bytes_rule_raw):
         bytes_rule = binascii.a2b_hex(bytes_rule_raw)
     return bytes_rule
 
-def GetProbability(my_lst, n=0, smooth=True, smooth_gram=2, detail=True):
-    if detail:
-        lst = []
-    else:
-        lst = None
+def ProbabilitySmooth(insn_lst, tmp_database):
+    pass
+
+# 20221107: 因为最后计算的是指令序列在整个程序空间出现的概率，因此不需要参数n
+# 之前引入参数n是因为原来的算法需要将预测反汇编得到的序列概率与原bytes_rule进行比较，为了结果的准确性因此统一使用bytes_rule使用的n-gram参数n
+def GetProbability(my_lst, n=0, smooth=True, smooth_gram=2):
+    lst = []
+
     insn_lst = my_lst[0]
     mismatch = my_lst[1]
     mydecode_len = my_lst[2]
@@ -417,6 +421,19 @@ def GetProbability(my_lst, n=0, smooth=True, smooth_gram=2, detail=True):
             n = slice_length
     tmp_data = gram_data[n-1]
     tmp_database = gram_database[n-1]
+
+    # prior probability
+    insn_hash, index = HashInsn(insn_lst[:n-1])
+    if insn_hash in tmp_database["every_total"][n-2]:
+        num = tmp_database["every_total"][n-2][insn_hash]
+        total = tmp_database["total"]
+    elif smooth:
+        pass
+    else:
+        num = 0
+        total = 1
+
+    lst.append( (num, total) )
 
     i = 0
     for i in range(insn_len-n+1):
@@ -447,8 +464,7 @@ def GetProbability(my_lst, n=0, smooth=True, smooth_gram=2, detail=True):
 
         if num == 0:
             break
-        if detail:
-            lst.append( (num, total) )
+        lst.append( (num, total) )
     return n, lst, mydecode_len
 
 # === for debug ===
@@ -600,6 +616,7 @@ if __name__ == "__main__":
                     probability_mole = Fraction(0, 1)       # 分子
 
                     max_probability = probability_mole / probability_deno
+                    max_probability_insn_lst = []
 
                     mismatch_insn_index = 0
                     for mismatch_insns in mismatch_insn_lst:
@@ -614,6 +631,7 @@ if __name__ == "__main__":
                             ori_probability_index -= n-1
                             if ori_probability_index >= len(ori_probability_lst):
                                 a = 0
+                                logger.debug("===")
                                 logger.debug("lst larger than ori_lst")
                                 logger.debug("ori_lst: %s" %ori_lst)
                                 logger.debug("lst    : %s" %lst)
@@ -621,6 +639,7 @@ if __name__ == "__main__":
                                 PrintInsn(ori_insn)
                                 logger.debug("insn:")
                                 PrintInsn(mismatch_insns[0])
+                                logger.debug("===")
                             else:
                                 ori_probability = ori_probability_lst[ori_probability_index]
                                 tmp = Fraction(1, 1)
@@ -631,10 +650,16 @@ if __name__ == "__main__":
                                     probability_deno = sum_tmp
                                     probability_mole = tmp
                                     max_probability = tmp / sum_tmp
+                                    max_probability_insn_lst = mismatch_insns[0]
                         else:
                             a = 0
                         mismatch_insn_index += 1
                     a = 0
+                if float(max_probability) > 0.5:
+                    logger.debug("\n\n\n========")
+                    logger.debug("Probability: %f" %float(max_probability))
+                    PrintInsn(max_probability_insn_lst)
+                    logger.debug("========\n\n\n")
                 result[packyara.name].append( (group_index, rule_index, probability_deno, probability_mole) )
                 logger.info( "%s  %s" %(probability_deno, probability_mole) )
                 logger.info( "%s  %f" %(probability_mole/probability_deno, float(probability_mole/probability_deno)) )

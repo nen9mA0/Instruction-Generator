@@ -372,8 +372,14 @@ if __name__ == "__main__":
 
     opc_lst = []
     for opcode in gens.ptn_dict:
-        opc_lst.append(opcode.hex())
-    opc_lst.sort(reverse=True, key=lambda x: len(x))
+        opc_lst.append( (opcode.hex(), gens.ptn_dict[opcode]) )
+    opc_lst.sort(reverse=True, key=lambda x: len(x[0]))
+    # for opc, iform in opc_lst:
+    #     mystr = opc + " "
+    #     for i in iform:
+    #         for iform_t in iform[i]["iform"]:
+    #             mystr += iform_t.iclass + " "
+    #     print(mystr)
 
     # sib mismatch has nothing to do with test bytes
     modrm_sib_bind = MakeMODRMSIBBind(gens)
@@ -381,13 +387,19 @@ if __name__ == "__main__":
     sib_mismatch_lst = GenSibMismatch(modrm_sib_bind, sib_modrm_lst)
 
     # test opcode mismatch
-    # bytes_rule = b"\xa4\xeb"
+    # bytes_rule = b"\x38\xeb"
     # bytes_rule = b"\x6a\x10\x68\x28\x89\x00\x01"
-    bytes_rule = b"\x03\xd3\xeb"
+    # bytes_rule = b"\x03\xd3\xeb"
     # bytes_rule = b"\x41\xe9"
+    # bytes_rule = b"\x83\x6d\xc0\x01\x0f\x85"
+    # bytes_rule = b"\xB2\x00\x8D\xB5\x00\x00\x00\x00\x8B\xFE\xB9\x12\x03\x00\x00\xAC\x32\xC2\xAA\xE2\xFA\xC3"
+    # bytes_rule = b"\x9C\x60\xE8\x00\x00\x00\x00\x5D\xB8\x57\x84\x40\x00\x2D\x50\x84\x40\x00"
+    # bytes_rule = b"\x8f\x45\x00"  # 出现前面单独出现ud0和ud2b的情况，且这两条指令不参与mismatch
+    bytes_rule = b"\x8d\x64\x24\xe9"
     orig_bytes_len = len(bytes_rule)
 
-    bytes_rule += b"\x00" * (15-orig_bytes_len)
+    # bytes_rule += b"\x00" * (15-orig_bytes_len)
+    bytes_rule += b"\x00" * 14
 
     mismatch_lst = []
     opcode_mismatch_lst = GenOpcodeMismatch(bytes_rule, search_trees)

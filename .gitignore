@@ -1,12 +1,19 @@
 */*
 
+
+!myInsGen/encoder/all-datafiles/basic_test/*
+
+myInsGen/encoder/all-datafiles/all_test
+myInsGen/encoder/all-datafiles/extension
+myInsGen/encoder/all-datafiles/just_for_test
+
 !myInsGen/encoder/
 myInsGen/encoder/log
 myInsGen/encoder/output
 myInsGen/encoder/.VSCodeCounter/
 myInsGen/encoder/.vscode
-myInsGen/encoder/all-datafiles
 myInsGen/encoder/Verify
-
+myInsGen/encoder/result
+myInsGen/encoder/bytes_rule_example
 *.pyc
 *.pkl

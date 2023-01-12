@@ -110,6 +110,7 @@ class YaraRuleGroup(object):
     rule_ptn = re.compile(r"^\s*\$(?P<name>[\d\w]+)*\s*=\s*\{(?P<rule>[0-9a-fA-F \(\)\|\?\[\-\]]+)\}\s*$")
     # string_ptn = re.compile(r"^\s*\$(?P<name>[\d\w]+)*\s*=\s*\"(?P<rule>.+)\"\s*fullword (ascii|wide)\s*$")
     string_ptn = re.compile(r"^\s*\$(?P<name>[\d\w]+)*\s*=\s*\"(?P<rule>.+)\".*$")
+    wildcard_ptn1 = re.compile(r"^\[(?P<low>\d+)(-(?P<high>\d+))?\]$")
     def __init__(self, rule_raw):
         self.rules = []
         p = self.rule_ptn.match(rule_raw)
@@ -187,13 +188,34 @@ class YaraRuleGroup(object):
         rule = self.ExpandWildCard(rule_raw)
         return rule
 
+    def CvtWildcard(self, low, high):
+        if low < high:
+            return "[%d-%d]" %(low, high)
+        elif low == high:
+            return "[%d]" %low
+        else:
+            raise ValueError("param low is larger than high")
+
+    def GetWildcardThres(self, str):
+        p = self.wildcard_ptn.match(str)
+        if p:
+            low = p.group("low")
+            high = p.group("high")
+            return low, high
+        else:
+            return None
+
     def ExpandWildCard(self, rule):
         new_rule = ""
         j = 0
         i = 0
         new_obj = ""
         expand_num = 0
+        wildcard = False
+        wildcard_high = 0
+        wildcard_low = 0
         while i < len(rule):
+            wildcard = False
             if not rule[i] in (' ', '[', ']', '|', '(', ')'):
                 # check
                 if not (self.IsNum(rule[i]) or rule[i] == '?'):
@@ -211,14 +233,26 @@ class YaraRuleGroup(object):
                             for num in expand_chr:
                                 expand_rule += new_obj.replace('?', num) + "|"
                             new_obj = expand_rule[:-1] + ")"
-                    new_rule += new_obj + " "
-                    new_obj = ""
+                        else:
+                            wildcard = True
+                            wildcard_high += 1
+                            wildcard_low += 1
+                            new_obj = ""
+                    if not wildcard:
+                        if  wildcard_high > 0:
+                            new_rule += self.CvtWildcard(wildcard_low, wildcard_high) + " "
+                            wildcard_high = 0
+                            wildcard_low = 0
+                        new_rule += new_obj + " "
+                        new_obj = ""
                 i += 1
             else:
                 if rule[i] == '[':
+                    wildcard = True
                     tmp = i
                     while rule[tmp] != ']':     # Here I didn't add an exception handle
                         tmp += 1
+                    low, high = self.CvtWildcard(rule[i:tmp+1])
                     new_rule += rule[i:tmp+1] + " "
                     i = tmp + 1
                 elif rule[i] != ' ':
