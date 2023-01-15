@@ -171,9 +171,7 @@ def GenModrmMismatch(test_bytes, modrm_bind):
     first_byte = test_bytes[0]
     modrm_mismatch_lst = []
     if first_byte in modrm_bind:
-        i = 0
         for byte in modrm_bind[first_byte]:
-            i += 1
             modrm_mismatch_lst.append( (byte, 0) )
     return modrm_mismatch_lst
 
@@ -252,82 +250,6 @@ def DisasmMismatch(cs, mismatch_lst, bytes_rule, length_first=0, restrict_one_in
                 mismatch_insn_lst.append( (insn_lst, len(mismatch_bytes)-mismatch_index) )
     return mismatch_insn_lst
 
-# Port from AutoYara_ngram
-def HashInsn(slice):
-    ret = b""
-    # checksum = self.HashBytes(slice)
-
-    # for debug
-    slice_bytes = b""
-
-    for insn in slice:
-        myhash = []
-        opcode_size = 1             # for add 
-                                    # 00 /r	ADD r/m8, r8	MR	Valid	Valid	Add r8 to r/m8.
-        for i in range(len(insn.opcode)-1, -1, -1):
-            if insn.opcode[i] != 0:
-                opcode_size = i+1
-                break
-        prefix_group = 0
-        prefix_size = 0
-        for i in range(len(insn.prefix)):
-            if insn.prefix[i] != 0:
-                prefix_group |= 1<<i
-                prefix_size += 1
-        opfix_size = opcode_size + prefix_size
-        insn_size = len(insn.bytes)
-        hash_type = 0
-        tmp_byte = (hash_type << 4) | insn_size
-
-        myhash.append( (tmp_byte<<3) | opfix_size )
-
-        mnemonic_len = len(insn.mnemonic)
-        mnemonic_too_long = False
-        if mnemonic_len >= 15:
-            mnemonic_too_long = True
-            mnemonic_len = 15
-        tmp_byte = (prefix_group << 4) | mnemonic_len
-        myhash.append(tmp_byte)
-
-        if prefix_size > 0:
-            for i in range(len(insn.prefix)):
-                if insn.prefix[i] != 0:
-                    myhash.append(insn.prefix[i])
-        myhash.extend(insn.opcode[:opcode_size])
-
-        ops = 0
-        op_num = 0
-        for i in insn.operands:
-            ops = ops << 2
-            op_num += 1
-            if i.type == capstone.x86.X86_OP_REG:
-                op_type = 1
-            elif i.type == capstone.x86.X86_OP_MEM:
-                op_type = 2
-            elif i.type == capstone.x86.X86_OP_IMM:
-                op_type = 3
-            else:
-                raise ValueError("")
-            ops |= op_type
-        if op_num > 4:
-            raise ValueError("")
-
-        for num in range(op_num, 4):
-            ops = ops << 2
-        myhash.append(ops)
-
-        tmp_byte = bytes(insn.mnemonic, "ascii")
-        if not mnemonic_too_long and len(tmp_byte) != mnemonic_len:
-            raise ValueError("Length different after encode")
-        ret += bytes(myhash) + tmp_byte
-        if mnemonic_too_long:
-            ret += b"\x00"
-
-        # for debug
-        slice_bytes += insn.bytes
-
-    return ret, slice_bytes
-
 
 
 if __name__ == "__main__":
@@ -395,7 +317,8 @@ if __name__ == "__main__":
     # bytes_rule = b"\xB2\x00\x8D\xB5\x00\x00\x00\x00\x8B\xFE\xB9\x12\x03\x00\x00\xAC\x32\xC2\xAA\xE2\xFA\xC3"
     # bytes_rule = b"\x9C\x60\xE8\x00\x00\x00\x00\x5D\xB8\x57\x84\x40\x00\x2D\x50\x84\x40\x00"
     # bytes_rule = b"\x8f\x45\x00"  # 出现前面单独出现ud0和ud2b的情况，且这两条指令不参与mismatch
-    bytes_rule = b"\x8d\x64\x24\xe9"
+    # bytes_rule = b"\x8d\x64\x24\xe9"
+    bytes_rule = b"\xa4\xeb"
     orig_bytes_len = len(bytes_rule)
 
     # bytes_rule += b"\x00" * (15-orig_bytes_len)
@@ -407,7 +330,7 @@ if __name__ == "__main__":
     modrm_mismatch_lst = GenModrmMismatch(bytes_rule, modrm_bind)
     mismatch_lst.append( ("Opcode Mismatch", opcode_mismatch_lst) )
     mismatch_lst.append( ("MODRM Mismatch", modrm_mismatch_lst) )
-    # mismatch_lst.append( ("SIB Mismatch", sib_mismatch_lst) )
+    mismatch_lst.append( ("SIB Mismatch", sib_mismatch_lst) )
 
 
     print("===== No Mismatch =====")

@@ -11,29 +11,31 @@ import HashTable
 import checker
 
 from global_init import *
+from ngram_slice import *
+import YaraReader
 
 import capstone
 import copy
 import binascii
 from fractions import Fraction
 
-import YaraReader
 import pickle
 
 
-yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\test.yar"
+# yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\test.yar"
+yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\autoyara.yar"
 
-gram1_database = "I:\\Project\\auto_yara\\ngram\\database\\1gram\\database.pkl"
-gram2_database = "I:\\Project\\auto_yara\\ngram\\database\\2gram\\database.pkl"
-gram3_database = "I:\\Project\\auto_yara\\ngram\\database\\3gram\\database.pkl"
-gram4_database = "I:\\Project\\auto_yara\\ngram\\database\\4gram\\database.pkl"
+gram1_database = "I:\\Project\\auto_yara\\ngram\\database\\database\\1gram_database.pkl"
+gram2_database = "I:\\Project\\auto_yara\\ngram\\database\\database\\2gram_database.pkl"
+gram3_database = "I:\\Project\\auto_yara\\ngram\\database\\database\\3gram_database.pkl"
+gram4_database = "I:\\Project\\auto_yara\\ngram\\database\\database\\4gram_database.pkl"
 
 gram_filename = [gram1_database, gram2_database, gram3_database, gram4_database]
 gram_data =     [None for i in range(len(gram_filename))]
 gram_database = [None for i in range(len(gram_filename))]
 gram_max = len(gram_data)-1
 
-result_file = "I:\\Project\\auto_yara\\GetStat\\final_data\\20221028\\test.pkl"
+result_file = "I:\\Project\\auto_yara\\GetStat\\final_data\\20230115\\test.pkl"
 slice_length = 4
 
 use_zero_padding = True
@@ -235,10 +237,12 @@ def CheckOpcodeMismatch(test_bytes, gens):
 
 # length to specify how long the bytes_rule appear in first disasm
 # 这里传入的ori_insn_index参数用来指示原bytes_rule中每条指令的长度。
-# 这边目前的处理是这样的，只考虑mismatch和原指令有相同后缀串的情况，因为后缀串不同计算n-gram似乎有问题（意义不明）
-# 因为存在大量n-gram数据集没有覆盖的情况，因此需要在这一步找到相同的后缀（注意，这里是n-gram，因此相同的后缀需要有(n-1)条对齐的指令）
-# 使用ori_insn_index参数实现。此后在计算概率时就可以不考虑
-def DisasmMismatch(cs, mismatch_lst, bytes_rule, ori_insn_index, length_first=0, restrict_one_insn=False):
+
+# [duplicate, 是有意义的]
+# ~~这边目前的处理是这样的，只考虑mismatch和原指令有相同后缀串的情况，因为后缀串不同计算n-gram似乎有问题（意义不明）~~
+# ~~因为存在大量n-gram数据集没有覆盖的情况，因此需要在这一步找到相同的后缀（注意，这里是n-gram，因此相同的后缀需要有(n-1)条对齐的指令）~~
+# ~~使用ori_insn_index参数实现。此后在计算概率时就可以不考虑~~
+def DisasmMismatch(cs, mismatch_lst, bytes_rule, ori_insn_index, length_first=0, restrict_one_insn=False, restrict_alignment=False):
     mismatch_insn_lst = []
     i = 0
     for mismatch_bytes, mismatch_index in mismatch_lst:
@@ -255,12 +259,12 @@ def DisasmMismatch(cs, mismatch_lst, bytes_rule, ori_insn_index, length_first=0,
         # 举个例子
         # bytes_rule第一字节为60，opcode mismatch的一个元素为66 60
         # 则传入的mismatch列表中60与bytes_rule中的第一个元素重复，所以mismatch_index为1
-        length_tmp = length_first + len(mismatch_bytes) - mismatch_index
+        # length_tmp = length_first + len(mismatch_bytes) - mismatch_index
         decode_len = mismatch_index - len(mismatch_bytes)
         ori_bytes_len = len(new_bytes) + decode_len     # 这里需要跟decode_len的初始值对齐
         if use_zero_padding:
-            new_bytes += b"\x00\x00\x00\x00\x00\x00\x00"
-        total_length = len(new_bytes)
+            new_bytes += b"\x00\x00\x00\x00\x00\x00\x00\x00"
+        # total_length = len(new_bytes)
         try:
             decode = cs.disasm(new_bytes, 0)
         except Exception as e:
@@ -284,112 +288,46 @@ def DisasmMismatch(cs, mismatch_lst, bytes_rule, ori_insn_index, length_first=0,
 
                 # === here restrict a bytes rule must be in one instruction ===
                 if restrict_one_insn:
-                    if decode_len >= length_tmp:
+                    if decode_len >= ori_bytes_len:
                         insn_lst.append(insn)
                     else:
                         break
                 # === if we don't use this restrict ===
                 else:
                     insn_lst.append(insn)
-            elif not get_alignment:
-                decode_len += insn.size
-                insn_lst.append(insn)
-            elif n > 0:
-                decode_len += insn.size
-                insn_lst.append(insn)
-                n -= 1
             else:
-                break
+                # 若为True，表示目前的模式是强制对齐的模式，若mismatch的结果与原rule在末尾没有对齐的指令则直接跳过
+                if restrict_alignment:
+                    if not get_alignment:
+                        decode_len += insn.size
+                        insn_lst.append(insn)
+                    elif n > 0:
+                        # 当找到第一个对齐指令，之后还需要往下找n-1个指令，n为ngram的长度
+                        decode_len += insn.size
+                        insn_lst.append(insn)
+                        n -= 1
+                    else:
+                        break
+                else:
+                    decode_len += insn.size
+                    insn_lst.append(insn)
             if decode_len >= ori_bytes_len:
                 break
-        if get_alignment:
-            mismatch_insn_lst.append( (insn_lst, mismatch_index - len(mismatch_bytes), decode_len) )
-        elif decode_len > ori_bytes_len:
-            pass
+        if restrict_alignment:
+            if get_alignment:
+                mismatch_insn_lst.append( (insn_lst, len(mismatch_bytes)-mismatch_index, decode_len) )
+            elif decode_len > ori_bytes_len:
+                pass
+        else:
+            if decode_len >= ori_bytes_len:
+                if len(insn_lst):
+                    mismatch_insn_lst.append( (insn_lst, len(mismatch_bytes)-mismatch_index, decode_len) )
+
             # logger.debug("Fully Mismatch %s" %new_bytes[:decode_len].hex())
         # if decode_len >= ori_bytes_len:
         #     if len(insn_lst):
         #         mismatch_insn_lst.append( (insn_lst, len(mismatch_bytes), decode_len) )
     return mismatch_insn_lst
-
-# Port from AutoYara_ngram
-def HashInsn(slice):
-    ret = b""
-    index = []
-    # checksum = self.HashBytes(slice)
-
-    # for debug
-    slice_bytes = b""
-
-    for insn in slice:
-        myhash = []
-        opcode_size = 1             # for add 
-                                    # 00 /r	ADD r/m8, r8	MR	Valid	Valid	Add r8 to r/m8.
-        for i in range(len(insn.opcode)-1, -1, -1):
-            if insn.opcode[i] != 0:
-                opcode_size = i+1
-                break
-        prefix_group = 0
-        prefix_size = 0
-        for i in range(len(insn.prefix)):
-            if insn.prefix[i] != 0:
-                prefix_group |= 1<<i
-                prefix_size += 1
-        opfix_size = opcode_size + prefix_size
-        insn_size = len(insn.bytes)
-        hash_type = 0
-        tmp_byte = (hash_type << 4) | insn_size
-
-        myhash.append( (tmp_byte<<3) | opfix_size )
-
-        mnemonic_len = len(insn.mnemonic)
-        mnemonic_too_long = False
-        if mnemonic_len >= 15:
-            mnemonic_too_long = True
-            mnemonic_len = 15
-        tmp_byte = (prefix_group << 4) | mnemonic_len
-        myhash.append(tmp_byte)
-
-        if prefix_size > 0:
-            for i in range(len(insn.prefix)):
-                if insn.prefix[i] != 0:
-                    myhash.append(insn.prefix[i])
-        myhash.extend(insn.opcode[:opcode_size])
-
-        ops = 0
-        op_num = 0
-        for i in insn.operands:
-            ops = ops << 2
-            op_num += 1
-            if i.type == capstone.x86.X86_OP_REG:
-                op_type = 1
-            elif i.type == capstone.x86.X86_OP_MEM:
-                op_type = 2
-            elif i.type == capstone.x86.X86_OP_IMM:
-                op_type = 3
-            else:
-                raise ValueError("")
-            ops |= op_type
-        if op_num > 4:
-            raise ValueError("")
-
-        for num in range(op_num, 4):
-            ops = ops << 2
-        myhash.append(ops)
-
-        tmp_byte = bytes(insn.mnemonic, "ascii")
-        if not mnemonic_too_long and len(tmp_byte) != mnemonic_len:
-            raise ValueError("Length different after encode")
-        ret += bytes(myhash) + tmp_byte
-        if mnemonic_too_long:
-            ret += b"\x00"
-
-        index.append(len(ret))
-        # for debug
-        # slice_bytes += insn.bytes
-    # return ret, slice_bytes
-    return ret, index
-
 
 def CvtBytesRule(bytes_rule_raw):
     if not '?' in bytes_rule_raw:
@@ -404,68 +342,185 @@ def CvtBytesRule(bytes_rule_raw):
 def ProbabilitySmooth(insn_lst, tmp_database):
     pass
 
+# [20230115 Duplicate]
 # 20221107: 因为最后计算的是指令序列在整个程序空间出现的概率，因此不需要参数n
 # 之前引入参数n是因为原来的算法需要将预测反汇编得到的序列概率与原bytes_rule进行比较，为了结果的准确性因此统一使用bytes_rule使用的n-gram参数n
-def GetProbability(my_lst, n=0, smooth=True, smooth_gram=2):
+# def GetProbability(my_lst, n=0, smooth=True, smooth_gram=2):
+#     lst = []
+
+#     insn_lst = my_lst[0]
+#     mismatch = my_lst[1]
+#     mydecode_len = my_lst[2]
+
+#     insn_len = len(insn_lst)
+#     if n == 0:
+#         if insn_len <= slice_length:
+#             n = insn_len
+#         else:
+#             n = slice_length
+#     tmp_data = gram_data[n-1]
+#     tmp_database = gram_database[n-1]
+
+#     # prior probability
+#     insn_hash, index = HashInsn(insn_lst[:n-1])
+#     if insn_hash in tmp_database["every_total"][n-2]:
+#         num = tmp_database["every_total"][n-2][insn_hash]
+#         total = tmp_database["total"]
+#     elif smooth:
+#         pass
+#     else:
+#         num = 0
+#         total = 1
+
+#     lst.append( (num, total) )
+
+#     i = 0
+#     for i in range(insn_len-n+1):
+#         insn_hash, index = HashInsn(insn_lst[i:i+n])
+#         if insn_hash in tmp_data:
+#             num, total = tmp_data[insn_hash]
+#         elif smooth:            # n-gram laplace smoothing
+#             num = 1
+#             flag = False
+#             low = -1 if (smooth_gram-2 < -1) else smooth_gram-2
+#             for j in range(n-2, low, -1):
+#                 new_hash = insn_hash[:index[j]]
+#                 if new_hash in tmp_database["every_total"][j]:
+#                     total = tmp_database["every_total"][j][new_hash] + tmp_database["total"]
+#                     flag = True
+#                     break
+#             if not flag:
+#                 if low > -1:
+#                     num = 0
+#                     total = 1
+#                 else:
+#                     total = tmp_database["total"]
+#             # add to hash for speeding
+#             tmp_data[insn_hash] = (num, total)
+#         else:
+#             num = 0
+#             total = 1
+
+#         if num == 0:
+#             break
+#         lst.append( (num, total) )
+#     return n, lst, mydecode_len
+
+# 新的概率计算，不使用smooth，但会对每个slice都求4种gram
+def GetProbability(my_lst):
     lst = []
+    insn_hash_lst = []      # 这里主要是给下面的ProbabilityAmend函数用，既然算过一遍就不再算了省点时间吧
 
     insn_lst = my_lst[0]
     mismatch = my_lst[1]
     mydecode_len = my_lst[2]
 
     insn_len = len(insn_lst)
-    if n == 0:
-        if insn_len <= slice_length:
-            n = insn_len
+    for i in range(1, slice_length+1):
+        lst.append([])
+        if insn_len < i:
+            # 如果当前指令长度小于gram数，直接返回None
+            lst[i-1].append(None)
         else:
-            n = slice_length
-    tmp_data = gram_data[n-1]
-    tmp_database = gram_database[n-1]
+            n = i
 
-    # prior probability
-    insn_hash, index = HashInsn(insn_lst[:n-1])
-    if insn_hash in tmp_database["every_total"][n-2]:
-        num = tmp_database["every_total"][n-2][insn_hash]
-        total = tmp_database["total"]
-    elif smooth:
-        pass
-    else:
-        num = 0
-        total = 1
+            tmp_data = gram_data[n-1]
+            tmp_database = gram_database[n-1]
 
-    lst.append( (num, total) )
-
-    i = 0
-    for i in range(insn_len-n+1):
-        insn_hash, index = HashInsn(insn_lst[i:i+n])
-        if insn_hash in tmp_data:
-            num, total = tmp_data[insn_hash]
-        elif smooth:            # n-gram laplace smoothing
-            num = 1
-            flag = False
-            low = -1 if (smooth_gram-2 < -1) else smooth_gram-2
-            for j in range(n-2, low, -1):
-                new_hash = insn_hash[:index[j]]
-                if new_hash in tmp_database["every_total"][j]:
-                    total = tmp_database["every_total"][j][new_hash] + tmp_database["total"]
-                    flag = True
-                    break
-            if not flag:
-                if low > -1:
+            # prior probability
+            if n > 1:
+                insn_hash, index = HashInsn(insn_lst[:n-1])
+                if insn_hash in tmp_database["every_total"][n-2]:
+                    num = tmp_database["every_total"][n-2][insn_hash]
+                    total = tmp_database["total"]
+                else:
                     num = 0
                     total = 1
-                else:
-                    total = tmp_database["total"]
-            # add to hash for speeding
-            tmp_data[insn_hash] = (num, total)
-        else:
-            num = 0
-            total = 1
+                lst[i-1].append( (num, total) )
+                i = 0
+            else:
+                # for 1-gram, which has no prior
+                i = 0
 
-        if num == 0:
-            break
-        lst.append( (num, total) )
-    return n, lst, mydecode_len
+            for j in range(insn_len-n+1):
+                insn_hash, index = HashInsn(insn_lst[j:j+n])
+                if n == 1:
+                    insn_hash_lst.append(insn_hash)
+                if insn_hash in tmp_data:
+                    num, total = tmp_data[insn_hash]
+                else:
+                    num = 0
+                    total = 1
+
+                if num == 0:
+                    break
+                lst[i-1].append( (num, total) )
+    return n, lst, mydecode_len, insn_hash_lst
+
+# 概率修正算法
+# TODO
+# 发现一个比较难办的情况：用capstone解析operand，有一些情况下操作数是固定的，如
+# a0 00 00 00 00          mov    al,ds:0x0
+# 这里al是固定的操作数，但operand中仍然会出现
+# 所以若直接以operand参数作为修正的依据，会出现误修正的情况，如这里目标操作数只可能是AL，但仍会按照寄存器修正方法乘上1/8
+# 目前看了几个编码类型，发现好像一般这种有固定操作数的情况不会使用modrm？(包括像mov cr0, eax这种指令)
+# 所以目前采用的处理方式是：先根据capstone提供的disp_size和imm_size将最重要的立即数类型修正好，剩下的字节数减去opcode和prefix长度
+# 剩下的字节就只可能是modrm或者sib，若存在modrm或sib则认为内存和寄存器操作数的编码是正常的，按照文档里的方法修正
+def ProbabilityAmend(insn_lst, insn_hash_lst):
+    amend_lst = []
+    i = 0
+    for insn in insn_lst:
+        amend_lst.append([])
+        insn_hash = insn_hash_lst[i]
+
+        opfix_size = insn_hash[0] & 0x7
+        prefix_group = insn_hash[1] >> 4
+        prefix_size = 0
+        for j in range(4):
+            if prefix_group & 1:
+                prefix_size += 1
+            prefix_group = prefix_group >> 1
+        opcode_size = opfix_size - prefix_size
+
+        # handle srm operand
+        opcode = insn_hash[2+prefix_size:2+opfix_size]
+        if opcode in opcode_cvt_dict:
+            # for srm operand insn, only has 8 cases of reg operand
+            amend_lst[i].append(8)
+        else:
+            # handle disp in mem
+            disp_size = insn.disp_size
+            imm_size = insn.imm_size
+            if disp_size:
+                amend_lst[i].append( 2**(disp_size*8) )
+            # handle imm
+            if imm_size:
+                amend_lst[i].append( 2**(imm_size*8) )
+            # if has modrm, remain_size must be 1, and if has sib, remain_size must be 2
+            remain_size = insn.size - opfix_size - imm_size - disp_size
+            if remain_size:
+                if remain_size >= 1 and remain_size <= 2:
+                    # has modrm, maybe has mem operand, or reg operand
+                    for operand in insn.operands:
+                        if operand.type == capstone.x86.X86_OP_REG:
+                            # reg
+                            amend_lst[i].append(8)
+                        elif operand.type == capstone.x86.X86_OP_MEM:
+                            # mem
+                            # for modrm encode
+                            amend_lst[i].append(8)
+                            if disp_size:
+                                # modrm + sib + displacement
+                                amend_lst[i].append(768)    # 256*3
+                            else:
+                                # modrm + sib
+                                amend_lst[i].append(256)
+                else:
+                    raise ValueError("Unexpected Instruction")
+
+        i += 1
+    return amend_lst
+
 
 # === for debug ===
 def PrintInsn(insn_lst):
@@ -567,11 +622,11 @@ if __name__ == "__main__":
                 modrm_mismatch_lst = GenModrmMismatch(bytes_rule, modrm_bind)
                 mismatch_lst.extend(opcode_mismatch_lst)
                 mismatch_lst.extend(modrm_mismatch_lst)
-                mismatch_lst.extend(sib_mismatch_lst)
+                # mismatch_lst.extend(sib_mismatch_lst)
 
                 ori_bytes_rule = bytes_rule
                 if use_zero_padding:
-                    bytes_rule += b"\x00\x00\x00\x00\x00\x00\x00"   # duplicated: we pad 6 bytes for fixing the last jump opcode
+                    bytes_rule += b"\x00\x00\x00\x00\x00\x00\x00\x00"   # duplicated: we pad 8 bytes for fixing the last jump opcode
                                                                     # don't do this because we don't know the operand of these jmp
                 ori_insn = []
                 ori_insn_index = []
@@ -599,30 +654,35 @@ if __name__ == "__main__":
                 ori_insn_num = 0
                 probability = 0.0
 
-                # n, ori_num, ori_total, ori_lst = GetProbability( (ori_insn, 0, decode_len), smooth_gram=1 )
-                n, ori_lst, mydecode_len = GetProbability( (ori_insn, 0, decode_len), smooth_gram=1, smooth=False )
+                # =======
+                n, ori_lst, mydecode_len, ori_insn_hash_lst = GetProbability( (ori_insn, 0, decode_len) )
+                ori_amend_lst = ProbabilityAmend(ori_insn, ori_insn_hash_lst)
+                # log probability
+                # P = a/b * c/d => log(P) = log( (a*c)/(b*d) ) = log(a)+log(c)-log(b)-log(d)
                 if len(ori_lst) == 0:
                     probability_deno = Fraction(1, 1)
                     probability_mole = Fraction(0, 1)
                 else:
                     # pre-calculated
-                    ori_probability_lst = []
-                    tmp = Fraction(1, 1)
-                    for num, total in ori_lst:
-                        tmp = tmp * Fraction(num, total)
-                        ori_probability_lst.append(tmp)
+                    # ori_probability_lst = []
+                    # tmp = Fraction(1, 1)
+                    # for num, total in ori_lst:
+                    #     tmp = tmp * Fraction(num, total)
+                    #     ori_probability_lst.append(tmp)
 
-                    probability_deno = Fraction(1, 1)       # 分母
-                    probability_mole = Fraction(0, 1)       # 分子
+                    # probability_deno = Fraction(1, 1)       # 分母
+                    # probability_mole = Fraction(0, 1)       # 分子
 
-                    max_probability = probability_mole / probability_deno
-                    max_probability_insn_lst = []
+                    # max_probability = probability_mole / probability_deno
+                    # max_probability_insn_lst = []
 
                     mismatch_insn_index = 0
                     for mismatch_insns in mismatch_insn_lst:
                         needed_len = len(mismatch_insns[0]) - n + 1
-                        a, lst, mydecode_len = GetProbability(mismatch_insns, n=n, smooth_gram=1, smooth=False)
-                        # a, num, total, lst = GetProbability(mismatch_insns, n, decode_len, smooth=False)
+                        a, lst, mydecode_len, insn_hash_lst = GetProbability(mismatch_insns)
+                        amend_lst = ProbabilityAmend(mismatch_insns[0], insn_hash_lst)
+                        # for debug
+                        continue
                         if len(lst) == needed_len:
                             # for debug
                             if len(lst) > 1:

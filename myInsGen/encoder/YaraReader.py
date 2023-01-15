@@ -1,6 +1,7 @@
 import re
 
 expand_chr = [chr(i) for i in range(ord('0'), ord('9')+1)] + [chr(i) for i in range(ord('a'), ord('f')+1)]
+rule_threshold = 200
 
 class YaraReader(object):
     packer_name_ptn = re.compile(r"^rule (?P<name>.*)\n$")
@@ -65,7 +66,7 @@ class PackerYara(object):
         self.rule_raw = []
         self.rule_groups = {}
         self.no_test = False        # Some Yara Rules That Didn't Match Our Test Conditions Will Be Mark As no_test
-        self.condition = None
+        self.cond = None
         needed = 0
         in_strings = False
         in_condition = False
@@ -83,7 +84,7 @@ class PackerYara(object):
                     needed |= 2
                 continue
             if in_strings:
-                rule_group = YaraRuleGroup(line)
+                rule_group = YaraRuleGroup(name, line)
                 self.rule_raw.append(line)
                 if rule_group.name and rule_group.type == "bytes":      # now only test bytes rules
                     self.rule_groups[rule_group.name] = rule_group
@@ -95,25 +96,33 @@ class PackerYara(object):
         if needed != self.need_mask:
             raise ValueError("Rule Uncomplete")
 
-    def AddRule(self, name, rule):
-        self.rule_raw.append(rule)
-        self.CvtRule(rule)
+    def __str__(self):
+        return "%s: %04d rules" %(self.name, len(self.rule_groups))
+
+    def __repr__(self):
+        return str(self)
+
+class TooManyRulesError(Exception):
+    def __init__(self, yara_name, rule_name):
+        self.yara_name = yara_name
+        self.rule_name = rule_name
 
     def __str__(self):
-        return "%s: %04d rules" %(self.name, len(self.rule))
+        return "Rule number in %s:%s receive threshold" %(self.yara_name, self.rule_name)
 
     def __repr__(self):
         return str(self)
 
 
 class YaraRuleGroup(object):
-    rule_ptn = re.compile(r"^\s*\$(?P<name>[\d\w]+)*\s*=\s*\{(?P<rule>[0-9a-fA-F \(\)\|\?\[\-\]]+)\}\s*$")
+    rule_ptn = re.compile(r"^\s*(?P<name>\$[\d\w]+)*\s*=\s*\{(?P<rule>[0-9a-fA-F \(\)\|\?\[\-\]]+)\}\s*$")
     # string_ptn = re.compile(r"^\s*\$(?P<name>[\d\w]+)*\s*=\s*\"(?P<rule>.+)\"\s*fullword (ascii|wide)\s*$")
-    string_ptn = re.compile(r"^\s*\$(?P<name>[\d\w]+)*\s*=\s*\"(?P<rule>.+)\".*$")
-    wildcard_ptn1 = re.compile(r"^\[(?P<low>\d+)(-(?P<high>\d+))?\]$")
-    def __init__(self, rule_raw):
+    string_ptn = re.compile(r"^\s*(?P<name>\$[\d\w]+)*\s*=\s*\"(?P<rule>.+)\".*$")
+    wildcard_ptn = re.compile(r"^\[(?P<low>\d+)(-(?P<high>\d+))?\]$")
+    def __init__(self, yara_name, rule_raw):
         self.rules = []
         p = self.rule_ptn.match(rule_raw)
+        self.yara_name = yara_name
         self.name = None
         self.type = ""
         if p:
@@ -121,7 +130,10 @@ class YaraRuleGroup(object):
             self.rule_raw = p.group("rule")
             self.type = "bytes"
             rule = self.PreprocessRule(self.rule_raw)
-            self.CvtRule(rule)
+            try:
+                self.CvtRule(rule)
+            except TooManyRulesError as e:
+                print(e)
         else:
             p = self.string_ptn.match(rule_raw)
             if p:
@@ -188,7 +200,9 @@ class YaraRuleGroup(object):
         rule = self.ExpandWildCard(rule_raw)
         return rule
 
-    def CvtWildcard(self, low, high):
+    def CvtWildcard(self, low, high=None):
+        if not high:
+            return "[%d]" %low
         if low < high:
             return "[%d-%d]" %(low, high)
         elif low == high:
@@ -201,9 +215,12 @@ class YaraRuleGroup(object):
         if p:
             low = p.group("low")
             high = p.group("high")
+            low = int(low)
+            if high:
+                high = int(high)
             return low, high
         else:
-            return None
+            return None, None
 
     def ExpandWildCard(self, rule):
         new_rule = ""
@@ -232,13 +249,13 @@ class YaraRuleGroup(object):
                                 raise ValueError("May Expand Too Many Rules: %d" %(16**expand_num))
                             for num in expand_chr:
                                 expand_rule += new_obj.replace('?', num) + "|"
-                            new_obj = expand_rule[:-1] + ")"
+                            new_obj = expand_rule[:-1] + ") "
                         else:
                             wildcard = True
                             wildcard_high += 1
                             wildcard_low += 1
                             new_obj = ""
-                    if not wildcard:
+                    if not wildcard:        # 延迟填充wildcard规则，因为可能出现[0-2] [0-2]这种规则，所以需要读取直到下一个元素不是wildcard再加入新的规则[0-4]
                         if  wildcard_high > 0:
                             new_rule += self.CvtWildcard(wildcard_low, wildcard_high) + " "
                             wildcard_high = 0
@@ -252,14 +269,19 @@ class YaraRuleGroup(object):
                     tmp = i
                     while rule[tmp] != ']':     # Here I didn't add an exception handle
                         tmp += 1
-                    low, high = self.CvtWildcard(rule[i:tmp+1])
-                    new_rule += rule[i:tmp+1] + " "
+                    low, high = self.GetWildcardThres(rule[i:tmp+1])
+                    wildcard_low += low
+                    if high:
+                        wildcard_high += high
+                    else:
+                        wildcard_high += low
                     i = tmp + 1
                 elif rule[i] != ' ':
-                    new_rule += rule[i]
+                    new_rule += rule[i] + " "
                     i += 1
                 else:
                     i += 1
+        new_rule = new_rule.strip()
         return new_rule
 
     def CvtRule(self, rule, suffix=""):
@@ -300,34 +322,55 @@ class YaraRuleGroup(object):
             elif ch == "[":
                 i += 1
                 begin_i = i
+                range_flag = False
                 while rule[i] != "]":
+                    if rule[i] == '-':
+                        range_flag = True
                     i += 1
 
-                end_i = i
-                i = begin_i
-                # handle jumpout number
-                begin_num, i_add = self.ReadNum(rule[i:])
-                if begin_num == -1:
-                    raise ValueError("")
-                end_num = begin_num
-                i += i_add
-                if i < end_i and rule[i] == '-':
-                    i += 1
-                    end_num, i_add = self.ReadNum(rule[i:])
-                    i += i_add
-                    if end_num == -1:
+                if range_flag:      # 对于[n]的情况不处理，只处理[n-m]
+                    end_i = i
+                    i = begin_i
+                    # handle jumpout number
+                    begin_num, i_add = self.ReadNum(rule[i:])
+                    if begin_num == -1:
                         raise ValueError("")
-                # check
-                if i != end_i:
+                    end_num = begin_num
+                    i += i_add
+                    if i < end_i and rule[i] == '-':
+                        i += 1
+                        end_num, i_add = self.ReadNum(rule[i:])
+                        i += i_add
+                        if end_num == -1:
+                            raise ValueError("")
+                    # check
+                    if i != end_i:
+                        raise ValueError("")
+
+                    # 以前把所有的[n]转换为n个??，现在反过来
+                    # for wildcard_num in range(begin_num, end_num):
+                    #     wildcard_lst = " ??" * wildcard_num
+                    #     self.CvtRule(rule[end_i+1:], suffix=myrule+wildcard_lst)
+
+                    # wildcard_lst = " ??" * end_num
+                    for wildcard_num in range(begin_num, end_num):
+                        wildcard_lst = " [%d]" %wildcard_num
+                        self.CvtRule(rule[end_i+1:], suffix=myrule+wildcard_lst)
+
+                    wildcard_lst = " [%d]" %end_num
+                    i = end_i + 1
+                    myrule += wildcard_lst
+            elif ch == "?":
+                i += 1
+                wildcard_num = 1
+                while rule[i] == '?' or rule[i] == ' ':
+                    if rule[i] == '?':
+                        wildcard_num += 1
+                    i += 1
+                if wildcard_num % 2:
                     raise ValueError("")
-
-                for wildcard_num in range(begin_num, end_num):
-                    wildcard_lst = " ??" * wildcard_num
-                    self.CvtRule(rule[end_i+1:], suffix=myrule+wildcard_lst)
-
-                wildcard_lst = " ??" * end_num
-                i = end_i + 1
-                myrule += wildcard_lst
+                wildcard_num = wildcard_num // 2
+                myrule += " [%d]" %wildcard_num
             elif ch == " ":
                 i += 1
                 myrule += " "
@@ -340,6 +383,8 @@ class YaraRuleGroup(object):
                 else:
                     raise ValueError("")
         self.rules.append(self.FormatRule(myrule))
+        if len(self.rules) >= rule_threshold:
+            raise TooManyRulesError(self.yara_name, self.name)
 
     def FormatRule(self, rule_str):
         i = 0
@@ -347,13 +392,34 @@ class YaraRuleGroup(object):
         while rule_str[i] == " " and i < len(rule_str):
             i += 1
 
+        # 这套写法针对wildcar全部转换为??的情况
+        # j = 0
+        # while i < len(rule_str):
+        #     if self.IsNum(rule_str[i]) or rule_str[i] == "?":
+        #         formatted_rule += rule_str[i]
+        #         j += 1
+        #         if j%2 == 0:
+        #             formatted_rule += " "
+        #     i += 1
+
         j = 0
+        in_wildcard = False
         while i < len(rule_str):
-            if self.IsNum(rule_str[i]) or rule_str[i] == "?":
+            if rule_str[i] in "[]":
                 formatted_rule += rule_str[i]
-                j += 1
-                if j%2 == 0:
+                if rule_str[i] == '[':
+                    if j%2:
+                        raise ValueError("")
+                    in_wildcard = True
+                elif rule_str[i] == ']':
                     formatted_rule += " "
+                    in_wildcard = False
+            elif self.IsNum(rule_str[i]):
+                formatted_rule += rule_str[i]
+                if not in_wildcard:
+                    j += 1
+                    if j%2 == 0:
+                        formatted_rule += " "
             i += 1
         if formatted_rule[-1] == " ":
             formatted_rule = formatted_rule[:-1]
@@ -365,10 +431,13 @@ class YaraConditionOp(object):
         self.lnode = lnode
         self.rnode = rnode
 
+    def __str__(self):
+        return "( %s ) %s ( %s )" %(str(self.lnode), self.op, str(self.rnode))
+
 class YaraConditionNode(object):
-    range_ptn = re.compile(r"^\s*\(?(?P<range>[\d\w]+) of (?P<total>[\w\d\$\(\)\*]+?)\)?\s*$")
+    range_ptn = re.compile(r"^(?P<range>[\d\w]+) of \(*(?P<total>[\w\d\$\*,]+)\)*\s*$")
     # num_ptn = re.compile(r"^\s*\(?(?P<range>[\d\w]+) of them\)?\s*$")
-    onerule_ptn = re.compile(r"^\s*\$(?P<range>[\w\d]+)\s*$")
+    onerule_ptn = re.compile(r"^\$(?P<range>[\w\d]+)\s*$")
     def __init__(self, cond_str, rule_groups):
         self.raw_cond = cond_str
         self.rule_groups = rule_groups
@@ -379,6 +448,7 @@ class YaraConditionNode(object):
         p = self.range_ptn.match(cond_str)
         if p:
             mytotal = p.group("total")
+            # total用来解析condition中的全局范围，them/$*表示范围为全部rule，其他情况则会指定rule的名字
             if mytotal == "them":
                 self.keys = self.rule_groups.keys()
             elif '$' in mytotal:
@@ -391,7 +461,18 @@ class YaraConditionNode(object):
                         if tmp_key in key:
                             self.keys.append(key)
                 else:
-                    raise ValueError("")
+                    self.keys = []
+                    keyname_lst = mytotal.split(",")
+                    all_keys = self.rule_groups.keys()
+                    for keyname in keyname_lst:
+                        keyname = keyname.strip()
+                        if keyname in all_keys:
+                            self.keys.append(keyname)
+                        else:
+                            # 这种情况有很大概率是因为对应的rule是一条ascii的rule，所以没有被读取，因此这边直接选择忽略而非抛出异常
+                            random_rule_group = next(iter(self.rule_groups))
+                            print("Rule %s not found in %s, Maybe it's a ascii rule, pass" %(keyname, self.rule_groups[random_rule_group].yara_name))
+                            # raise ValueError("")
             else:
                 raise ValueError("")
 
@@ -411,8 +492,16 @@ class YaraConditionNode(object):
                     self.type = "any"
                     self.keys = [myrange]
             else:
-                print(cond_str)
+                if not cond_str == "pe.is_32bit":
+                    print(cond_str)
                 self.type = "system"
+
+    def __str__(self):
+        return self.raw_cond
+
+    def __repr__(self):
+        return self.raw_cond
+
 
 class YaraCondition(object):
     ops = ("and", "or", "not")
@@ -431,15 +520,30 @@ class YaraCondition(object):
                 rnode = self.ParseCond(cond_str[index+len(op):])
                 break
         if not flag:
+            cond_str = cond_str.strip().strip("()")
             node = YaraConditionNode(cond_str, self.rule_groups)
+            if node.type == "system":
+                node = None
         else:
-            node = YaraConditionOp(lnode, rnode, op)
+            if not lnode:
+                node = rnode
+            elif not rnode:
+                node = lnode
+            else:
+                node = YaraConditionOp(lnode, rnode, op)
         return node
 
+    def __str__(self):
+        return str(self.cond_node)
+
+    def __repr__(self):
+        return str(self.cond_node)
 
 
-yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\autoyara.yar"
+# yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\autoyara.yar"
+# yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\test.yar"
 # yara_file = "I:\\Project\\auto_yara\\ngram\\new-rules\\automine_818.yar"
+yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\automine_accessible1016.yar"
 if __name__ == "__main__":
     with open(yara_file) as f:
         lines = f.readlines()
