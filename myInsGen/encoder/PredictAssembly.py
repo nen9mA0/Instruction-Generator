@@ -17,6 +17,7 @@ import YaraReader
 import capstone
 import copy
 import binascii
+import math
 from fractions import Fraction
 
 import pickle
@@ -420,7 +421,7 @@ def GetProbability(my_lst):
         lst.append([])
         if insn_len < i:
             # 如果当前指令长度小于gram数，直接返回None
-            lst[i-1].append(None)
+            lst[i-1] = None
         else:
             n = i
 
@@ -452,10 +453,10 @@ def GetProbability(my_lst):
                     num = 0
                     total = 1
 
-                if num == 0:
-                    break
+                # if num == 0:
+                #     break
                 lst[i-1].append( (num, total) )
-    return n, lst, mydecode_len, insn_hash_lst
+    return lst, mydecode_len, insn_hash_lst
 
 # 概率修正算法
 # TODO
@@ -521,6 +522,98 @@ def ProbabilityAmend(insn_lst, insn_hash_lst):
         i += 1
     return amend_lst
 
+# log probability
+# P = a/b * c/d => log(P) = log( (a*c)/(b*d) ) = log(a)+log(c)-log(b)-log(d)
+
+# for speed up
+log_num_dict = {}
+def CalcLogProbability(probability_lst, amend_lst):
+    # ====== convert to log probability ======
+    cvt_probability_lst = []
+    i = 0
+    for ngram_probability_lst in probability_lst:
+        if ngram_probability_lst:
+            cvt_probability_lst.append([])
+            for num, total in ngram_probability_lst:
+                tmp_log_probability = 0.0
+                if num:
+                    # for num
+                    if num in log_num_dict:
+                        tmp_num = log_num_dict[num]
+                    else:
+                        tmp_num = math.log(num)
+                        log_num_dict[num] = tmp_num
+                    tmp_log_probability += tmp_num
+                    # for total
+                    if total in log_num_dict:
+                        tmp_num = log_num_dict[total]
+                    else:
+                        tmp_num = math.log(total)
+                        log_num_dict[total] = tmp_num
+                    tmp_log_probability -= tmp_num
+
+                    # add to list
+                    cvt_probability_lst[i].append(tmp_log_probability)
+                else:
+                    # 若存在分母为0的情况，则log为负无穷
+                    cvt_probability_lst[i].append(float("-inf"))
+        else:
+            cvt_probability_lst.append(None)
+        i += 1
+
+    cvt_amend_lst = []
+    for insn_amend_lst in amend_lst:
+        tmp_log_probability = 0.0       # 默认修正概率为1（即不修正），对应log为0.0
+        for amend in insn_amend_lst:
+            if amend in log_num_dict:
+                tmp_num = log_num_dict[amend]
+            else:
+                tmp_num = math.log(amend)
+                log_num_dict[amend] = tmp_num
+            tmp_log_probability -= tmp_num
+        cvt_amend_lst.append(tmp_log_probability)
+
+    # calculate probability
+    # for every ngram
+    log_probability_lst = []
+    for n in range(len(cvt_probability_lst)):
+        if cvt_probability_lst[n]:          # if not None
+            log_probability = 0.0
+            flag = True
+            # == calculate like ngram formula first ==
+            for log_num in cvt_probability_lst[n]:
+                log_probability += log_num
+                if math.isinf(log_num):
+                    flag = False
+                    break
+            # == then do amend ==
+            if flag:
+                if n == 0:
+                    # for 1-gram, which has no prior
+                    # we can simply multiply all numbers
+                    for amend_log in cvt_amend_lst:
+                        log_probability += amend_log
+                else:
+                    # for n-gram, n>1
+                    # P(ABCDE) = P(ABC) * P(D|ABC) * P(E|BCD)
+                    #          = P(ABC) * P(ABCD) / P(ABC) * P(BCDE) / P(BCD)
+                    # so for n-gram
+                    # P'(lst) = P(lst[:n-1]) * P'(lst[:n-1])  *  P(lst[:n]) * P'(lst[:n]) / P(lst[:n-1]) / P'(lst[:n-1])
+                    # ============================
+
+                    # for prior
+                    for amend_log in cvt_amend_lst[:n]:
+                        log_probability += amend_log
+                    # for other probabilitys
+                    for j in range(len(cvt_amend_lst)-n):
+                        for amend_log in cvt_amend_lst[j:j+n+1]:
+                            log_probability += amend_log
+                        for amend_log in cvt_amend_lst[j:j+n]:
+                            log_probability -= amend_log
+            log_probability_lst.append(log_probability)
+        else:
+            log_probability_lst.append(None)
+    return log_probability_lst
 
 # === for debug ===
 def PrintInsn(insn_lst):
@@ -655,10 +748,11 @@ if __name__ == "__main__":
                 probability = 0.0
 
                 # =======
-                n, ori_lst, mydecode_len, ori_insn_hash_lst = GetProbability( (ori_insn, 0, decode_len) )
+                ori_lst, mydecode_len, ori_insn_hash_lst = GetProbability( (ori_insn, 0, decode_len) )
                 ori_amend_lst = ProbabilityAmend(ori_insn, ori_insn_hash_lst)
-                # log probability
-                # P = a/b * c/d => log(P) = log( (a*c)/(b*d) ) = log(a)+log(c)-log(b)-log(d)
+                ori_log_probability = CalcLogProbability(ori_lst, ori_amend_lst)
+
+
                 if len(ori_lst) == 0:
                     probability_deno = Fraction(1, 1)
                     probability_mole = Fraction(0, 1)
@@ -679,8 +773,9 @@ if __name__ == "__main__":
                     mismatch_insn_index = 0
                     for mismatch_insns in mismatch_insn_lst:
                         needed_len = len(mismatch_insns[0]) - n + 1
-                        a, lst, mydecode_len, insn_hash_lst = GetProbability(mismatch_insns)
+                        lst, mydecode_len, insn_hash_lst = GetProbability(mismatch_insns)
                         amend_lst = ProbabilityAmend(mismatch_insns[0], insn_hash_lst)
+                        log_probability = CalcLogProbability(lst, amend_lst)
                         # for debug
                         continue
                         if len(lst) == needed_len:
