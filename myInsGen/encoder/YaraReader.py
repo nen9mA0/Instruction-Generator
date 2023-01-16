@@ -121,6 +121,7 @@ class YaraRuleGroup(object):
     wildcard_ptn = re.compile(r"^\[(?P<low>\d+)(-(?P<high>\d+))?\]$")
     def __init__(self, yara_name, rule_raw):
         self.rules = []
+        self.probability = []
         p = self.rule_ptn.match(rule_raw)
         self.yara_name = yara_name
         self.name = None
@@ -328,7 +329,7 @@ class YaraRuleGroup(object):
                         range_flag = True
                     i += 1
 
-                if range_flag:      # 对于[n]的情况不处理，只处理[n-m]
+                if range_flag:      # 处理[n-m]
                     end_i = i
                     i = begin_i
                     # handle jumpout number
@@ -353,13 +354,20 @@ class YaraRuleGroup(object):
                     #     self.CvtRule(rule[end_i+1:], suffix=myrule+wildcard_lst)
 
                     # wildcard_lst = " ??" * end_num
+
                     for wildcard_num in range(begin_num, end_num):
-                        wildcard_lst = " [%d]" %wildcard_num
-                        self.CvtRule(rule[end_i+1:], suffix=myrule+wildcard_lst)
+                        if wildcard_num:
+                            wildcard_lst = " [%d]" %wildcard_num
+                            self.CvtRule(rule[end_i+1:], suffix=myrule+wildcard_lst)
+                        else:
+                            self.CvtRule(rule[end_i+1:], suffix=myrule)
 
                     wildcard_lst = " [%d]" %end_num
                     i = end_i + 1
                     myrule += wildcard_lst
+                else:
+                    # 若只是[n]，直接保留
+                    myrule += " %s" %rule[begin_i-1:i+1]
             elif ch == "?":
                 i += 1
                 wildcard_num = 1
@@ -541,9 +549,9 @@ class YaraCondition(object):
 
 
 # yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\autoyara.yar"
-# yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\test.yar"
+yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\test.yar"
 # yara_file = "I:\\Project\\auto_yara\\ngram\\new-rules\\automine_818.yar"
-yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\automine_accessible1016.yar"
+# yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\automine_accessible1016.yar"
 if __name__ == "__main__":
     with open(yara_file) as f:
         lines = f.readlines()

@@ -47,12 +47,14 @@ def HashInsn(slice, debug=False):
 
     for insn in slice:
         myhash = []
-        opcode_size = 1             # for add 
-                                    # 00 /r	ADD r/m8, r8	MR	Valid	Valid	Add r8 to r/m8.
-        for i in range(len(insn.opcode)-1, -1, -1):
-            if insn.opcode[i] != 0:
-                opcode_size = i+1
-                break
+
+        opcode_size = 1
+        opcode_lst = insn.opcode
+        if opcode_lst[0] == 0x0f:
+            if opcode_lst[1] == 0x38 or opcode_lst[1] == 0x3a:
+                opcode_size = 3
+            else:
+                opcode_size = 2
 
         prefix_group = 0
         prefix_size = 0
