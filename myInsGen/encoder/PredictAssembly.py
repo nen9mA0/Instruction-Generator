@@ -22,13 +22,18 @@ import decimal
 
 import pickle
 import copy
+import os
 
 
-debug = True
+# debug = True
+debug = False
 
+# 断点续执行功能，继续执行前别忘了把log保存
+break_continue_flag = True
 
-yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\test.yar"
+# yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\test.yar"
 # yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\autoyara.yar"
+yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\artificial.yar"
 
 gram1_database = "I:\\Project\\auto_yara\\ngram\\database\\database\\1gram_database.pkl"
 gram2_database = "I:\\Project\\auto_yara\\ngram\\database\\database\\2gram_database.pkl"
@@ -40,11 +45,14 @@ gram_data =     [None for i in range(len(gram_filename))]
 gram_database = [None for i in range(len(gram_filename))]
 gram_max = len(gram_data)-1
 
-result_file = "I:\\Project\\auto_yara\\GetStat\\final_data\\20230115\\test.pkl"
+result_file = "I:\\Project\\auto_yara\\GetStat\\data\\20230115\\artificial.pkl"
+# result_file = "I:\\Project\\auto_yara\\GetStat\\data\\20230115\\autoyara.pkl"
 slice_length = 4
 
 use_zero_padding = True
 padding_len = 8
+
+max_wildcard = 1
 
 # for logging
 log_name = ""
@@ -334,16 +342,56 @@ def DisasmMismatch(cs, mismatch_lst, bytes_rule, ori_insn_index, padding, length
         #         mismatch_insn_lst.append( (insn_lst, len(mismatch_bytes), decode_len) )
     return mismatch_insn_lst
 
+# 将bytes_rule转换为二进制形式，并且对wildcard进行展开
+# TODO: 目前对于处理多段wildcard的情况会产生非常大的计算量，因为每条子规则都会产生500条左右的mismatch，因此一段wildcard理论上就需要500*500的计算量，n段需要500^n（实际上在FilterMismatchInsn中进行了部分剪枝）
+#       因此目前对算法进行进一步的优化，具体的优化方法是限制wildcard段数，由全局变量max_wildcard确定（默认为2），若当前的wildcard段数超出max_wildcard，则会根据下列规则进行优化
+#       * 将rule近似处理成与max_wildcard段数相同的规则，主要遵循下列假设
+#         * 两个子规则串的距离越远，最终计算得到的概率越趋近于P1 * P2，因此优先在wildcard段落中寻找wildcard较长的情况进行切分
+#         * 若多段wildcard长度相等，则根据尽量保留每段bytes_rule最长的原则进行切分
+#       进行上述操作直至切分后的每条规则满足max_wildcard限制
+#       切分后的多条rule加入rule_group，并标记bytes_rule_type，之后计算时将连续被标记的rule概率相乘
+def DivideSubBytesRule(bytes_rule_lst_gap, bytes_rule_lst, bytes_rule_gap):
+    if len(bytes_rule_gap) > max_wildcard:
+        tmp_index = []
+        len_index = 0
+        max_gap = 0
+        for i in range(len(bytes_rule_gap)):
+            len_index += len(bytes_rule_lst[i])
+            tmp_index.append(len_index)
+            gap = bytes_rule_gap[i]
+            len_index += gap
+            if gap > max_gap:
+                max_gap = gap
+            tmp_index.append(len_index)
+        len_index += len(bytes_rule_lst[-1])
+        tmp_index.append(len_index)
+
+        # 获取距离中心最小的最长wildcard
+        gap_index = [i for i,j in enumerate(bytes_rule_gap) if j==max_gap]
+        new_bytes_rule_len_avg = (len_index - max_gap) / 2
+        min_distance = len_index
+        min_index = -1
+        for i in gap_index:
+            distance = abs(new_bytes_rule_len_avg - tmp_index[i*2+1])
+            if distance < min_distance:
+                min_distance = distance
+                min_index = i
+        DivideSubBytesRule(bytes_rule_lst_gap, bytes_rule_lst[:min_index+1], bytes_rule_gap[:min_index])
+        DivideSubBytesRule(bytes_rule_lst_gap, bytes_rule_lst[min_index+1:], bytes_rule_gap[min_index+1:])
+    else:
+        bytes_rule_lst_gap.append( (bytes_rule_lst, bytes_rule_gap) )
+
 def CvtBytesRule(bytes_rule_raw):
-    bytes_rule_lst = []
-    bytes_rule_gap = []
+    bytes_rule_lst_gap = []
     if not '[' in bytes_rule_raw:
         bytes_rule_raw = bytes_rule_raw.replace(' ', '')
         bytes_rule = binascii.a2b_hex(bytes_rule_raw)
-        bytes_rule_lst.append(bytes_rule)
-    else:           # now we just fill them with \x00
+        bytes_rule_lst_gap.append( ([bytes_rule], []) )
+    else:
         i = 0
         end = 0
+        bytes_rule_lst = []
+        bytes_rule_gap = []
         while i < len(bytes_rule_raw):
             if bytes_rule_raw[i] == '[':
                 begin = i
@@ -363,7 +411,10 @@ def CvtBytesRule(bytes_rule_raw):
         bytes_rule_tmp = bytes_rule_tmp.replace(' ', '')
         bytes_rule = binascii.a2b_hex(bytes_rule_tmp)
         bytes_rule_lst.append(bytes_rule)
-    return bytes_rule_lst, bytes_rule_gap
+
+        # max_wildcard处理
+        DivideSubBytesRule(bytes_rule_lst_gap, bytes_rule_lst, bytes_rule_gap)
+    return bytes_rule_lst_gap
 
 def ProbabilitySmooth(insn_lst, tmp_database):
     pass
@@ -735,8 +786,9 @@ def GetWildCardPosLst(bytes_rule_lst, bytes_rule_gap):
     return wildcard_pos_lst
 
 
-def DfsWildcardProbability(bytes_rule_lst_log_probability, bytes_rule_gap, bytes_rule_final_probability, prev_end_mismatch, index, p):
-    total = 0
+def DfsWildcardProbability(bytes_rule_lst_log_probability, bytes_rule_gap, bytes_rule_probability, prev_end_mismatch, index, p):
+    total_lst = [0] * slice_length
+    total_mismatch_lst = [0] * slice_length
     if index < len(bytes_rule_lst_log_probability):
         j = 0
         for log_probability, begin_mismatch, end_mismatch in bytes_rule_lst_log_probability[index]:
@@ -749,15 +801,43 @@ def DfsWildcardProbability(bytes_rule_lst_log_probability, bytes_rule_gap, bytes
                         new_p[i] += log_probability[i]
                     elif not log_probability[i]:
                         new_p[i] = None
-                total += DfsWildcardProbability(bytes_rule_lst_log_probability, bytes_rule_gap, bytes_rule_final_probability, end_mismatch, index+1, new_p)
+                new_total_lst, new_total_mismatch_lst = DfsWildcardProbability(bytes_rule_lst_log_probability, bytes_rule_gap, bytes_rule_probability, end_mismatch, index+1, new_p)
+                for i in range(slice_length):
+                    total_lst[i] += new_total_lst[i]
+                    total_mismatch_lst[i] += new_total_mismatch_lst[i]
             j += 1
-        return total
+        return total_lst, total_mismatch_lst
     else:
         for i in range(slice_length):
             # 如果p[i]为None，则直接忽略，对概率没有影响
             if p[i] != None:
-                bytes_rule_final_probability[i] += p[i].exp()
-        return 1
+                prob_tmp = p[i].exp()
+                if prob_tmp:
+                    bytes_rule_probability[i] += p[i].exp()
+                    total_mismatch_lst[i] += 1
+                total_lst[i] = 1
+        return total_lst, total_mismatch_lst
+
+def FilterMismatchInsn(bytes_rule_lst_log_probability, bytes_rule_gap):
+    new_lst = []
+    i = 0
+    gap_len = len(bytes_rule_gap)
+    for bytes_rule_log_probability in bytes_rule_lst_log_probability:
+        new_lst.append([])
+        for item in bytes_rule_log_probability:                 # prevent copy
+            log_probability, begin_mismatch, end_mismatch = item
+            # check end_mismatch
+            # 第一个rule，只需要比较end_mismatch
+            if i == 0 and end_mismatch <= bytes_rule_gap[i]:
+                new_lst[i].append(item)
+            # 最后一个rule，只需要比较begin_mismatch
+            elif i == gap_len and begin_mismatch <= bytes_rule_gap[i-1]:
+                new_lst[i].append(item)
+            # 中间的，需要比较两边
+            elif begin_mismatch <= bytes_rule_gap[i-1] and end_mismatch <= bytes_rule_gap[i]:
+                new_lst[i].append(item)
+        i += 1
+    return new_lst
 
 
 # === for debug ===
@@ -839,108 +919,156 @@ if __name__ == "__main__":
 
 
     result = {}
+    if break_continue_flag:
+        if os.path.exists(result_file):
+            with open(result_file, "rb") as f:
+                result = pickle.load(f)
+
     for packyara in packyara_lst:
-        logger.info("\n\n\n==== Processing %s ====" %packyara.name)
+        logger.info("==== Processing %s ====" %packyara.name)
         log_name = packyara.name
-        result[packyara.name] = []
         group_index = -1
+
+        # 有些规则因为都是string，解析不出来
+        if len(packyara.rule_groups) == 0:
+            logger.info("\tYara has no rule, run next")
+            continue
+
+        if break_continue_flag:
+            if packyara.name in result:
+                continue
         for group_name in packyara.rule_groups:
-            logger.info("\n\n=== RuleGroup %s ===" %group_name)
+            logger.info("\t=== RuleGroup %s ===" %group_name)
             rule_group = packyara.rule_groups[group_name]
             rule_index = -1
             group_index += 1
             for bytes_rule_raw in rule_group.rules:
-                bytes_rule_lst, bytes_rule_gap = CvtBytesRule(bytes_rule_raw)
-                bytes_rule_lst_log_probability = []
-                # for debug
-                if debug:
-                    all_insn_lst = []
-                for bytes_rule_index in range(len(bytes_rule_lst)):
-                    bytes_rule = bytes_rule_lst[bytes_rule_index]
-                    bytes_rule_log_probability = []
-                    ori_bytes_len = len(bytes_rule)
-                    rule_index += 1
-                    log_index = rule_index
-                    mismatch_lst = []
-                    opcode_mismatch_lst = GenOpcodeMismatch(bytes_rule, search_trees)
-                    # mismatch_lst_check = CheckOpcodeMismatch(test_bytes, gens)
-                    modrm_mismatch_lst = GenModrmMismatch(bytes_rule, modrm_bind)
-                    mismatch_lst.extend(opcode_mismatch_lst)
-                    mismatch_lst.extend(modrm_mismatch_lst)
-                    # mismatch_lst.extend(sib_mismatch_lst)
+                logger.info("\tRule: %s" %bytes_rule_raw)
+                bytes_rule_lst_gap = CvtBytesRule(bytes_rule_raw)
 
-                    ori_bytes_rule = bytes_rule
-                    padding = BytesRulePadding(bytes_rule_index, bytes_rule_lst, bytes_rule_gap)
-                    bytes_rule += padding
+                # 对于wildcard段数大于max_wildcard的处理
+                for bytes_rule_lst, bytes_rule_gap in bytes_rule_lst_gap:
+                    # 多个wildcard切分的子规则串之间的概率是相乘的关系
+                    bytes_rule_final_probability = [decimal.Decimal(1)] * slice_length
 
-                    wildcard_pos_lst = GetWildCardPosLst(bytes_rule_lst, bytes_rule_gap)
-
-                    ori_insn = []
-                    ori_insn_index = []
-                    try:
-                        decode = cs.disasm(bytes_rule, 0)
-                    except Exception as e:
-                        print(e)
-                        print("Disasm Bytes %s Failed!  PackYara: %s  Rule: %d" %(bytes_rule.hex(), log_name, rule_index))
-                        continue
-                    ori_decode_len = 0
-                    for insn in decode:
-                        ori_insn.append(insn)
-                        ori_decode_len += insn.size
-                        ori_insn_index.append(ori_decode_len)
-                        if ori_decode_len >= ori_bytes_len:
-                            break
-
-                    mismatch_insn_lst = DisasmMismatch(cs, mismatch_lst, ori_bytes_rule, ori_insn_index, padding)
-                    # if decode_len != len(bytes_rule):         # now the last byte of rule is an opcode of a jump/call/ret instruction
-                    #     # raise ValueError("Someting Wrong With Bytes %s? Disasm Failed" %(bytes_rule.hex()))
-                    #     print("Someting Wrong With Bytes %s? Disasm Failed!  PackYara: %s  Rule: %d" %(bytes_rule.hex(), packyara.name, rule_index))
-                    #     continue
-                    flag = False
-                    total_insn = 0
-                    ori_insn_num = 0
-                    probability = decimal.Decimal(0.0)
-
-                    # =======
-                    ori_insn_tuple = (ori_insn, 0, ori_decode_len-ori_bytes_len)
-                    ori_lst, ori_insn_hash_lst = GetProbability( ori_insn_tuple )
-                    ori_amend_lst = ProbabilityAmend(ori_insn_tuple, ori_insn_hash_lst, wildcard_pos_lst)
-                    ori_log_probability = CalcLogProbability(ori_lst, ori_amend_lst)
-
-                    bytes_rule_log_probability.append( (ori_log_probability, 0, ori_decode_len-ori_bytes_len) )
-
-                    mismatch_insn_index = 0
-                    for mismatch_insns in mismatch_insn_lst:
-                        lst, insn_hash_lst = GetProbability(mismatch_insns)
-                        amend_lst = ProbabilityAmend(mismatch_insns, insn_hash_lst, wildcard_pos_lst)
-                        log_probability = CalcLogProbability(lst, amend_lst)
-                        bytes_rule_log_probability.append( (log_probability, mismatch_insns[1], mismatch_insns[2]) )
-                    bytes_rule_lst_log_probability.append(bytes_rule_log_probability)
+                    bytes_rule_lst_log_probability = []
                     # for debug
                     if debug:
-                        all_insn_lst.append([ori_insn_tuple]+mismatch_insn_lst)
+                        all_insn_lst = []
 
-                bytes_rule_final_probability = []
-                for i in range(slice_length):
-                    bytes_rule_final_probability.append(decimal.Decimal(0.0))
-                total = 0
-                if len(bytes_rule_lst_log_probability) > 1:
-                    # 对于存在wildcard的情况
-                    # TODO: 文档中关于规则2的计算处理很繁琐（特别是如果考虑间隔多个wildcard的情况），后续再补充吧
-                    # TODO: 文档中关于计算方法的近似，我一直认为可以找到一个只跟指令长度的概率有关的方法近似计算wildcard之间的内容，之后考虑
-                    for log_probability, begin_mismatch, end_mismatch in bytes_rule_lst_log_probability[0]:
-                        total += DfsWildcardProbability(bytes_rule_lst_log_probability, bytes_rule_gap, bytes_rule_final_probability, end_mismatch, 1, copy.deepcopy(log_probability))
-                else:
-                    # 这种情况下bytes_rule_lst_log_probability只有一个元素
-                    for ngram_log_probability_lst in bytes_rule_lst_log_probability[0]:
-                        for i in range(slice_length):
-                            ngram_log_probability = ngram_log_probability_lst[0][i]
-                            if ngram_log_probability != None:
-                                bytes_rule_final_probability[i] += ngram_log_probability.exp()
-                                total += 1
-                rule_group.probability.append( (bytes_rule_final_probability, total) )
-            # with open(result_file, "wb") as f:                      # save every packer to prevent accident
-            #     pickle.dump(result, f)
+                    for bytes_rule_index in range(len(bytes_rule_lst)):
+                        bytes_rule = bytes_rule_lst[bytes_rule_index]
+                        bytes_rule_log_probability = []
+                        ori_bytes_len = len(bytes_rule)
+                        rule_index += 1
+                        log_index = rule_index
+                        mismatch_lst = []
+                        opcode_mismatch_lst = GenOpcodeMismatch(bytes_rule, search_trees)
+                        # mismatch_lst_check = CheckOpcodeMismatch(test_bytes, gens)
+                        modrm_mismatch_lst = GenModrmMismatch(bytes_rule, modrm_bind)
+                        mismatch_lst.extend(opcode_mismatch_lst)
+                        mismatch_lst.extend(modrm_mismatch_lst)
+                        # mismatch_lst.extend(sib_mismatch_lst)
+
+                        ori_bytes_rule = bytes_rule
+                        padding = BytesRulePadding(bytes_rule_index, bytes_rule_lst, bytes_rule_gap)
+                        bytes_rule += padding
+
+                        wildcard_pos_lst = GetWildCardPosLst(bytes_rule_lst, bytes_rule_gap)
+
+                        ori_insn = []
+                        ori_insn_index = []
+                        try:
+                            decode = cs.disasm(bytes_rule, 0)
+                        except Exception as e:
+                            print(e)
+                            print("Disasm Bytes %s Failed!  PackYara: %s  Rule: %d" %(bytes_rule.hex(), log_name, rule_index))
+                            continue
+                        ori_decode_len = 0
+                        for insn in decode:
+                            ori_insn.append(insn)
+                            ori_decode_len += insn.size
+                            ori_insn_index.append(ori_decode_len)
+                            if ori_decode_len >= ori_bytes_len:
+                                break
+
+                        mismatch_insn_lst = DisasmMismatch(cs, mismatch_lst, ori_bytes_rule, ori_insn_index, padding)
+                        # if decode_len != len(bytes_rule):         # now the last byte of rule is an opcode of a jump/call/ret instruction
+                        #     # raise ValueError("Someting Wrong With Bytes %s? Disasm Failed" %(bytes_rule.hex()))
+                        #     print("Someting Wrong With Bytes %s? Disasm Failed!  PackYara: %s  Rule: %d" %(bytes_rule.hex(), packyara.name, rule_index))
+                        #     continue
+                        flag = False
+                        total_insn = 0
+                        ori_insn_num = 0
+                        probability = decimal.Decimal(0.0)
+
+                        # =======
+                        ori_insn_tuple = (ori_insn, 0, ori_decode_len-ori_bytes_len)
+                        ori_lst, ori_insn_hash_lst = GetProbability( ori_insn_tuple )
+                        ori_amend_lst = ProbabilityAmend(ori_insn_tuple, ori_insn_hash_lst, wildcard_pos_lst)
+                        ori_log_probability = CalcLogProbability(ori_lst, ori_amend_lst)
+
+                        bytes_rule_log_probability.append( (ori_log_probability, 0, ori_decode_len-ori_bytes_len) )
+
+                        mismatch_insn_index = 0
+                        for mismatch_insns in mismatch_insn_lst:
+                            lst, insn_hash_lst = GetProbability(mismatch_insns)
+                            amend_lst = ProbabilityAmend(mismatch_insns, insn_hash_lst, wildcard_pos_lst)
+                            log_probability = CalcLogProbability(lst, amend_lst)
+                            bytes_rule_log_probability.append( (log_probability, mismatch_insns[1], mismatch_insns[2]) )
+                        bytes_rule_lst_log_probability.append(bytes_rule_log_probability)
+                        # for debug
+                        if debug:
+                            all_insn_lst.append([ori_insn_tuple]+mismatch_insn_lst)
+
+                    bytes_rule_probability = [decimal.Decimal(0)] * slice_length
+                    total_lst = [0] * slice_length              # 统计各个gram一共有多少条mismatch被计算
+                    total_mismatch_lst = [0] * slice_length     # 统计各个gram一共有多少条mismatch大于0
+                    if len(bytes_rule_lst_log_probability) > 1:
+                        # 对于存在wildcard的情况
+                        # TODO: 文档中关于规则2的计算处理很繁琐（特别是如果考虑间隔多个wildcard的情况），后续再补充吧
+                        # TODO: 文档中关于计算方法的近似，我一直认为可以找到一个只跟指令长度的概率有关的方法近似计算wildcard之间的内容，之后考虑
+                        # 这里因为直接算的话，当rule串中存在多段wildcard时效率实在是太低，而且目前没有处理规则2，所以直接先将超出wildcard的mismatch全部过滤掉
+                        bytes_rule_lst_log_probability = FilterMismatchInsn(bytes_rule_lst_log_probability, bytes_rule_gap)
+                        i = 0
+                        for log_probability, begin_mismatch, end_mismatch in bytes_rule_lst_log_probability[0]:
+                            new_total_lst, new_total_mismatch_lst = DfsWildcardProbability(bytes_rule_lst_log_probability, bytes_rule_gap, bytes_rule_probability, end_mismatch, 1, copy.deepcopy(log_probability))
+                            for i in range(slice_length):
+                                total_lst[i] += new_total_lst[i]
+                                total_mismatch_lst[i] += new_total_mismatch_lst[i]
+                            i += 1
+                    else:
+                        # 这种情况下bytes_rule_lst_log_probability只有一个元素
+                        for ngram_log_probability_lst in bytes_rule_lst_log_probability[0]:
+                            for i in range(slice_length):
+                                ngram_log_probability = ngram_log_probability_lst[0][i]
+                                if ngram_log_probability != None:
+                                    prob_tmp = ngram_log_probability.exp()
+                                    if prob_tmp:            # if not zero
+                                        bytes_rule_probability[i] += prob_tmp
+                                        total_mismatch_lst[i] += 1
+                                    else:
+                                        a = 0
+                                    total_lst[i] += 1
+                    for i in range(slice_length):
+                        bytes_rule_final_probability[i] *= bytes_rule_probability[i]
+                rule_group.AddRuleProbability( (bytes_rule_final_probability, total_lst, total_mismatch_lst) )
+            logger.info("\tProbability:")
+            for i in range(slice_length):
+                logger.info("\t\t%d-gram Probability:\t%35s  \tTotal Mismatch: %d  \tTotal Insn: %d" %(i+1, rule_group.probability[i], rule_group.total_mismatch_lst[i], rule_group.total_lst[i]))
+            logger.info("")
+            # 到这里，一条rule的概率被计算完成
+            a = 0
+
+        result[packyara.name] = packyara
+        with open(result_file, "wb") as f:                      # save every packer to prevent accident
+            pickle.dump(result, f)
+        # 到这里， 一条Yara规则中的所有rule都计算完概率了，下一步需要根据Yara条件计算最终的mismatch概率
+        packyara.CalcMismatch()
+        logger.info("=Total Mismatch Probability:=")
+        for i in range(slice_length):
+            logger.info("\t%d-gram Probability:\t%35s" %(i+1, packyara.mismatch_probability[i]))
+        logger.info("\n")
     a = 0
 
 # Done:  hash中使用了MODRM的reg，但没有区分哪条指令是确实使用reg来作为opcode的，这可能使得某些指令操作的寄存器不同就被当做不同指令

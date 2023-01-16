@@ -1,4 +1,8 @@
+from global_init import *
 import re
+import decimal
+
+slice_length = 4
 
 expand_chr = [chr(i) for i in range(ord('0'), ord('9')+1)] + [chr(i) for i in range(ord('a'), ord('f')+1)]
 rule_threshold = 200
@@ -70,6 +74,7 @@ class PackerYara(object):
         needed = 0
         in_strings = False
         in_condition = False
+        self.mismatch_probability = None
         for line in lines:
             p = self.keyword_ptn.match(line)
             if p:
@@ -88,13 +93,20 @@ class PackerYara(object):
                 self.rule_raw.append(line)
                 if rule_group.name and rule_group.type == "bytes":      # now only test bytes rules
                     self.rule_groups[rule_group.name] = rule_group
-                else:
-                    self.no_test = True
+                # Now some rules with string rule will also be tested
+                # else:
+                #     self.no_test = True
             elif in_condition:
-                self.cond = YaraCondition(line, self.rule_groups)
+                self.cond = YaraCondition(line, self)
                 in_condition = False
         if needed != self.need_mask:
             raise ValueError("Rule Uncomplete")
+        if not self.cond:
+            raise ValueError("Rule has no condition")
+
+    def CalcMismatch(self):
+        if self.cond:
+            self.mismatch_probability = self.cond.Calc()
 
     def __str__(self):
         return "%s: %04d rules" %(self.name, len(self.rule_groups))
@@ -115,13 +127,16 @@ class TooManyRulesError(Exception):
 
 
 class YaraRuleGroup(object):
-    rule_ptn = re.compile(r"^\s*(?P<name>\$[\d\w]+)*\s*=\s*\{(?P<rule>[0-9a-fA-F \(\)\|\?\[\-\]]+)\}\s*$")
+    rule_ptn = re.compile(r"^\s*(?P<name>\$[\d\w]*)*\s*=\s*\{(?P<rule>[0-9a-fA-F \(\)\|\?\[\-\]]+)\}\s*$")
     # string_ptn = re.compile(r"^\s*\$(?P<name>[\d\w]+)*\s*=\s*\"(?P<rule>.+)\"\s*fullword (ascii|wide)\s*$")
-    string_ptn = re.compile(r"^\s*(?P<name>\$[\d\w]+)*\s*=\s*\"(?P<rule>.+)\".*$")
+    string_ptn = re.compile(r"^\s*(?P<name>\$[\d\w]*)*\s*=\s*\"(?P<rule>.+)\".*$")
     wildcard_ptn = re.compile(r"^\[(?P<low>\d+)(-(?P<high>\d+))?\]$")
     def __init__(self, yara_name, rule_raw):
         self.rules = []
-        self.probability = []
+        self.rule_probability = []
+        self.probability = [decimal.Decimal(0)] * slice_length
+        self.total_lst = [0] * slice_length
+        self.total_mismatch_lst = [0] * slice_length
         p = self.rule_ptn.match(rule_raw)
         self.yara_name = yara_name
         self.name = None
@@ -143,6 +158,15 @@ class YaraRuleGroup(object):
                 self.type = "string"
             else:
                 raise ValueError("Rule Format Eror")
+
+    def AddRuleProbability(self, probability_lst):
+        if len(probability_lst[0]) != len(self.probability):
+            raise ValueError("")
+        self.rule_probability.append(probability_lst)
+        for i in range(slice_length):
+            self.probability[i] += probability_lst[0][i]
+            self.total_lst[i] += probability_lst[1][i]     # 统计该gram计算的所有mismatch串个数
+            self.total_mismatch_lst[i] += probability_lst[2][i]
 
     def IsNum(self, ch):
         if ch >= '0' and ch <= '9':
@@ -367,7 +391,8 @@ class YaraRuleGroup(object):
                     myrule += wildcard_lst
                 else:
                     # 若只是[n]，直接保留
-                    myrule += " %s" %rule[begin_i-1:i+1]
+                    myrule += "%s " %rule[begin_i-1:i+1]
+                    i += 1
             elif ch == "?":
                 i += 1
                 wildcard_num = 1
@@ -439,18 +464,101 @@ class YaraConditionOp(object):
         self.lnode = lnode
         self.rnode = rnode
 
+    def Calc(self):
+        # calculate first
+        lst = []
+        if self.lnode:
+            tmp = self.lnode.Calc()
+            if tmp != None:
+                lst.append(tmp)
+        if self.rnode:
+            tmp = self.rnode.Calc()
+            if tmp != None:
+                lst.append(tmp)
+
+        if self.op == "or":
+            probability = [decimal.Decimal(0)] * slice_length
+            for prob in lst:
+                for i in range(slice_length):
+                    probability[i] += prob[i]
+        elif self.op == "and":
+            probability = [decimal.Decimal(1)] * slice_length
+            for prob in lst:
+                for i in range(slice_length):
+                    probability[i] *= prob[i]
+        elif self.op == "not":
+            probability = [decimal.Decimal(1)] * slice_length
+            if len(lst) == 1:
+                for i in range(slice_length):
+                    probability[i] -= lst[0][i]
+            else:
+                raise ValueError("")
+        return probability
+
     def __str__(self):
         return "( %s ) %s ( %s )" %(str(self.lnode), self.op, str(self.rnode))
+
+    def __repr__(self):
+        return str(self)
 
 class YaraConditionNode(object):
     range_ptn = re.compile(r"^(?P<range>[\d\w]+) of \(*(?P<total>[\w\d\$\*,]+)\)*\s*$")
     # num_ptn = re.compile(r"^\s*\(?(?P<range>[\d\w]+) of them\)?\s*$")
-    onerule_ptn = re.compile(r"^\$(?P<range>[\w\d]+)\s*$")
-    def __init__(self, cond_str, rule_groups):
+    onerule_ptn = re.compile(r"^(?P<range>\$[\w\d]*)\s*$")
+    def __init__(self, cond_str, packyara):
         self.raw_cond = cond_str
-        self.rule_groups = rule_groups
+        self.packyara = packyara
+        self.rule_groups = packyara.rule_groups
         self.type = ""
         self.Parse(cond_str)
+
+    def Calc(self):
+        if self.type == "system":
+            # 这种情况不对结果产生影响，但因为可能采用了or或and运算符，所以返回None做特殊处理
+            return None
+        elif self.type == "any":
+            probability = [decimal.Decimal(0)] * slice_length
+            for rule_name in self.rule_groups:
+                for i in range(slice_length):
+                    probability[i] += self.rule_groups[rule_name].probability[i]
+            return probability
+        elif self.type == "all":
+            probability = [decimal.Decimal(1)] * slice_length
+            for rule_name in self.rule_groups:
+                for i in range(slice_length):
+                    probability[i] *= self.rule_groups[rule_name].probability[i]
+            return probability
+        elif self.type == "num":
+            probability = [decimal.Decimal(1)] * slice_length
+            rule_probability_lst = []
+
+            # ==========
+            # TODO: 这里有个让我纠结的问题，默认是按1gram排的，但1gram的顺序不一定是2gram的顺序
+            # 我觉得这里既然是计算整个规则的误匹配度，那我还是把每个gram都排序后再算吧
+
+            # 原来的做法是只按照1gram的排序来算
+            # for rule_name in self.rule_groups:
+            #     if rule_name in self.keys:
+            #         rule_probability_lst.append(self.rule_groups[rule_name].probability)
+            # rule_probability_lst.sort(reverse=True)
+
+            # 现在换成全部排序，注意，这样修改后rule_probability_lst的i和j与之前是相反的，之前第一维是每个mismatch指令，第二维是指令对应的4个gram，修改后需要排序gram所以是反的
+            for i in range(slice_length):
+                rule_probability_lst.append([])
+                for rule_name in self.rule_groups:
+                    if rule_name in self.keys:
+                        rule_probability_lst[i].append(self.rule_groups[rule_name].probability[i])
+                rule_probability_lst[i].sort(reverse=True)
+            # ==========
+
+            match_num = len(rule_probability_lst)
+            if match_num > self.num:        # if length of rule_probability_lst < number, maybe some rules are ignored, such as string rules 
+                match_num = self.num
+
+            for i in range(match_num):
+                for j in range(slice_length):
+                    probability[j] *= rule_probability_lst[j][i]
+            return probability
 
     def Parse(self, cond_str):
         p = self.range_ptn.match(cond_str)
@@ -458,7 +566,7 @@ class YaraConditionNode(object):
             mytotal = p.group("total")
             # total用来解析condition中的全局范围，them/$*表示范围为全部rule，其他情况则会指定rule的名字
             if mytotal == "them":
-                self.keys = self.rule_groups.keys()
+                self.keys = list(self.rule_groups.keys())
             elif '$' in mytotal:
                 if '*' in mytotal:
                     self.keys = []
@@ -479,7 +587,7 @@ class YaraConditionNode(object):
                         else:
                             # 这种情况有很大概率是因为对应的rule是一条ascii的rule，所以没有被读取，因此这边直接选择忽略而非抛出异常
                             random_rule_group = next(iter(self.rule_groups))
-                            print("Rule %s not found in %s, Maybe it's a ascii rule, pass" %(keyname, self.rule_groups[random_rule_group].yara_name))
+                            logger.warning("Rule %s not found in %s, Maybe it's a ascii rule, pass" %(keyname, self.rule_groups[random_rule_group].yara_name))
                             # raise ValueError("")
             else:
                 raise ValueError("")
@@ -501,7 +609,7 @@ class YaraConditionNode(object):
                     self.keys = [myrange]
             else:
                 if not cond_str == "pe.is_32bit":
-                    print(cond_str)
+                    logger.warning("Unhandle condition: %s" %cond_str)
                 self.type = "system"
 
     def __str__(self):
@@ -513,10 +621,13 @@ class YaraConditionNode(object):
 
 class YaraCondition(object):
     ops = ("and", "or", "not")
-    def __init__(self, cond_str, rule_groups):
+    def __init__(self, cond_str, packyara):
         self.raw_cond = cond_str
-        self.rule_groups = rule_groups
+        self.packyara = packyara
         self.cond_node = self.ParseCond(cond_str)
+
+    def Calc(self):
+        return self.cond_node.Calc()
 
     def ParseCond(self, cond_str):
         flag = False
@@ -529,7 +640,7 @@ class YaraCondition(object):
                 break
         if not flag:
             cond_str = cond_str.strip().strip("()")
-            node = YaraConditionNode(cond_str, self.rule_groups)
+            node = YaraConditionNode(cond_str, self.packyara)
             if node.type == "system":
                 node = None
         else:
@@ -548,10 +659,11 @@ class YaraCondition(object):
         return str(self.cond_node)
 
 
-# yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\autoyara.yar"
-yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\test.yar"
+yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\autoyara.yar"
+# yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\test.yar"
 # yara_file = "I:\\Project\\auto_yara\\ngram\\new-rules\\automine_818.yar"
 # yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\automine_accessible1016.yar"
+# yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\artificial.yar"
 if __name__ == "__main__":
     with open(yara_file) as f:
         lines = f.readlines()
