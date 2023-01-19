@@ -29,11 +29,21 @@ import os
 debug = False
 
 # 断点续执行功能，继续执行前别忘了把log保存
-break_continue_flag = True
+break_continue_flag = False
 
-# yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\test.yar"
+# 这边提供了两种概率的计算方式
+# * 概率相加的方式： 意思就是将mismatch的所有指令出现的概率相加，这种方式最终反映的是目标规则串在整个指令串空间中出现的概率，因此体现的是概率的分布情况。
+#     如规则为53 E9，假设整个空间的概率分布均匀，那53 E9出现的概率应该为1/65536，而计算得到的概率为0.0000092522943
+# * 取概率最大值的方式： 意思就是取mismatch的所有指令中概率最大的情况，这种方式是考虑到Yara规则匹配时，只需要匹配到一条符合规则的指令，因此这个概率可以反映这条Yara规则误匹配到一条指令的最大概率（即最坏情况）
+# 两种计算方式在计算mismatch指令串概率和计算存在wildcard时的概率（CalcWildcardProbability函数）存在比较大的区别
+# 其中若采用取概率最大值的方式，wildcard计算量会少很多，因为概率相加的方式需要遍历每一种指令串的组合情况，而取最大值的方式只需要将wildcard两边的bytes rule中mismatch概率最大的指令概率相乘
+# 因此使用该种计算方式时不需要限制wildcard段数（DivideSubBytesRule函数）
+use_max_probability = True
+
+# yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\test2.yar"
+yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\test_in_paper.yar"
 # yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\autoyara.yar"
-yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\artificial.yar"
+# yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\automine_accessible1016.yar"
 
 gram1_database = "I:\\Project\\auto_yara\\ngram\\database\\database\\1gram_database.pkl"
 gram2_database = "I:\\Project\\auto_yara\\ngram\\database\\database\\2gram_database.pkl"
@@ -45,14 +55,14 @@ gram_data =     [None for i in range(len(gram_filename))]
 gram_database = [None for i in range(len(gram_filename))]
 gram_max = len(gram_data)-1
 
-result_file = "I:\\Project\\auto_yara\\GetStat\\data\\20230115\\artificial.pkl"
-# result_file = "I:\\Project\\auto_yara\\GetStat\\data\\20230115\\autoyara.pkl"
+# result_file = "I:\\Project\\auto_yara\\GetStat\\data\\20230115\\automine_accessible1016.pkl"
+result_file = "I:\\Project\\auto_yara\\GetStat\\data\\20230115\\test_in_paper_1_max.pkl"
 slice_length = 4
 
 use_zero_padding = True
 padding_len = 8
 
-max_wildcard = 1
+max_wildcard = 3
 
 # for logging
 log_name = ""
@@ -351,7 +361,7 @@ def DisasmMismatch(cs, mismatch_lst, bytes_rule, ori_insn_index, padding, length
 #       进行上述操作直至切分后的每条规则满足max_wildcard限制
 #       切分后的多条rule加入rule_group，并标记bytes_rule_type，之后计算时将连续被标记的rule概率相乘
 def DivideSubBytesRule(bytes_rule_lst_gap, bytes_rule_lst, bytes_rule_gap):
-    if len(bytes_rule_gap) > max_wildcard:
+    if not use_max_probability and len(bytes_rule_gap) > max_wildcard:
         tmp_index = []
         len_index = 0
         max_gap = 0
@@ -968,7 +978,7 @@ if __name__ == "__main__":
                         modrm_mismatch_lst = GenModrmMismatch(bytes_rule, modrm_bind)
                         mismatch_lst.extend(opcode_mismatch_lst)
                         mismatch_lst.extend(modrm_mismatch_lst)
-                        # mismatch_lst.extend(sib_mismatch_lst)
+                        mismatch_lst.extend(sib_mismatch_lst)
 
                         ori_bytes_rule = bytes_rule
                         padding = BytesRulePadding(bytes_rule_index, bytes_rule_lst, bytes_rule_gap)
@@ -1016,10 +1026,52 @@ if __name__ == "__main__":
                             amend_lst = ProbabilityAmend(mismatch_insns, insn_hash_lst, wildcard_pos_lst)
                             log_probability = CalcLogProbability(lst, amend_lst)
                             bytes_rule_log_probability.append( (log_probability, mismatch_insns[1], mismatch_insns[2]) )
+                        
                         bytes_rule_lst_log_probability.append(bytes_rule_log_probability)
                         # for debug
                         if debug:
                             all_insn_lst.append([ori_insn_tuple]+mismatch_insn_lst)
+
+                        # print some infomation which will be used in paper
+                        # coefficient = [decimal.Decimal("1E5"), decimal.Decimal("1E5"), decimal.Decimal("1E5"), decimal.Decimal("1E5")]
+                        # max_probability = [decimal.Decimal(0)] * 4
+                        # logger.info("\tInsn:")
+                        # for insn in ori_insn:
+                        #     logger.info("\t%-13s:\t%s %s" %(insn.bytes.hex(), insn.mnemonic, insn.op_str))
+                        # logger.info("\t\tProbability:")
+                        # for i in range(slice_length):
+                        #     if ori_log_probability[i] != None:
+                        #         tmp = ori_log_probability[i].exp()*coefficient[i]
+                        #         if tmp > max_probability[i]:
+                        #             max_probability[i] = tmp
+                        #         logger.info("\t\t%d-gram Probability:\t%s" %(i+1,tmp))
+                        #     else:
+                        #         logger.info("\t\t%d-gram Probability:\t%s" %(i+1, 0))
+
+                        # for i in range(len(mismatch_insn_lst)):
+                        #     mismatch_insn = mismatch_insn_lst[i]
+                        #     insn_lst, mismatch_begin, mismatch_end = mismatch_insn
+                        #     is_type12 = False
+                        #     for insn in insn_lst:
+                        #         if bytes_rule[:ori_bytes_len] in insn.bytes:
+                        #             is_type12 = True
+                        #     if is_type12:
+                        #         logger.info("\tInsn:")
+                        #         for insn in insn_lst:
+                        #             logger.info("\t%-13s:\t%s %s" %(insn.bytes.hex(), insn.mnemonic, insn.op_str))
+                        #         logger.info("\t\tProbability:")
+                        #         for j in range(slice_length):
+                        #             log_probability, mismatch_begin, mismatch_end = bytes_rule_log_probability[i+1]
+                        #             if log_probability[j] != None:
+                        #                 tmp = log_probability[j].exp()*coefficient[j]
+                        #                 if tmp > max_probability[j]:
+                        #                     max_probability[j] = tmp
+                        #                 logger.info("\t\t%d-gram Probability:\t%s" %(j+1, tmp))
+                        #             else:
+                        #                 logger.info("\t\t%d-gram Probability:\t%s" %(j+1, 0))
+                        # logger.info("\nMax Probability")
+                        # for i in range(slice_length):
+                        #     logger.info("\t\t%d-gram Probability:\t%s" %(i+1, max_probability[i]))
 
                     bytes_rule_probability = [decimal.Decimal(0)] * slice_length
                     total_lst = [0] * slice_length              # 统计各个gram一共有多少条mismatch被计算
@@ -1030,13 +1082,38 @@ if __name__ == "__main__":
                         # TODO: 文档中关于计算方法的近似，我一直认为可以找到一个只跟指令长度的概率有关的方法近似计算wildcard之间的内容，之后考虑
                         # 这里因为直接算的话，当rule串中存在多段wildcard时效率实在是太低，而且目前没有处理规则2，所以直接先将超出wildcard的mismatch全部过滤掉
                         bytes_rule_lst_log_probability = FilterMismatchInsn(bytes_rule_lst_log_probability, bytes_rule_gap)
-                        i = 0
-                        for log_probability, begin_mismatch, end_mismatch in bytes_rule_lst_log_probability[0]:
-                            new_total_lst, new_total_mismatch_lst = DfsWildcardProbability(bytes_rule_lst_log_probability, bytes_rule_gap, bytes_rule_probability, end_mismatch, 1, copy.deepcopy(log_probability))
+                        if use_max_probability:
+                            prev_end_mismatch = 0
+                            index = 0
+                            for bytes_rule_log_probability in bytes_rule_lst_log_probability:
+                                # 注意这里是log后的数据，所以初值是-inf
+                                max_probability_in_one_mismatch = [decimal.Decimal("-inf")] * slice_length
+                                total_mismatch_lst_in_one_mismatch = [0] * slice_length
+                                for log_probability, begin_mismatch, end_mismatch in bytes_rule_log_probability:
+                                    gap = bytes_rule_gap[index-1]
+                                    if prev_end_mismatch + begin_mismatch <= gap:
+                                        for i in range(slice_length):
+                                            if log_probability[i] != None and log_probability[i] > max_probability_in_one_mismatch[i]:
+                                                max_probability_in_one_mismatch[i] = log_probability[i]
+                                            total_mismatch_lst_in_one_mismatch[i] += 1
+                                    prev_end_mismatch = end_mismatch
+                                for i in range(slice_length):
+                                    bytes_rule_probability[i] += max_probability_in_one_mismatch[i]
+                                    if total_lst[i]:
+                                        total_lst[i] *= total_mismatch_lst_in_one_mismatch[i]
+                                    else:
+                                        total_lst[i] = total_mismatch_lst_in_one_mismatch[i]
+                                index += 1
                             for i in range(slice_length):
-                                total_lst[i] += new_total_lst[i]
-                                total_mismatch_lst[i] += new_total_mismatch_lst[i]
-                            i += 1
+                                bytes_rule_probability[i] = bytes_rule_probability[i].exp()
+                        else:
+                            i = 0
+                            for log_probability, begin_mismatch, end_mismatch in bytes_rule_lst_log_probability[0]:
+                                new_total_lst, new_total_mismatch_lst = DfsWildcardProbability(bytes_rule_lst_log_probability, bytes_rule_gap, bytes_rule_probability, end_mismatch, 1, copy.deepcopy(log_probability))
+                                for i in range(slice_length):
+                                    total_lst[i] += new_total_lst[i]
+                                    total_mismatch_lst[i] += new_total_mismatch_lst[i]
+                                i += 1
                     else:
                         # 这种情况下bytes_rule_lst_log_probability只有一个元素
                         for ngram_log_probability_lst in bytes_rule_lst_log_probability[0]:
@@ -1044,31 +1121,39 @@ if __name__ == "__main__":
                                 ngram_log_probability = ngram_log_probability_lst[0][i]
                                 if ngram_log_probability != None:
                                     prob_tmp = ngram_log_probability.exp()
-                                    if prob_tmp:            # if not zero
-                                        bytes_rule_probability[i] += prob_tmp
-                                        total_mismatch_lst[i] += 1
+                                    if use_max_probability:
+                                        if bytes_rule_probability[i] < prob_tmp:
+                                            bytes_rule_probability[i] = prob_tmp
                                     else:
-                                        a = 0
+                                        if prob_tmp:            # if not zero
+                                            bytes_rule_probability[i] += prob_tmp
+                                            total_mismatch_lst[i] += 1
+                                        else:
+                                            a = 0
                                     total_lst[i] += 1
                     for i in range(slice_length):
                         bytes_rule_final_probability[i] *= bytes_rule_probability[i]
                 rule_group.AddRuleProbability( (bytes_rule_final_probability, total_lst, total_mismatch_lst) )
             logger.info("\tProbability:")
             for i in range(slice_length):
-                logger.info("\t\t%d-gram Probability:\t%35s  \tTotal Mismatch: %d  \tTotal Insn: %d" %(i+1, rule_group.probability[i], rule_group.total_mismatch_lst[i], rule_group.total_lst[i]))
+                if use_max_probability:
+                    logger.info("\t\t%d-gram Probability:\t%35s  \tTotal Insn: %d" %(i+1, rule_group.probability[i], rule_group.total_lst[i]))
+                else:
+                    logger.info("\t\t%d-gram Probability:\t%35s  \tTotal Mismatch: %d  \tTotal Insn: %d" %(i+1, rule_group.probability[i], rule_group.total_mismatch_lst[i], rule_group.total_lst[i]))
             logger.info("")
             # 到这里，一条rule的概率被计算完成
             a = 0
 
-        result[packyara.name] = packyara
-        with open(result_file, "wb") as f:                      # save every packer to prevent accident
-            pickle.dump(result, f)
         # 到这里， 一条Yara规则中的所有rule都计算完概率了，下一步需要根据Yara条件计算最终的mismatch概率
         packyara.CalcMismatch()
         logger.info("=Total Mismatch Probability:=")
         for i in range(slice_length):
             logger.info("\t%d-gram Probability:\t%35s" %(i+1, packyara.mismatch_probability[i]))
         logger.info("\n")
+
+        result[packyara.name] = packyara
+        with open(result_file, "wb") as f:                      # save every packer to prevent accident
+            pickle.dump(result, f)
     a = 0
 
 # Done:  hash中使用了MODRM的reg，但没有区分哪条指令是确实使用reg来作为opcode的，这可能使得某些指令操作的寄存器不同就被当做不同指令

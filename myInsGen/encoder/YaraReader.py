@@ -518,13 +518,13 @@ class YaraConditionNode(object):
             return None
         elif self.type == "any":
             probability = [decimal.Decimal(0)] * slice_length
-            for rule_name in self.rule_groups:
+            for rule_name in self.keys:
                 for i in range(slice_length):
                     probability[i] += self.rule_groups[rule_name].probability[i]
             return probability
         elif self.type == "all":
             probability = [decimal.Decimal(1)] * slice_length
-            for rule_name in self.rule_groups:
+            for rule_name in self.keys:
                 for i in range(slice_length):
                     probability[i] *= self.rule_groups[rule_name].probability[i]
             return probability
@@ -659,8 +659,8 @@ class YaraCondition(object):
         return str(self.cond_node)
 
 
-yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\autoyara.yar"
-# yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\test.yar"
+# yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\autoyara.yar"
+yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\test2.yar"
 # yara_file = "I:\\Project\\auto_yara\\ngram\\new-rules\\automine_818.yar"
 # yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\automine_accessible1016.yar"
 # yara_file = "I:\\Project\\auto_yara\\GetStat\\yara_rules\\20221028\\artificial.yar"
